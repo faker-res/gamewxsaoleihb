@@ -1,7 +1,7 @@
 /**
 * name 
 */
-module gamelonghu.page {
+module gamewxsaoleihb.page {
 	const enum TYPE_INDEX {
 		TYPE_WANFA_JIESHAO = 0,
 		TYPE_CARD_BEISHU = 1,

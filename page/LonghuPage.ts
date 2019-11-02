@@ -1,7 +1,7 @@
 /**
 * 牛牛
 */
-module gamelonghu.page {
+module gamewxsaoleihb.page {
 	export class LonghuPage extends game.gui.base.Page {
 		static readonly BET_TIME: number = 15;   //下注时长
 		static readonly BET_MAX: number[] = [5000, 8000, 25000, 50000];   //投注限额
