@@ -4,35 +4,32 @@
 module gamewxsaoleihb.page {
 	export class WxSaoLeiHBPageDef extends game.gui.page.PageDef {
 		static GAME_NAME: string;
-		//龙虎斗界面
-		static PAGE_LONGHU: string = "1";
-		//龙虎斗地图UI
-		static PAGE_LONGHU_MAP: string = "2";
-		//龙虎斗开始下注界面
-		static PAGE_LONGHU_BEGIN: string = "3";
-		//龙虎斗游戏VS界面
-		static PAGE_LONGHU_VS: string = "4";
-		//龙虎斗玩家列表界面
-		static PAGE_LONGHU_PLAYER_LIST: string = "5";
-		//龙虎斗停止下注界面
-		static PAGE_LONGHU_END: string = "6";
-		//龙虎斗大路界面
-		static PAGE_LONGHU_ROAD: string = "7";
-		//龙虎斗游戏规则界面
-		static PAGE_LONGHU_RULE: string = "101";
+		//红包HUD界面
+		static PAGE_WXSLHB_HUD: string = "1";
+		//红包地图UI
+		static PAGE_WXSLHB_MAP: string = "2";
+		//红包记录
+		static PAGE_WXSLHB_JL: string = "3";
+		//红包余额明细
+		static PAGE_WXSLHB_YEMX: string = "4";
+		//发红包界面
+		static PAGE_WXSLHB_FAHB: string = "5";
+		//红包详情
+		static PAGE_WXSLHB_HB_INFO: string = "6";
+		//红包游戏规则界面
+		static PAGE_WXSLHB_RULE: string = "101";
 
 
 		static myinit(str: string) {
 			super.myinit(str);
 			WxSaoLeiHBClip.init()
-			// PageDef._pageClassMap[WxSaoLeiHBPageDef.PAGE_LONGHU] = WxSaoLeiHBPage;
-			// PageDef._pageClassMap[WxSaoLeiHBPageDef.PAGE_LONGHU_MAP] = WxSaoLeiHBMapPage;
-			// PageDef._pageClassMap[WxSaoLeiHBPageDef.PAGE_LONGHU_BEGIN] = WxSaoLeiHBBeginPage;
-			// PageDef._pageClassMap[WxSaoLeiHBPageDef.PAGE_LONGHU_RULE] = WxSaoLeiHBRulePage;
-			// PageDef._pageClassMap[WxSaoLeiHBPageDef.PAGE_LONGHU_VS] = WxSaoLeiHBVSPage;
-			// PageDef._pageClassMap[WxSaoLeiHBPageDef.PAGE_LONGHU_PLAYER_LIST] = WxSaoLeiHBPlayerListPage;
-			// PageDef._pageClassMap[WxSaoLeiHBPageDef.PAGE_LONGHU_END] = WxSaoLeiHBEndPage;
-			// PageDef._pageClassMap[WxSaoLeiHBPageDef.PAGE_LONGHU_ROAD] = WxSaoLeiHBRoadPage;
+			PageDef._pageClassMap[WxSaoLeiHBPageDef.PAGE_WXSLHB_HUD] = WxSaoLeiHBPage;
+			PageDef._pageClassMap[WxSaoLeiHBPageDef.PAGE_WXSLHB_MAP] = WxSaoLeiHBMapPage;
+			PageDef._pageClassMap[WxSaoLeiHBPageDef.PAGE_WXSLHB_JL] = WxSaoLeiHBJLPage;
+			PageDef._pageClassMap[WxSaoLeiHBPageDef.PAGE_WXSLHB_YEMX] = WxSaoLeiHBYEMXPage;
+			PageDef._pageClassMap[WxSaoLeiHBPageDef.PAGE_WXSLHB_FAHB] = WxSaoLeiHBFAHBPage;
+			PageDef._pageClassMap[WxSaoLeiHBPageDef.PAGE_WXSLHB_RULE] = WxSaoLeiHBRulePage;
+			PageDef._pageClassMap[WxSaoLeiHBPageDef.PAGE_WXSLHB_HB_INFO] = WxSaoLeiHBInfoPage;
 
 
 			this["__needLoadAsset"] = [
@@ -42,53 +39,23 @@ module gamewxsaoleihb.page {
 				PathGameTongyong.atlas_game_ui_tongyong + "logo.atlas",
 				PathGameTongyong.atlas_game_ui_tongyong + "general.atlas",
 				PathGameTongyong.atlas_game_ui_tongyong + "touxiang.atlas",
-				Path_game_longhu.atlas_game_ui + "longhu.atlas",
 				PathGameTongyong.atlas_game_ui_tongyong + "tuichu.atlas",
 				DatingPath.atlas_dating_ui + "qifu.atlas",
-				Path_game_longhu.atlas_game_ui + "longhu/effect/bipai.atlas",
-				Path_game_longhu.atlas_game_ui + "longhu/effect/hu.atlas",
-				Path_game_longhu.atlas_game_ui + "longhu/effect/long.atlas",
-				PathGameTongyong.atlas_game_ui_tongyong + "general/effect/suiji.atlas",
-				PathGameTongyong.atlas_game_ui_tongyong + "general/effect/fapai_1.atlas",
-				PathGameTongyong.atlas_game_ui_tongyong + "general/effect/xipai.atlas",
-				PathGameTongyong.atlas_game_ui_tongyong + "general/effect/kaipai.atlas",
-
-				Path.custom_atlas_scene + 'card.atlas',
-				Path.custom_atlas_scene + 'chip.atlas',
-				PathGameTongyong.ui_tongyong_sk + "HeGuan.sk",
-				PathGameTongyong.ui_tongyong_sk + "HeGuan.png",
-
-				Path.map + 'pz_longhu.png',
-				Path.map_far + 'bg_longhu.jpg'
+				Path_game_wxSaoLeiHB.atlas_game_ui + "guize.atlas",
+				Path_game_wxSaoLeiHB.atlas_game_ui + "hud.atlas",
+				Path_game_wxSaoLeiHB.atlas_game_ui + "saolei.atlas",
+				Path_game_wxSaoLeiHB.atlas_game_ui + "sk.atlas",
 			]
 
 			if (WebConfig.needMusicPreload) {
 				this["__needLoadAsset"] = this["__needLoadAsset"].concat([
-					Path_game_longhu.music_longhu + "lh_bgm.mp3",
-					Path_game_longhu.music_longhu + "chouma.mp3",
-					Path_game_longhu.music_longhu + "dian1.mp3",
-					Path_game_longhu.music_longhu + "dian2.mp3",
-					Path_game_longhu.music_longhu + "dian3.mp3",
-					Path_game_longhu.music_longhu + "dian4.mp3",
-					Path_game_longhu.music_longhu + "dian5.mp3",
-					Path_game_longhu.music_longhu + "dian6.mp3",
-					Path_game_longhu.music_longhu + "dian7.mp3",
-					Path_game_longhu.music_longhu + "dian8.mp3",
-					Path_game_longhu.music_longhu + "dian9.mp3",
-					Path_game_longhu.music_longhu + "dian10.mp3",
-					Path_game_longhu.music_longhu + "dian11.mp3",
-					Path_game_longhu.music_longhu + "dian12.mp3",
-					Path_game_longhu.music_longhu + "dian13.mp3",
-					Path_game_longhu.music_longhu + "dingding_end.mp3",
-					Path_game_longhu.music_longhu + "dingding_start.mp3",
-					Path_game_longhu.music_longhu + "he.mp3",
-					Path_game_longhu.music_longhu + "hu_win.mp3",
-					Path_game_longhu.music_longhu + "long_win.mp3",
-					Path_game_longhu.music_longhu + "paoxiao.mp3",
-					Path_game_longhu.music_longhu + "piaoqian.mp3",
-					Path_game_longhu.music_longhu + "shouqian.mp3",
-					Path_game_longhu.music_longhu + "xiazhu_end.mp3",
-					Path_game_longhu.music_longhu + "xiazhu_start.mp3",
+					Path_game_wxSaoLeiHB.music_wxsaoleihb + "back.mp3",
+					Path_game_wxSaoLeiHB.music_wxsaoleihb + "btn.mp3",
+					Path_game_wxSaoLeiHB.music_wxsaoleihb + "colseReturn.mp3",
+					Path_game_wxSaoLeiHB.music_wxsaoleihb + "hongbao_tan.mp3",
+					Path_game_wxSaoLeiHB.music_wxsaoleihb + "newHongbao.mp3",
+					Path_game_wxSaoLeiHB.music_wxsaoleihb + "no_zhonglei.mp3",
+					Path_game_wxSaoLeiHB.music_wxsaoleihb + "zhonglei.mp3",
 				])
 			}
 		}

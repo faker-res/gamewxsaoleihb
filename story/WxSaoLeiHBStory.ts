@@ -1,5 +1,5 @@
 /**
-* name 牛牛剧情
+* name 微信扫雷红包
 */
 module gamewxsaoleihb.story {
 	const enum MAP_STATUS {
@@ -36,17 +36,14 @@ module gamewxsaoleihb.story {
 			}
 			this._game.sceneObjectMgr.on(SceneObjectMgr.EVENT_LOAD_MAP, this, this.onIntoNewMap);
 			this._game.sceneObjectMgr.on(SceneObjectMgr.EVENT_MAPINFO_CHANGE, this, this.onMapInfoChange);
-			// this._game.sceneObjectMgr.on(WxSaoLeiHBMapInfo.EVENT_BATTLE_CHECK, this, this.onUpdateBattle);
 			this._game.sceneObjectMgr.on(MapInfo.EVENT_STATUS_CHECK, this, this.onUpdateState);
-
-			// this.onUpdateBattle();
 		}
 
 		private onIntoNewMap(info?: MapAssetInfo): void {
 			if (!info) return;
 			this.onMapInfoChange();
 			this._game.uiRoot.closeAll();
-			this._game.uiRoot.HUD.open(WxSaoLeiHBPageDef.PAGE_LONGHU_MAP);
+			this._game.uiRoot.HUD.open(WxSaoLeiHBPageDef.PAGE_WXSLHB_MAP);
 		}
 
 		private onMapInfoChange(): void {
@@ -54,7 +51,7 @@ module gamewxsaoleihb.story {
 			this._niuMapInfo = mapinfo as WxSaoLeiHBMapInfo;
 			if (mapinfo) {
 				this.onUpdateState();
-				// this.onUpdateBattle();
+				this.onUpdateBattle();
 			}
 		}
 
@@ -71,22 +68,16 @@ module gamewxsaoleihb.story {
 
 					break;
 				case MAP_STATUS.PLAY_STATUS_PUSH_CARD:// 发牌阶段
-					// this.cardsDeal();
 					break;
 				case MAP_STATUS.PLAY_STATUS_BET:// 下注阶段
-					// this.cardsReDeal();
 					break;
 				case MAP_STATUS.PLAY_STATUS_STOP_BET:// 停止下注阶段
-					// this._wxSaoLeiHBMgr.isReConnect = false;
 					break;
 				case MAP_STATUS.PLAY_STATUS_SHOW_CARD:// 开牌阶段
-					// this.cardsReDeal();
 					break;
 				case MAP_STATUS.PLAY_STATUS_SETTLE:// 结算阶段
-					// this.cardsReDeal();
 					break;
 				case MAP_STATUS.PLAY_STATUS_SHOW_INFO:// 显示结算信息阶段
-					// this.cardsReDeal();
 					break;
 				case MAP_STATUS.PLAY_STATUS_RELAX:// 休息阶段
 					this._isShow = false;
@@ -95,84 +86,15 @@ module gamewxsaoleihb.story {
 			}
 		}
 
-		// createObj() {
-		// 	let card = this._game.sceneObjectMgr.createOfflineObject(SceneRoot.CARD_MARK, WxSaoLeiHBData) as WxSaoLeiHBData;
-		// 	card.pos = new Vector2(850, 175);
-		// 	return card;
-		// }
-
-		// //正常游戏发牌
-		// private cardsDeal(): void {
-		// 	if (!this._niuMapInfo) return;
-		// 	if (this._wxSaoLeiHBMgr.allCards.length) return;
-		// 	let cards = [0, 0, 0];
-		// 	let handle = new Handler(this, this.createObj);
-		// 	this._wxSaoLeiHBMgr.Init(cards, handle);
-		// 	this._wxSaoLeiHBMgr.sort();
-		// 	this._wxSaoLeiHBMgr.fapai();
-		// }
-
-		// //断线重连,重发下牌
-		// private cardsReDeal(): void {
-		// 	if (!this._niuMapInfo) return;
-		// 	if (this._wxSaoLeiHBMgr.allCards.length) return;
-		// 	let cards = [0, 0, 0];
-		// 	let handle = new Handler(this, this.createObj);
-		// 	this._wxSaoLeiHBMgr.Init(cards, handle);
-		// 	this._wxSaoLeiHBMgr.sort();
-		// 	this._wxSaoLeiHBMgr.refapai();
-		// 	// if (status <= WxSaoLeiHBStory.PLAY_STATUS_SHOW_CARD) {
-		// 	// 	this._wxSaoLeiHBMgr.isReConnect = false;
-		// 	// }
-		// 	// this._wxSaoLeiHBMgr.event(WxSaoLeiHBMgr.DEAL_OVER);
-		// }
-
 		// //战斗结构体 出牌
-		// private _index: number = 0;
-		// private onUpdateBattle(): void {
-		// 	if (!this._niuMapInfo) return;
-		// 	let battleInfoMgr = this._niuMapInfo.battleInfoMgr;
-		// 	for (let i: number = 0; i < battleInfoMgr.info.length; i++) {
-		// 		let info = battleInfoMgr.info[i];
-		// 		if (info instanceof gamecomponent.object.BattleInfoDeal) {
-		// 			let arr = this._wxSaoLeiHBMgr.initCard(info.Cards).concat();
-		// 			if (this._openCards.length < 2) {
-		// 				this._openCards = this._openCards.concat(arr)
-		// 			}
-		// 		}
-		// 	}
-		// 	if (this._wxSaoLeiHBMgr.isReConnect && this._curStatus >= MAP_STATUS.PLAY_STATUS_SHOW_CARD) {
-		// 		if (this._openCards && this._openCards.length > 0) {
-		// 			for (let i = 0; i < this._openCards.length; i++) {
-		// 				this._wxSaoLeiHBMgr.setValue(this._openCards[i], i);
-		// 			}
-		// 			if (!this._isShow) {
-		// 				if (this._wxSaoLeiHBMgr) {
-		// 					this._wxSaoLeiHBMgr.event(WxSaoLeiHBMgr.SHOW_OVER);
-		// 				}
-		// 				this._isShow = true;
-		// 			}
-		// 		}
-		// 	} else {
-		// 		if (this._openCards && this._openCards.length > 0) {
-		// 			for (let i = 0; i < this._openCards.length; i++) {
-		// 				Laya.timer.once(1800 + 1500 * i, this, () => {
-		// 					if (this._wxSaoLeiHBMgr) {
-		// 						this._wxSaoLeiHBMgr.setValue(this._openCards[i], i);
-		// 					}
-		// 				})
-		// 			}
-		// 			if (!this._isShow) {
-		// 				Laya.timer.once(4500, this, () => {
-		// 					if (this._wxSaoLeiHBMgr) {
-		// 						this._wxSaoLeiHBMgr.event(WxSaoLeiHBMgr.SHOW_OVER);
-		// 					}
-		// 					this._isShow = true;
-		// 				})
-		// 			}
-		// 		}
-		// 	}
-		// }
+		private _index: number = 0;
+		private onUpdateBattle(): void {
+			if (!this._niuMapInfo) return;
+			let battleInfoMgr = this._niuMapInfo.battleInfoMgr;
+			for (let i: number = 0; i < battleInfoMgr.info.length; i++) {
+				let info = battleInfoMgr.info[i];
+			}
+		}
 
 		enterMap() {
 			//各种判断
