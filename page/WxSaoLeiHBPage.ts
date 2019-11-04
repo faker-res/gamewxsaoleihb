@@ -60,7 +60,6 @@ module gamewxsaoleihb.page {
 			this._viewUI.img_room0.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.img_room1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.img_room2.on(LEvent.CLICK, this, this.onBtnClickWithTween);
-			this._viewUI.img_room3.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.btn_join.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 
 			for (let index = 0; index < this._viewUI.box_right.numChildren; index++) {
@@ -97,9 +96,6 @@ module gamewxsaoleihb.page {
 					break;
 				case this._viewUI.img_room2://0.1元场
 					this.checkMoneyToStory(Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_3);
-					break;
-				case this._viewUI.img_room3://1元场
-					this.checkMoneyToStory(Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_4);
 					break;
 				case this._viewUI.btn_join:
 					let maplv = TongyongUtil.getJoinMapLv(BuyuPageDef.GAME_NAME, mainPlayer.playerInfo.money);
@@ -167,7 +163,6 @@ module gamewxsaoleihb.page {
 				this._viewUI.img_room0.off(LEvent.CLICK, this, this.onBtnClickWithTween);
 				this._viewUI.img_room1.off(LEvent.CLICK, this, this.onBtnClickWithTween);
 				this._viewUI.img_room2.off(LEvent.CLICK, this, this.onBtnClickWithTween);
-				this._viewUI.img_room3.off(LEvent.CLICK, this, this.onBtnClickWithTween);
 				this._viewUI.btn_join.off(LEvent.CLICK, this, this.onBtnClickWithTween);
 			}
 			super.close();

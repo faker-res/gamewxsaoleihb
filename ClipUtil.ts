@@ -3,74 +3,17 @@
 */
 module gamewxsaoleihb {
     export class ClipUtil extends Laya.Box {
-        //货币 金色
-        public static MONEY_FONT2: any;
-        //龙虎局数 橘色
-        public static JU_FONT: any;
-        //排行榜
-        public static RANK_FONT2: any;
-        //加钱飘字
-        public static ADD_MONEY_FONT: any;
-        //扣钱飘字
-        public static SUB_MONEY_FONT: any;
-        //游戏回合数
-        public static GAME_ROUND: any;
+        //货币
+        public static MONEY_FONT: any;
 
         static init(): void {
-            this.MONEY_FONT2 = {
-                source: PathGameTongyong.atlas_game_ui_tongyong+ "general.atlas",
-                url: PathGameTongyong.ui_tongyong_general + 'clip_money1.png',
-                clipWidth: 16,
-                clipHeight: 22,
+            this.MONEY_FONT = {
+                source: Path_game_wxSaoLeiHB.atlas_game_ui+ "saolei.atlas",
+                url: Path_game_wxSaoLeiHB.ui_wxsaoleihb + 'clip_0-9.png',
+                clipWidth: 52,
+                clipHeight: 79,
                 clipX: 11,
                 space: 0
-            };
-            this.RANK_FONT2 = {
-                source: PathGameTongyong.atlas_game_ui_tongyong+ "general.atlas",
-                url: PathGameTongyong.ui_tongyong_general + 'clip_top.png',
-                clipWidth: 28,
-                clipHeight: 31,
-                clipX: 10,
-                space: 0
-            };
-
-            this.JU_FONT = {
-                source: Path_game_longhu.atlas_game_ui + "longhu.atlas",
-                url: Path_game_longhu.ui_longhu + 'clip_ju.png',
-                clipWidth: 60,
-                clipHeight: 64,
-                clipX: 10,
-                space: -5
-            };
-
-            //加钱飘字
-            this.ADD_MONEY_FONT = {
-                source: PathGameTongyong.atlas_game_ui_tongyong+ "general.atlas",
-                url: PathGameTongyong.ui_tongyong_general + 'clip_num1.png',
-                clipWidth: 25,
-                clipHeight: 32,
-                clipX: 11,
-                space: -8
-            };
-
-            //扣钱飘字
-            this.SUB_MONEY_FONT = {
-                source: PathGameTongyong.atlas_game_ui_tongyong+ "general.atlas",
-                url: PathGameTongyong.ui_tongyong_general + 'clip_num.png',
-                clipWidth: 25,
-                clipHeight: 32,
-                clipX: 11,
-                space: -8
-            };
-
-            //百家乐回合数
-            this.GAME_ROUND = {
-                source: PathGameTongyong.atlas_game_ui_tongyong+ "general.atlas",
-                url: PathGameTongyong.ui_tongyong_general + 'clip_zhuangtai.png',
-                clipWidth: 16,
-                clipHeight: 20,
-                clipX: 10,
-                space: -3
             };
         }
         private _clip: ClipCell;

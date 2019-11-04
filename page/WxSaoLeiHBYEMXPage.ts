@@ -21,7 +21,18 @@ module gamewxsaoleihb.page {
 		protected init(): void {
 			this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLei_MXUI');
 			this.addChild(this._viewUI);
+			this._viewUI.btn_back.on(LEvent.CLICK, this, this.close);
+			this._viewUI.list_ye.vScrollBarSkin = "";
+			this._viewUI.list_ye.scrollBar.elasticDistance = 100;
+			this._viewUI.list_ye.itemRender = this.createChildren("game_ui.wxsaoleihb.component.WXSaoLei_LB2UI", YEMX);
+			this._viewUI.list_ye.renderHandler = new Handler(this, this.renderHandler);
+		}
 
+		private renderHandler(cell: YEMX, index: number) {
+			if (cell) {
+				cell.dataSource["index"] = index;
+				cell.setData(this._game, cell.dataSource);
+			}
 		}
 
 		// 页面打开时执行函数
@@ -33,6 +44,22 @@ module gamewxsaoleihb.page {
 			if (this._viewUI) {
 			}
 			super.close();
+		}
+	}
+	class YEMX extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_LB2UI {
+		private _game: Game;
+		private _data: any;
+		constructor() {
+			super();
+		}
+		setData(game: Game, data: any) {
+			this._data = data;
+			if (!data) return;
+			this.lb_date.text = Sync.getTimeStr1(this._data.time);
+			this.lb_time.text = Sync.getTimeShortStr2(this._data.time);
+			this.lb_money.text = this._data.money;
+			// this.lb_type.text = this._data.name;
+			// this.lb_diff.text = this._data.money;
 		}
 	}
 }
