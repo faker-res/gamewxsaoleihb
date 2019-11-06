@@ -1,9 +1,8 @@
 //龙虎斗
-import WxSaoLeiHBMapInfo = gamewxsaoleihb.data.WxSaoLeiHBMapInfo;
-import WxSaoLeiHBPageDef = gamewxsaoleihb.page.WxSaoLeiHBPageDef;
-import WxSaoLeiHBStory = gamewxsaoleihb.story.WxSaoLeiHBStory;
+import WxSaoLeiHBMapInfo = gamewxsaoleihb.data.WxsaoleihbMapInfo;
+import WxsaoleihbPageDef = gamewxsaoleihb.page.WxsaoleihbPageDef;
+import WxSaoLeiHBStory = gamewxsaoleihb.story.WxsaoleihbStory;
 import WxSaoLeiHBMgr = gamewxsaoleihb.manager.WxSaoLeiHBMgr;
-import WxSaoLeiHBHudMgr = gamewxsaoleihb.manager.WxSaoLeiHBHudMgr
 //
 import Path_game_wxSaoLeiHB = gamewxsaoleihb.data.Path;
 import WxSaoLeiHBClip = gamewxsaoleihb.ClipUtil;

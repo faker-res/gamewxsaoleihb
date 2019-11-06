@@ -5,15 +5,50 @@ module gamewxsaoleihb {
     export class ClipUtil extends Laya.Box {
         //货币
         public static MONEY_FONT: any;
+        //HUD数字1
+        public static HUD_FONT1: any;
+        //HUD数字2
+        public static HUD_FONT2: any;
+        //HUD数字3
+        public static HUD_FONT3: any;
 
         static init(): void {
             this.MONEY_FONT = {
-                source: Path_game_wxSaoLeiHB.atlas_game_ui+ "saolei.atlas",
+                source: Path_game_wxSaoLeiHB.atlas_game_ui + "saolei.atlas",
                 url: Path_game_wxSaoLeiHB.ui_wxsaoleihb + 'clip_0-9.png',
                 clipWidth: 52,
                 clipHeight: 79,
                 clipX: 11,
                 space: 0
+            };
+            //HUD数字1
+            this.HUD_FONT1 = {
+                source: Path_game_wxSaoLeiHB.atlas_game_ui + "hud.atlas",
+                url: Path_game_wxSaoLeiHB.ui_wxsaoleihb + 'hud/clip_1.png',
+                clipWidth: 22,
+                clipHeight: 25,
+                clipX: 11,
+                space: -5
+            };
+
+            //HUD数字2
+            this.HUD_FONT2 = {
+                source: Path_game_wxSaoLeiHB.atlas_game_ui + "hud.atlas",
+                url: Path_game_wxSaoLeiHB.ui_wxsaoleihb + 'hud/clip_2.png',
+                clipWidth: 22,
+                clipHeight: 25,
+                clipX: 11,
+                space: -5
+            };
+
+            //HUD数字3
+            this.HUD_FONT3 = {
+                source: Path_game_wxSaoLeiHB.atlas_game_ui + "hud.atlas",
+                url: Path_game_wxSaoLeiHB.ui_wxsaoleihb + 'hud/clip_3.png',
+                clipWidth: 21,
+                clipHeight: 24,
+                clipX: 11,
+                space: -5
             };
         }
         private _clip: ClipCell;
@@ -136,7 +171,7 @@ module gamewxsaoleihb {
         private _preSkin: string = null;
         private _postSkin: string = null;
         public setText(str: any, needZero: boolean = false, isTween: boolean = false, preSkin: string = null, postSkin: string = null): void {
-            if (this._num == str && this._needZero == needZero && this._isTween == isTween && this._preSkin == preSkin && this._postSkin == postSkin)  {
+            if (this._num == str && this._needZero == needZero && this._isTween == isTween && this._preSkin == preSkin && this._postSkin == postSkin) {
                 return;
             }
             this._num = str;

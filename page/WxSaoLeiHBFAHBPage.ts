@@ -3,16 +3,12 @@
 */
 module gamewxsaoleihb.page {
 	export class WxSaoLeiHBFAHBPage extends game.gui.base.Page {
-		private static readonly TYPE_DANLEI = 1;//单雷
-		private static readonly TYPE_DUOLEI = 2;//多雷
-		private static readonly BAO_NUMS: Array<number> = [7, 9];//红包数
-		private static readonly LEI_MAX_NUM: number = 9;//最大雷点数
-		private static readonly LEI_HAO: Array<number> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];//雷号
 		private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLei_HBUI;
-		private _type: number;
-		private _baoNum: number;
-		private _leiDian: Array<number> = [];
-		private _money: number;
+		private _type: number;	//红包类型
+		private _baoNum: number;//红包数
+		private _leiDian: Array<number> = [];//雷点数
+		private _money: number;//红包金额
+		private _mapinfo: WxSaoLeiHBMapInfo;
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);
 			this._isNeedBlack = true;
@@ -37,45 +33,46 @@ module gamewxsaoleihb.page {
 			this._viewUI.tab_hb.selectHandler = Handler.create(this, this.selectHandler, null, false);
 			this._viewUI.btn_random.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.btn_send.on(LEvent.CLICK, this, this.onBtnClickWithTween);
-			this._viewUI.btn_back.on(LEvent.CLICK,this,this.close);
+			this._viewUI.btn_back.on(LEvent.CLICK, this, this.close);
+			this._viewUI.hb_danL_num1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
+			this._viewUI.hb_danL_num2.on(LEvent.CLICK, this, this.onBtnClickWithTween);
+			this._viewUI.hb_duoL_num1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
+
+
+			this._viewUI.tab_hb.selectedIndex = 0;
+			this.updateViewUI();
 		}
 
-		private initUI(): void {
+		private updateViewUI(): void {
 			let mainPlayer: PlayerData = this._game.sceneObjectMgr.mainPlayer;
 			if (!mainPlayer) return;
 			let playerInfo = mainPlayer.playerInfo;
 			if (!playerInfo) return;
-			for (let i = 0; i < WxSaoLeiHBFAHBPage.LEI_MAX_NUM; i++) {
+			for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {
 				this._viewUI["btn_" + i].on(LEvent.CLICK, this, this.onLeiDianClick, [i]);
 			}
-			this._game.sceneObjectMgr.mainPlayer
 			this._viewUI.lb_ye.text = playerInfo.money.toString();
 			//红包发放范围
-			this._viewUI.lb_range.text = StringU.substitute("红包发放范围：{0}-{1}", );
+			this._mapinfo = this._game.sceneObjectMgr.mapInfo as WxSaoLeiHBMapInfo;
+			let mapLv = this._mapinfo.GetMapLevel();
+			let index = WxSaoLeiHBMgr.ALL_GAME_ROOM_CONFIG_ID.indexOf(mapLv);
+			if (index < 0) index = 0;
+			this._viewUI.lb_range.text = StringU.substitute("红包发放范围：{0}-{1}", WxSaoLeiHBMgr.MIN_TEMP[index], WxSaoLeiHBMgr.MAX_TEMP[index]);
 		}
 
 		private onLeiDianClick(index: number): void {
-			if (this._type == WxSaoLeiHBFAHBPage.TYPE_DANLEI) {
-				for (let i = 0; i < WxSaoLeiHBFAHBPage.LEI_MAX_NUM; i++) {
-					if (i == index) {
-						this._viewUI["btn_" + i].selected = true;
-						this._leiDian = [index];
-					} else {
-						this._viewUI["btn_" + i].selected = false;
-					}
-				}
-			} else if (this._type == WxSaoLeiHBFAHBPage.TYPE_DUOLEI) {
-				for (let i = 0; i < WxSaoLeiHBFAHBPage.LEI_MAX_NUM; i++) {
-					//不重复记录
-					if (this._leiDian.indexOf(i) > -1) continue;
-					if (i == index) {
-						this._viewUI["btn_" + i].selected = true;
-						this._leiDian.push(index);
-					} else {
-						this._viewUI["btn_" + i].selected = false;
-					}
+			let have_index = this._leiDian.indexOf(index)
+			if (have_index > -1) {
+				//有的要去除掉
+				this._leiDian.splice(have_index, 1);
+			} else {
+				if (this._type == WxSaoLeiHBMgr.TYPE_DANLEI - 1) {
+					this._leiDian = [index];
+				} else if (this._type == WxSaoLeiHBMgr.TYPE_DUOLEI - 1) {
+					this._leiDian.push(index);
 				}
 			}
+			this.updateLeiDianUI();
 		}
 
 		protected onBtnTweenEnd(e: any, target: any) {
@@ -83,20 +80,15 @@ module gamewxsaoleihb.page {
 				case this._viewUI.btn_random:
 					this._leiDian = [];
 					let randomIndex: number
-					if (this._type == WxSaoLeiHBFAHBPage.TYPE_DANLEI) {
-						//随机红包数
-						randomIndex = MathU.randomRange(0, WxSaoLeiHBFAHBPage.BAO_NUMS.length - 1);
-						this._baoNum = WxSaoLeiHBFAHBPage.BAO_NUMS[randomIndex];
+					if (this._type == WxSaoLeiHBMgr.TYPE_DANLEI - 1) {
 						//随机雷点
 						let randomNum = MathU.randomRange(0, 9);
 						this._leiDian = [randomNum];
-					} else if (this._type = WxSaoLeiHBFAHBPage.TYPE_DUOLEI) {
-						//固定包数
-						this._baoNum = WxSaoLeiHBFAHBPage.BAO_NUMS[1];
+					} else if (this._type = WxSaoLeiHBMgr.TYPE_DUOLEI - 1) {
 						//随机雷点数
-						let leiDianNum = MathU.randomRange(1, WxSaoLeiHBFAHBPage.LEI_MAX_NUM);
+						let leiDianNum = MathU.randomRange(1, WxSaoLeiHBMgr.LEI_MAX_NUM);
 						//随机雷点
-						let leiDianNums = WxSaoLeiHBFAHBPage.LEI_HAO;
+						let leiDianNums = [].concat(WxSaoLeiHBMgr.LEI_HAO);	//预防数组引用
 						while (leiDianNum > 0) {
 							randomIndex = MathU.randomRange(0, leiDianNums.length - 1);
 							this._leiDian.push(leiDianNums[randomIndex]);
@@ -104,6 +96,7 @@ module gamewxsaoleihb.page {
 							leiDianNum--;
 						}
 					}
+					this.updateLeiDianUI();
 					break
 				case this._viewUI.btn_send:
 					//发红包
@@ -112,36 +105,82 @@ module gamewxsaoleihb.page {
 					if (!this._leiDian || this._leiDian.length < 0) this._game.showTips("雷点数不能为空");
 					this._money = Number(this._viewUI.txtInput.text);
 					if (this._money < 0) this._game.showTips("金额不能为空哦~");
-					let leiDianStr = JSON.stringify(this._leiDian);
-					this._game.network.call_wxsaoleihb_sendhb(this._type, this._baoNum, leiDianStr, this._money);
+					let leiDianStr = "";
+					for (let i = 0; i < this._leiDian.length; i++) {
+						if (i > 0) leiDianStr += ","
+						leiDianStr += this._leiDian[i];
+					}
+					this._game.network.call_wxsaoleihb_sendhb(this._type + 1, this._baoNum, leiDianStr, this._money);
+					break
+				case this._viewUI.hb_danL_num1:
+					this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[0];
+					this.updateBaoUI()
+					break
+				case this._viewUI.hb_danL_num2:
+					this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[1];
+					this.updateBaoUI()
+					break
+				case this._viewUI.hb_duoL_num1:
+					this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[1];
+					this.updateBaoUI()
 					break
 			}
 		}
 
 		private selectHandler(index: number): void {
+			this._type = index;
+			this.updateBaoUI(true);
+		}
+
+		//更新雷点UI
+		private updateLeiDianUI(): void {
+			for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {
+				if (this._leiDian.indexOf(i) > -1) {
+					//有值
+					this._viewUI["btn_" + i].selected = true;
+				} else {
+					this._viewUI["btn_" + i].selected = false;
+				}
+			}
+			let str = ""
+			for (let i = 0; i < this._leiDian.length; i++) {
+				if (i > 0) str += ",";
+				str += this._leiDian[i];
+			}
+			this._viewUI.lb_lh.text = str;
+		}
+
+		//更新红包UI
+		private updateBaoUI(isChangeTab: boolean = false): void {
 			this._viewUI.box_danL.visible = false;
 			this._viewUI.box_duoL.visible = false;
+			this._viewUI.hb_danL_num1.selected = false;
+			this._viewUI.hb_danL_num2.selected = false;
+			this._viewUI.hb_duoL_num1.selected = false;
 			//清空数据
 			this._leiDian = [];
-			for (let i = 0; i < WxSaoLeiHBFAHBPage.LEI_MAX_NUM; i++) {
+			for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {
 				this._viewUI["btn_" + i].selected = false;
 			}
-			if (index == WxSaoLeiHBFAHBPage.TYPE_DANLEI) {
-				this._baoNum[WxSaoLeiHBFAHBPage.BAO_NUMS[0]];
+			if (isChangeTab) this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[0];
+			if (this._type == WxSaoLeiHBMgr.TYPE_DANLEI - 1) {
 				this._viewUI.lb_hbDanl_num.text = this._baoNum + "包";
 				this._viewUI.box_danL.visible = true;
-				this._viewUI.hb_danL_num1.selected = true;
-			} else if (index == WxSaoLeiHBFAHBPage.TYPE_DUOLEI) {
-				this._baoNum[WxSaoLeiHBFAHBPage.BAO_NUMS[1]];
+				this._viewUI.hb_danL_num1.selected = this._baoNum == WxSaoLeiHBMgr.BAO_NUMS[0];
+				this._viewUI.hb_danL_num2.selected = this._baoNum == WxSaoLeiHBMgr.BAO_NUMS[1];
+				let bet = WxSaoLeiHBMgr.DANLEI_BET[WxSaoLeiHBMgr.BAO_NUMS.indexOf(this._baoNum)];
+				this._viewUI.lb_danL_info.text = StringU.substitute("赔率:{0}", bet);
+			} else if (this._type == WxSaoLeiHBMgr.TYPE_DUOLEI - 1) {
 				this._viewUI.lb_hbDuol_num.text = this._baoNum + "包";
 				this._viewUI.box_duoL.visible = true;
 				this._viewUI.hb_duoL_num1.selected = true;
 			}
+			this.updateLeiDianUI();
 		}
 
 		public close(): void {
 			if (this._viewUI) {
-				for (let i = 0; i < WxSaoLeiHBFAHBPage.LEI_MAX_NUM; i++) {
+				for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {
 					this._viewUI["btn_" + i].off(LEvent.CLICK, this, this.onLeiDianClick, [i]);
 				}
 			}

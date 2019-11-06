@@ -2,7 +2,7 @@
 * name 
 */
 module gamewxsaoleihb.data {
-	export class WxSaoLeiHBMapInfo extends gamecomponent.object.MapInfoT<LonghuData> {
+	export class WxsaoleihbMapInfo extends gamecomponent.object.MapInfoT<gamecomponent.object.MapInfoLogObject> {
 		//地图状态变更
 		static EVENT_STATUS_CHECK: string = "WxSaoLeiHBMapInfo.EVENT_STATUS_CHECK";
 		//战斗体更新
@@ -27,7 +27,7 @@ module gamewxsaoleihb.data {
 		static EVENT_ROAD_RECORD: string = "WxSaoLeiHBMapInfo.EVENT_ROAD_RECORD";
 
 		constructor(v: SceneObjectMgr) {
-			super(v, () => { return new LonghuData() });
+			super(v, () => { return new gamecomponent.object.MapInfoLogObject() });
 
 		}
 
@@ -36,38 +36,38 @@ module gamewxsaoleihb.data {
 			super.onUpdate(flags, mask, strmask);
 			let isNew = flags & core.obj.OBJ_OPT_NEW;
 			if (isNew || mask.GetBit(MapField.MAP_INT_MAP_BYTE)) {
-				this._sceneObjectMgr.event(WxSaoLeiHBMapInfo.EVENT_STATUS_CHECK);
+				this._sceneObjectMgr.event(WxsaoleihbMapInfo.EVENT_STATUS_CHECK);
 			}
 			if (isNew || mask.GetBit(MapField.MAP_INT_BATTLE_INDEX)) {
 				this._battleInfoMgr.OnUpdate();
-				this._sceneObjectMgr.event(WxSaoLeiHBMapInfo.EVENT_BATTLE_CHECK);
+				this._sceneObjectMgr.event(WxsaoleihbMapInfo.EVENT_BATTLE_CHECK);
 			}
 			if (isNew || mask.GetBit(MapField.MAP_INT_MAP_BYTE1)) {
-				this._sceneObjectMgr.event(WxSaoLeiHBMapInfo.EVENT_GAME_TURN_CHANGE);
+				this._sceneObjectMgr.event(WxsaoleihbMapInfo.EVENT_GAME_TURN_CHANGE);
 			}
 			if (isNew || mask.GetBit(MapField.MAP_INT_COUNT_DOWN)) {
-				this._sceneObjectMgr.event(WxSaoLeiHBMapInfo.EVENT_COUNT_DOWN);
+				this._sceneObjectMgr.event(WxsaoleihbMapInfo.EVENT_COUNT_DOWN);
 			}
 			if (isNew || mask.GetBit(MapField.MAP_INT_MAP_UINT16)) {
-				this._sceneObjectMgr.event(WxSaoLeiHBMapInfo.EVENT_MAP_BANKER_CHANGE, 1);
+				this._sceneObjectMgr.event(WxsaoleihbMapInfo.EVENT_MAP_BANKER_CHANGE, 1);
 			}
 			if (isNew || mask.GetBit(MapField.MAP_INT_MAP_UINT16)) {
-				this._sceneObjectMgr.event(WxSaoLeiHBMapInfo.EVENT_CARD_POOL_CHANGE);
+				this._sceneObjectMgr.event(WxsaoleihbMapInfo.EVENT_CARD_POOL_CHANGE);
 			}
 			if (isNew || strmask.GetBit(MapField.MAP_STR_GAME_NO)) {
-				this._sceneObjectMgr.event(WxSaoLeiHBMapInfo.EVENT_GAME_NO);
+				this._sceneObjectMgr.event(WxsaoleihbMapInfo.EVENT_GAME_NO);
 			}
 			if (isNew || strmask.GetBit(MapField.MAP_STR_GAME_RECORD)) {
-				this._sceneObjectMgr.event(WxSaoLeiHBMapInfo.EVENT_GAME_RECORD);
+				this._sceneObjectMgr.event(WxsaoleihbMapInfo.EVENT_GAME_RECORD);
 			}
 			if (isNew || strmask.GetBit(MapField.MAP_STR_SZ_LIST)) {
-				this._sceneObjectMgr.event(WxSaoLeiHBMapInfo.EVENT_SZ_LIST);
+				this._sceneObjectMgr.event(WxsaoleihbMapInfo.EVENT_SZ_LIST);
 			}
 			if (isNew || strmask.GetBit(MapField.MAP_STR_SEATED_LIST)) {
-				this._sceneObjectMgr.event(WxSaoLeiHBMapInfo.EVENT_SEATED_LIST);
+				this._sceneObjectMgr.event(WxsaoleihbMapInfo.EVENT_SEATED_LIST);
 			}
 			if (isNew || strmask.GetBit(MapField.MAP_STR_ROAD_RECORD)) {
-				this._sceneObjectMgr.event(WxSaoLeiHBMapInfo.EVENT_ROAD_RECORD);
+				this._sceneObjectMgr.event(WxsaoleihbMapInfo.EVENT_ROAD_RECORD);
 			}
 		}
 	}
