@@ -6,6 +6,7 @@ module gamewxsaoleihb.page {
 		static readonly TYPE_GET_HB = 1;//收到红包
 		static readonly TYPE_RECIVE_HB = 2;//发出红包
 		private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLei_JLUI;
+		private _curType: number;
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);
 			this._isNeedBlack = true;
@@ -32,13 +33,14 @@ module gamewxsaoleihb.page {
 			this._viewUI.list_info.itemRender = this.createChildren("game_ui.wxsaoleihb.component.WXSaoLei_LB1UI", HBInfoMX);
 			this._viewUI.list_info.renderHandler = new Handler(this, this.renderHandler);
 			this._viewUI.tab.selectHandler = Handler.create(this, this.selectHandler, null, false);
+			this._viewUI.list_info.selectedIndex = 0;
 			this.initView();
 		}
 
-		private initView():void{
-			let mainPlayer:PlayerData = this._game.sceneObjectMgr.mainPlayer;
-            if (!mainPlayer) return;
-            let mainPlayerInfo = mainPlayer.playerInfo;
+		private initView(): void {
+			let mainPlayer: PlayerData = this._game.sceneObjectMgr.mainPlayer;
+			if (!mainPlayer) return;
+			let mainPlayerInfo = mainPlayer.playerInfo;
 			this._viewUI.img_head.skin = TongyongUtil.getHeadUrl(mainPlayerInfo.headimg);
 			this._viewUI.lb_name.text = mainPlayer.GetNickName();
 		}
@@ -51,16 +53,22 @@ module gamewxsaoleihb.page {
 		}
 
 		private selectHandler(index: number): void {
+			this._curType = index;
 			if (index == WxSaoLeiHBJLPage.TYPE_GET_HB) {
 				this._viewUI.lb_type.text = "共收";
+				this._viewUI.lb_num_money
+				this._viewUI.lb_num_hb
 			} else if (index == WxSaoLeiHBJLPage.TYPE_RECIVE_HB) {
 				this._viewUI.lb_type.text = "共发";
+				this._viewUI.lb_num_money
+				this._viewUI.lb_num_hb
 			}
 			this._viewUI.list_info;
 		}
 
 		public close(): void {
 			if (this._viewUI) {
+				
 			}
 			super.close();
 		}
@@ -78,8 +86,14 @@ module gamewxsaoleihb.page {
 			this.lb_date.text = Sync.getTimeStr1(this._data.time);
 			this.lb_time.text = Sync.getTimeShortStr2(this._data.time);
 			this.lb_money.text = this._data.money;
+			this.btn_jh.visible;
+			this.on(LEvent.CLICK, this, this.onBtnClick);
 			// this.lb_type.text = this._data.name;
 			// this.lb_diff.text = this._data.money;
+		}
+
+		private onBtnClick(): void {
+
 		}
 	}
 }

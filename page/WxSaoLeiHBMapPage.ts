@@ -5,9 +5,11 @@ module gamewxsaoleihb.page {
     export class WxSaoLeiHBMapPage extends game.gui.base.Page {
         private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLeiUI;
         private _arrHB: Array<any> = [];
+        // private _arrHBMsg: Array<any> = [];
         private _wxSaoLeiMgr: WxSaoLeiHBMgr;
         private _wxSaoLeiStory: WxSaoLeiHBStory;
         private _wxSaoLeiMapInfo: WxSaoLeiHBMapInfo;
+        private _mainPlayer: PlayerData;
         constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
             super(v, onOpenFunc, onCloseFunc);
             this._isNeedDuang = false;
@@ -29,6 +31,9 @@ module gamewxsaoleihb.page {
         protected init(): void {
             this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLeiUI');
             this.addChild(this._viewUI);
+            this._viewUI.panel_hb.vScrollBarSkin = "";
+            this._viewUI.panel_hb.vScrollBar.autoHide = true;
+            this._viewUI.panel_hb.vScrollBar.elasticDistance = 100;
             if (!this._pageHandle) {
                 this._pageHandle = PageHandle.Get("WxSaoLeiHBMapPage");//额外界面控制器
             }
@@ -37,10 +42,12 @@ module gamewxsaoleihb.page {
                 this._wxSaoLeiMgr = this._wxSaoLeiStory.wxSaoLeiHBMgr;
                 this.onUpdateMapInfo();
             }
-
-            this._viewUI.panel_hb.vScrollBarSkin = "";
-            this._viewUI.panel_hb.vScrollBar.autoHide = true;
-            this._viewUI.panel_hb.vScrollBar.elasticDistance = 100;
+            this._mainPlayer = this._game.sceneObjectMgr.mainPlayer;
+            this._wxSaoLeiMgr.on(WxSaoLeiHBMgr.MAP_HB_INFO, this, this.updateHBdata);   //红包数据
+            this._wxSaoLeiMgr.on(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, this, this.openHBInfoPage);  //红包领取数据详情
+            this._wxSaoLeiMgr.on(WxSaoLeiHBMgr.MAP_HB_LQ_MSG, this, this.updateLqMsg);  //红包领取消息
+            //初始化所有的红包
+            this.updateHBdata(GlobalDef.WXSAOLEI_HB_TOTAL, null, null);
             this._viewUI.mouseThrough = true;
             //初始房间名字
             let mapLv = this._wxSaoLeiMapInfo.GetMapLevel();
@@ -52,6 +59,7 @@ module gamewxsaoleihb.page {
         // 页面打开时执行函数
         protected onOpen(): void {
             super.onOpen();
+
             this.updateViewUI();
             this._viewUI.btn_share.on(LEvent.CLICK, this, this.onBtnClickWithTween)
             this._viewUI.btn_hbjl.on(LEvent.CLICK, this, this.onBtnClickWithTween)
@@ -72,8 +80,6 @@ module gamewxsaoleihb.page {
             this._viewUI.btn_di2.on(LEvent.CLICK, this, this.onBtnClick);
             this._viewUI.finsh_check.on(LEvent.CLICK, this, this.onBtnClick);
 
-            this._wxSaoLeiMgr.on(WxSaoLeiHBMgr.MAP_HB_INFO, this, this.updateHBdata);   //红包数据
-            this._wxSaoLeiMgr.on(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, this, this.openHBInfoPage);  //红包领取数据
         }
 
         //重置UI状态
@@ -82,6 +88,7 @@ module gamewxsaoleihb.page {
             this._viewUI.box_ye.visible = false;
             this._viewUI.box_di1.visible = false;
             this._viewUI.box_di2.visible = true;
+            this.updateDiBuUI();
         }
 
         //弹出红包详情界面
@@ -94,7 +101,7 @@ module gamewxsaoleihb.page {
         //===========红包领取start==========
         public static readonly TYPE_HBY = 1;//红包雨
         public static readonly TYPE_GET_HB = 2;//领取红包
-        public static readonly TYPE_NO_GET_HB = 2;//红包已领完
+        public static readonly TYPE_NO_GET_HB = 3;//红包已领完
         private _curHbData: any;   //当前打开这个界面的红包数据
         initHBGetUI(type: number, hbData: any): void {
             this._curHbData = hbData;
@@ -120,9 +127,8 @@ module gamewxsaoleihb.page {
         private updateGetHBUI(hbData: any): void {
             this._viewUI.open_head.skin = TongyongUtil.getHeadUrl(hbData.head);
             this._viewUI.open_name.text = hbData.name;
-            this._viewUI.open_hb_name.text = "恭喜发财,大吉大利";
-            let ld_arr = hbData.ld_str.split(',');
-            this._viewUI.open_ld.text = JSON.stringify(ld_arr);
+            this._viewUI.open_hb_name.text = hbData.money + "元";
+            this._viewUI.open_ld.text = hbData.ld_str;
         }
 
         //红包雨
@@ -170,22 +176,21 @@ module gamewxsaoleihb.page {
                 this._viewUI.box_di1_up.y = 31;
                 this._viewUI.img_di1_bg.y = 18;
                 this._viewUI.img_di1_bg.height = 207;
-                this._viewUI.panel_hb.height = 1088;
+                this._viewUI.panel_hb.height = 962;
             } else {
                 this._viewUI.box_di1_down.visible = false;
                 this._viewUI.box_di1_up.y = 154;
                 this._viewUI.img_di1_bg.y = 144;
                 this._viewUI.img_di1_bg.height = 74;
-                this._viewUI.panel_hb.height = 962;
+                this._viewUI.panel_hb.height = 1088;
             }
             this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
         }
 
         //更新玩家数据
         updateMainInfo(): void {
-            let mainPlayer: PlayerData = this._game.sceneObjectMgr.mainPlayer;
-            if (!mainPlayer) return;
-            let mainPlayerInfo = mainPlayer.playerInfo;
+            if (!this._mainPlayer) return;
+            let mainPlayerInfo = this._mainPlayer.playerInfo;
             this._viewUI.lb_ye.text = StringU.substitute("余额：{0}", mainPlayerInfo.money);
             //冻结
 
@@ -202,8 +207,7 @@ module gamewxsaoleihb.page {
 
         /**按钮点击事件缓动完 回调 该做啥就做啥 */
         protected onBtnTweenEnd(e: any, target: any): void {
-            let mainPlayer = this._game.sceneObjectMgr.mainPlayer;
-            if (!mainPlayer) return;
+            if (!this._mainPlayer) return;
             switch (target) {
                 case this._viewUI.btn_share:
                     //微信分享
@@ -236,15 +240,22 @@ module gamewxsaoleihb.page {
                     break
                 case this._viewUI.btn_more:
                     //成员列表
-                    // this._game.uiRoot.general.open(WxSaoLeiHBPageDef.PAGE_WXSLHB_FAHB);
+                    this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_ROOM_INFO);
                     break
                 case this._viewUI.btn_hb_close:
                     this._viewUI.box_hb_open.visible = false;
                     break
                 case this._viewUI.btn_hb_open:
                     //领取红包
-                    //判断当前这个红包的状态,已结束则打开红包结束状态，否则发送领取红包协议
-
+                    if (!this._curHbData) return;
+                    //判断状态
+                    if (this._curHbData.hb_state == 1) {
+                        //判断是否有操作过 操作过，直接打开红包详情界面，否则发领取协议
+                        this._game.network.call_wxsaoleihb_opt(this._curHbData.hb_id);
+                    } else {
+                        //红包已领完
+                        this.initHBGetUI(WxSaoLeiHBMapPage.TYPE_NO_GET_HB, this._curHbData);
+                    }
                     break
                 case this._viewUI.rain_open:
                     //红包雨领取红包
@@ -265,42 +276,56 @@ module gamewxsaoleihb.page {
 
         //------------------红包主界面操作start---------
         //红包数据更新
-        private updateHBdata(type: number, info: any): void {
-            let mainPlayer: PlayerData = this._game.sceneObjectMgr.mainPlayer;
-            if (!mainPlayer) return;
-            let mainUid = mainPlayer.GetUserId();
-            let isSelf = info.uid == mainUid;
+        private updateHBdata(type: number, hb_info: any, lq_info: any): void {
+            if (!this._mainPlayer) return;
+            let mainUid = this._mainPlayer.GetUserId();
+            let isSelf;
             //状态更新
-            if (type == WxSaoLeiHBMgr.HB_ADD) {
-                //新增 在末尾加
-                this.addHB(info, isSelf, WxSaoLeiHBMapPage.MAIN_HB);
-            } else if (type == WxSaoLeiHBMgr.HB_REMOVE) {
-                //移除
-                this.removeHB(info);
-            } else if (type == WxSaoLeiHBMgr.HB_UPDATE) {
-                //红包更新
-                this.updateHB(info);
-            } else if (type == WxSaoLeiHBMgr.HB_LQ_UPDATE) {
-                //只有我领别人或者别人领我的红包,才需要加信息条
-                //红包领取数据更新
-                let lq_data: any;
-                let lq_data_arr;
-                if (info.lq_data) {
-                    lq_data_arr = JSON.parse(info.lq_data);
-                    lq_data = lq_data_arr[lq_data_arr.length - 1];
-                }
-                if (isSelf || (lq_data && lq_data.uid == mainUid))
-                    this.addHB(info, isSelf, WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO);
-                //领完了在加一条
-                if (isSelf && lq_data_arr.length == info.bao_num) {
-                    //自己的红包领完了在加一条
-                    this.addHB(info, isSelf, WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO, WxSaoLeiHBMapPage.EXTRA_TYPE_FINSH);
-                    //判断是否需要预中雷结算信息
-                    if (info.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
-                        this.addHB(info, isSelf, WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO, WxSaoLeiHBMapPage.EXTRA_TYPE_ZL);
+            if (type == GlobalDef.WXSAOLEI_HB_TOTAL) {
+                //初始化所有红包
+                for (var key in this._wxSaoLeiMgr.hbData) {
+                    if (this._wxSaoLeiMgr.hbData.hasOwnProperty(key)) {
+                        let hb_data = this._wxSaoLeiMgr.hbData[key];
+                        isSelf = hb_data.uid == mainUid
+                        this.addHB(hb_data, isSelf, WxSaoLeiHBMapPage.MAIN_HB);
                     }
                 }
+            } else {
+                isSelf = hb_info.uid == mainUid;
+                if (type == GlobalDef.WXSAOLEI_HB_ADD) {
+                    //新增 在末尾加
+                    this.addHB(hb_info, isSelf, WxSaoLeiHBMapPage.MAIN_HB);
+                } else if (type == GlobalDef.WXSAOLEI_HB_REMOVE) {
+                    //移除
+                    this.removeHB(hb_info);
+                } else if (type == GlobalDef.WXSAOLEI_HB_UPDATE) {
+                    //红包更新
+                    this.updateHB(hb_info);
+                }
             }
+            this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
+        }
+
+        //领取信息
+        private updateLqMsg(lq_data): void {
+            if (!this._mainPlayer) return;
+            let mainUid = this._mainPlayer.GetUserId();
+            //红包领取数据更新
+            if (!lq_data) return;
+            //这条领取数据是由哪个红包的
+            let isSelf = mainUid == lq_data.owner_uid;
+            //只有我领别人或者别人领我的红包,才需要加信息条
+            if (isSelf || (lq_data && lq_data.uid == mainUid))
+                this.addHB("", isSelf, WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO, 0, lq_data);
+            //领完了在加一条
+            // if (isSelf && hb_info.lq_num == hb_info.bao_num) {
+            //     //自己的红包领完了在加一条
+            //     this.addHB("", isSelf, WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO, WxSaoLeiHBMapPage.EXTRA_TYPE_FINSH);
+            //多雷结算信息
+            // if (hb_info.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
+            //     this.addHB(hb_info, isSelf, WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO, WxSaoLeiHBMapPage.EXTRA_TYPE_ZL_SETTLE);
+            // }
+            // }
             this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
         }
 
@@ -308,10 +333,10 @@ module gamewxsaoleihb.page {
         private static readonly MAIN_HB: number = 1;    //红包
         private static readonly MAIN_HB_LQ_INFO: number = 2;   //红包信息
         public static readonly EXTRA_TYPE_FINSH: number = 1;    //红包已领完
-        public static readonly EXTRA_TYPE_ZL: number = 2;    //预中雷信息结算
+        public static readonly EXTRA_TYPE_ZL_SETTLE: number = 2;    //预中雷信息结算
         private _hbUIY: number = 0;
         private _diffY: number = 12;
-        addHB(hbData: any, isSelf: boolean = false, type: number, extraType: number = 0) {
+        addHB(hbData: any, isSelf: boolean = false, type: number, extraType: number = 0, lq_data: any = "") {
             let uiHb: any;
             switch (type) {
                 case WxSaoLeiHBMapPage.MAIN_HB:
@@ -324,10 +349,11 @@ module gamewxsaoleihb.page {
                     }
                     break
                 case WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO:
-                    uiHb = new HBInfo(extraType);
+                    if (!lq_data) return;
+                    uiHb = new HBInfo(extraType, lq_data);
                     break
             }
-            uiHb.setData(this._game, hbData);
+            uiHb.setData(this, this._game, hbData);
             uiHb.y = this._hbUIY;
             this._viewUI.panel_hb.addChild(uiHb);
             this._hbUIY += uiHb.height + this._diffY;
@@ -335,28 +361,35 @@ module gamewxsaoleihb.page {
         }
 
         //移除红包
-        removeHB(hbData: any) {
-            let index = this.findHBUIByHBData(hbData);
-            let removeUiHB = this._arrHB[index];
-            let removeY: number = removeUiHB.y;
-            removeUiHB.removeSelf();
-            this._arrHB.splice(index, 1);
-            //在调整在它之后的所有的位置
-            let curUIY: number;
-            for (let i = index; i < this._arrHB.length; i++) {
-                if (curUIY != 0 && !curUIY) curUIY = removeY;
-                let curUiHB = this._arrHB[i];
-                let saveY = curUiHB.y;
-                curUiHB.y = curUIY;
-                curUIY = saveY;
+        removeHB(hbDatas: any) {
+            for (let i = 0; i < hbDatas.length; i++) {
+                let cur_hb_data = hbDatas[i];
+                let index = this.findHBUIByHBData(cur_hb_data);
+                let removeUiHB = this._arrHB[index];
+                let removeY: number = removeUiHB.y;
+                removeUiHB.removeSelf();
+                this._arrHB.splice(index, 1);
+                //在调整在它之后的所有的位置
+                let curUIY: number;
+                for (let i = index; i < this._arrHB.length; i++) {
+                    if (curUIY != 0 && !curUIY) curUIY = removeY;
+                    let curUiHB = this._arrHB[i];
+                    let saveY = curUiHB.y;
+                    curUiHB.y = curUIY;
+                    curUIY = saveY;
+                }
             }
         }
 
         //更新红包
-        updateHB(hbData: any) {
-            let index = this.findHBUIByHBData(hbData);
-            let uiHB = this._arrHB[index];
-            uiHB.setData(this._game, hbData);
+        updateHB(hbDatas: any) {
+            for (let i = 0; i < hbDatas.length; i++) {
+                let cur_hb_data = hbDatas[i];
+                let index = this.findHBUIByHBData(cur_hb_data);
+                let uiHB = this._arrHB[index];
+                if (!uiHB) return;
+                uiHB.setData(this, this._game, cur_hb_data);
+            }
         }
 
         //查找到对应的红包ui
@@ -364,7 +397,8 @@ module gamewxsaoleihb.page {
             for (let i = 0; i < this._arrHB.length; i++) {
                 let uiHB = this._arrHB[i];
                 if (!uiHB) continue;
-                let hb_data = uiHB.dataSource;
+                if (uiHB instanceof HBInfo) continue;
+                let hb_data = uiHB._data;
                 if (!hb_data) continue;
                 if (hb_data.hb_id == hbData.hb_id) {
                     return i;
@@ -375,6 +409,7 @@ module gamewxsaoleihb.page {
         public close(): void {
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_INFO, this, this.updateHBdata);
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, this, this.openHBInfoPage);
+            this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_LQ_MSG, this, this.updateLqMsg);
             if (this._viewUI) {
                 this._game.stopAllSound();
                 this._game.stopMusic();
@@ -385,39 +420,30 @@ module gamewxsaoleihb.page {
     class HBLeft extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_HB1UI {
         private _game: Game;
         private _data: any;
-        private _lq_data: any;
-        private _lq_data_self: any;
         private _player: PlayerData;
         private _playerInfo: any;
+        private _page: WxSaoLeiHBMapPage;
         constructor() {
             super();
         }
-        setData(game: Game, data: any) {
+        setData(page: WxSaoLeiHBMapPage, game: Game, data: any) {
             this._data = data;
             if (!data) return;
+            this._game = game;
+            if (!this._game) return;
             this._player = this._game.sceneObjectMgr.mainPlayer;
             if (!this._player) return;
             this._playerInfo = this._player.playerInfo;
-
-            this._lq_data = JSON.parse(this._data.lq_data);
+            this._page = page;
+            if (!this._page) return;
             this.lb_name.text = this._data.name;
             this.img_head.skin = TongyongUtil.getHeadUrl(this._data.head);
             this.img_kuang.visible = false;
             this.img_light.visible = false;
-            //是否是自己操作过的红包
-            //预中雷，中雷，未中雷，已领完，已过期
-            let isSelfOpt: boolean = false;
-            for (let i = 0; i < this._lq_data.length; i++) {
-                let cur_data = this._lq_data[i];
-                if (cur_data.uid == this._playerInfo.GetUserId()) {
-                    isSelfOpt = true;
-                    this._lq_data_self = cur_data;
-                }
-            }
             //红包状态结束
             if (this._data.hb_data == 2) {
-                let diffTime = Laya.timer.currTimer - this._data.create_time;
-                let isLQFinsh = this._lq_data.length >= this._data.bao_num;
+                let diffTime = this._game.sync.serverTimeBys - this._data.create_time;
+                let isLQFinsh = this._data.lq_num >= this._data.bao_num;
                 let isTimeOut = diffTime > WxSaoLeiHBMgr.HB_TIME;
                 this.img_di.skin = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/btn_hb1.png";
                 if (this._data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
@@ -428,51 +454,40 @@ module gamewxsaoleihb.page {
                 if (isLQFinsh)
                     this.lb_status.text = "已领完";
                 else {
-                    if (isTimeOut)
-                        this.lb_status.text = "已超时";
+                    this.lb_status.text = isTimeOut ? "已超时" : "进行中";
                 }
             } else {
                 this.img_di.skin = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/btn_hb0.png";
                 this.img_kuang.visible = true;
-                this.ani1.play(0, true);
+                if (!this.ani1.isPlaying)
+                    this.ani1.play(0, true);
                 //判断类型
                 if (this._data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
                     this.img_hb.skin = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_hb2.png";
                 } else if (this._data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
                     this.img_light.visible = true;
-                    this.ani2.play(0, true);
+                    if (!this.ani2.isPlaying)
+                        this.ani2.play(0, true);
                     this.img_hb.skin = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_hb4.png";
                 }
-                if (isSelfOpt) {
-                    //自己操作过
-                    if (this._lq_data_self.is_zl) {
-                        if (this._data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
-                            this.lb_status.text = "中雷";
-                        } else if (this._data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
-                            this.lb_status.text = "预中雷";
-                        }
-                    } else {
-                        this.lb_status.text = "未中雷";
-                    }
-                } else {
-                    //自己还没有操作过
-                    this.lb_status.text = "";
-                    this.box_main.on(LEvent.CLICK, this, this.onBtnLQ);
-                }
+                this.lb_status.text = "";
             }
+            this.box_main.on(LEvent.CLICK, this, this.onBtnLQ);
             //红包剩余
-            this.lb_sy.text = StringU.substitute("剩余:{0}/{1}", this._lq_data.length, this._data.bao_num);
+            this.lb_sy.text = StringU.substitute("剩余:{0}/{1}", this._data.lq_num, this._data.bao_num);
             //红包金额
             this.lb_money.text = this._data.money;
             //红包雷号
             this.lb_ld.text = this._data.ld_str;
             //倒计时
+            Laya.timer.clearAll(this);
             Laya.timer.loop(1000, this, this.updateTime);
         }
 
         private updateTime(): void {
-            let diffTime = Laya.timer.currTimer - this._data.create_time;
-            let countDown = WxSaoLeiHBMgr.HB_TIME - diffTime;
+            if (!this._data) return;
+            let diffTime: number = this._game.sync.serverTimeBys - this._data.create_time;
+            let countDown = Math.floor(WxSaoLeiHBMgr.HB_TIME - diffTime);
             if (countDown < 0) {
                 this.lb_time.text = "0秒";
             } else {
@@ -482,54 +497,47 @@ module gamewxsaoleihb.page {
 
         //领取红包
         private onBtnLQ(): void {
-            if (this._data.hb_data == 2) {
-                //发红包数据查询记录  红包已领完
-                let page: WxSaoLeiHBMapPage = this._game.uiRoot.HUD.getPage(WxsaoleihbPageDef.PAGE_WXSLHB_MAP) as WxSaoLeiHBMapPage;
-                if (page) {
-                    page.initHBGetUI(WxSaoLeiHBMapPage.TYPE_NO_GET_HB, this._data);
-                }
+            if (!this._data) return;
+            if (this._data.hb_state == 2) {
+                //红包已领完
+                this._page.initHBGetUI(WxSaoLeiHBMapPage.TYPE_NO_GET_HB, this._data);
             } else {
-                //未结束 发领取红包记录
-
+                //未结束
+                this._page.initHBGetUI(WxSaoLeiHBMapPage.TYPE_GET_HB, this._data);
             }
         }
     }
     class HBRight extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_HB2UI {
         private _game: Game;
         private _data: any;
-        private _lq_data: any;
-        private _lq_data_self: any;
         private _player: PlayerData;
         private _playerInfo: any;
+        private _page: WxSaoLeiHBMapPage;
         constructor() {
             super();
         }
-        setData(game: Game, data: any) {
+        setData(page: WxSaoLeiHBMapPage, game: Game, data: any) {
             this._data = data;
             if (!data) return;
+            this._game = game;
+            if (!this._game) return;
             this._player = this._game.sceneObjectMgr.mainPlayer;
             if (!this._player) return;
             this._playerInfo = this._player.playerInfo;
-
-            this._lq_data = JSON.parse(this._data.lq_data);
+            this._page = page;
+            if (!this._page) return;
             this.lb_name.text = this._data.name;
             this.img_head.skin = TongyongUtil.getHeadUrl(this._data.head);
             this.img_kuang.visible = false;
             this.img_light.visible = false;
-            //是否是自己操作过的红包
-            //预中雷，中雷，未中雷，已领完，已过期
-            let isSelfOpt: boolean = false;
-            for (let i = 0; i < this._lq_data.length; i++) {
-                let cur_data = this._lq_data[i];
-                if (cur_data.uid == this._playerInfo.GetUserId()) {
-                    isSelfOpt = true;
-                    this._lq_data_self = cur_data;
-                }
-            }
             //红包状态结束
-            if (this._data.hb_data == 2) {
-                let diffTime = Laya.timer.currTimer - this._data.create_time;
-                let isLQFinsh = this._lq_data.length >= this._data.bao_num;
+            if (this._data.hb_state == 2) {
+                if (this.ani1.isPlaying)
+                    this.ani1.stop();
+                if (this.ani2.isPlaying)
+                    this.ani2.stop();
+                let diffTime = this._game.sync.serverTimeBys - this._data.create_time;
+                let isLQFinsh = this._data.lq_num >= this._data.bao_num;
                 let isTimeOut = diffTime > WxSaoLeiHBMgr.HB_TIME;
                 this.img_di.skin = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/btn_hb1.png";
                 if (this._data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
@@ -540,51 +548,40 @@ module gamewxsaoleihb.page {
                 if (isLQFinsh)
                     this.lb_status.text = "已领完";
                 else {
-                    if (isTimeOut)
-                        this.lb_status.text = "已超时";
+                    this.lb_status.text = isTimeOut ? "已超时" : "进行中";
                 }
             } else {
                 this.img_di.skin = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/btn_hb0.png";
                 this.img_kuang.visible = true;
-                this.ani1.play(0, true);
+                if (!this.ani1.isPlaying)
+                    this.ani1.play(0, true);
                 //判断类型
                 if (this._data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
                     this.img_hb.skin = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_hb2.png";
                 } else if (this._data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
                     this.img_light.visible = true;
-                    this.ani2.play(0, true);
+                    if (!this.ani2.isPlaying)
+                        this.ani2.play(0, true);
                     this.img_hb.skin = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_hb4.png";
                 }
-                if (isSelfOpt) {
-                    //自己操作过
-                    if (this._lq_data_self.is_zl) {
-                        if (this._data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
-                            this.lb_status.text = "中雷";
-                        } else if (this._data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
-                            this.lb_status.text = "预中雷";
-                        }
-                    } else {
-                        this.lb_status.text = "未中雷";
-                    }
-                } else {
-                    //自己还没有操作过
-                    this.lb_status.text = "";
-                    this.box_main.on(LEvent.CLICK, this, this.onBtnLQ);
-                }
+                this.lb_status.text = "";
             }
+            this.box_main.on(LEvent.CLICK, this, this.onBtnLQ);
             //红包剩余
-            this.lb_sy.text = StringU.substitute("剩余:{0}/{1}", this._lq_data.length, this._data.bao_num);
+            this.lb_sy.text = StringU.substitute("剩余:{0}/{1}", this._data.lq_num, this._data.bao_num);
             //红包金额
             this.lb_money.text = this._data.money;
             //红包雷号
             this.lb_ld.text = this._data.ld_str;
             //倒计时
+            Laya.timer.clearAll(this);
             Laya.timer.loop(1000, this, this.updateTime);
         }
 
         private updateTime(): void {
-            let diffTime = Laya.timer.currTimer - this._data.create_time;
-            let countDown = WxSaoLeiHBMgr.HB_TIME - diffTime;
+            if (!this._data) return;
+            let diffTime: number = this._game.sync.serverTimeBys - this._data.create_time;
+            let countDown = Math.floor(WxSaoLeiHBMgr.HB_TIME - diffTime);
             if (countDown < 0) {
                 this.lb_time.text = "0秒";
             } else {
@@ -594,68 +591,73 @@ module gamewxsaoleihb.page {
 
         //领取红包
         private onBtnLQ(): void {
-            if (this._data.hb_data == 2) return;
-            this._game.network.call_wxsaoleihb_opt(this._data.hb_id);
+            if (!this._data) return;
+            if (this._data.hb_state == 2) {
+                //红包已领完
+                this._page.initHBGetUI(WxSaoLeiHBMapPage.TYPE_NO_GET_HB, this._data);
+            } else {
+                //未结束
+                this._page.initHBGetUI(WxSaoLeiHBMapPage.TYPE_GET_HB, this._data);
+            }
         }
     }
     class HBInfo extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_getUI {
         private _game: Game;
-        private _data: any;
+        // private _data: any;  //红包数据
+        private _lq_data: any;      //领取数据
         private _wxsaoleihbMgr: WxSaoLeiHBMgr;
-        private _extraType: number;
-        constructor(extraType: number) {
+        private _extraType: number; //额外参数
+        constructor(extraType: number, lq_data: any) {
             super();
             this._extraType = extraType;
+            this._lq_data = lq_data;
         }
-        setData(game: Game, data: any) {
-            this._data = data;
-            if (!data) return;
+        setData(page: WxSaoLeiHBMapPage, game: Game, data: any) {
+            // if (!data) return;
+            this._game = game;
+            if (!this._game) return;
             let mainPlayer: PlayerData = this._game.sceneObjectMgr.mainPlayer;
             if (!mainPlayer) return;
             let story: WxSaoLeiHBStory = this._game.sceneObjectMgr.story;
             if (!story) return;
             this._wxsaoleihbMgr = story.wxSaoLeiHBMgr;
+            if (!this._lq_data) return;
             let info = "";  //信息
-            let last_lq_data: any;  //最后一条领取数据
-            let lq_data_arr: any;   //领取数据组
-            let ld_arr = JSON.parse(this._data.ld_str);             //雷点数组
-            if (this._data.lq_data) {
-                lq_data_arr = JSON.parse(this._data.lq_data);
-            }
-            if (!lq_data_arr) return;
-            let pf_money: number = this._data.hb_data.type == WxSaoLeiHBMgr.TYPE_DANLEI ? this._wxsaoleihbMgr.LqDanLeiPFMoney(this._data) : this._wxsaoleihbMgr.LqDuoLeiPFMoney(this._data);
+            //赔付金额
+            let pf_money: number = this._lq_data.pf_money;
             if (this._extraType == 0) {
                 //不是额外信息
                 let mainUid = mainPlayer.GetUserId();
-                let isSelf = this._data.uid == mainUid;
-                last_lq_data = lq_data_arr[lq_data_arr.length - 1];
-                let name = last_lq_data.name;
+                let isSelf = this._lq_data.uid == mainUid;  //领取人是自己
+                let name = "";
                 let color = "#3b72fe";  //玩家颜色色值
-                let zl_num = Number(last_lq_data.lq_money.substr(-1, 1));  //中雷号
-                let lq_money = last_lq_data.lq_money;
+                let lq_money: string = this._lq_data.lq_money.toString(); //领取的金钱
+                let zl_num = Number(lq_money.substr(-1, 1));;  //中雷号
+                let is_zl = pf_money > 0;      //是否中雷
                 if (isSelf) {
-                    //自己的红包别人领了 拿取最后一条的数据
-                    if (last_lq_data.is_zl) {
-                        if (this._data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
+                    //领取了别人的红包
+                    name = mainPlayer.GetNickName();
+                    if (is_zl) {
+                        if (this._lq_data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
+                            info = StringU.substitute("您领取了<span color='{0}'>{1}</span>玩家的红包,获得{2},中雷{3}赔付{4}", color, name, HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED), zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
+                        } else if (this._lq_data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
+                            info = StringU.substitute("您领取了<span color='{0}'>{1}</span>玩家的红包,获得{2},预中雷{3}冻结{4}", color, name, HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED), zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
+                        }
+                    } else {
+                        info = StringU.substitute("您领取了<span color='{0}'>{1}</span>玩家的红包,获得{2}", color, name, HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED));
+                    }
+                } else {
+                    //自己的红包别人领了
+                    name = this._lq_data.name;
+                    if (is_zl) {
+                        if (this._lq_data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
                             info = StringU.substitute("<span color='{0}'>{1}</span>玩家领取了您的红包,中雷{2}赔付{3}", color, name, zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
-                        } else if (this._data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
+                        } else if (this._lq_data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
                             info = StringU.substitute("<span color='{0}'>{1}</span>玩家领取了您的红包,预中雷{2}冻结{3}", color, name, zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
                         }
                     } else {
-                        info = StringU.substitute("<span color='{0}'>{1}</span>{0}玩家领取了您的红包");
+                        info = StringU.substitute("<span color='{0}'>{1}</span>玩家领取了您的红包", color, name);
                     }
-                } else {
-                    //领取了别人的红包
-                    if (last_lq_data.is_zl) {
-                        if (this._data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
-                            info = StringU.substitute("您领取了<span color='{0}'>{1}</span>玩家的红包,获得{2},中雷{3}赔付{4}", color, name, HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED), zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
-                        } else if (this._data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
-                            info = StringU.substitute("您领取了<span color='{0}'>{1}</span>玩家领取了您的红包,获得{2},预中雷{3}冻结{4}", color, name, HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED), zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
-                        }
-                    } else {
-                        info = StringU.substitute("您领取了<span color='{0}'>{1}</span>玩家领取了您的红包,获得{2}", color, name, HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED));
-                    }
-
                 }
             } else {
                 switch (this._extraType) {
@@ -663,23 +665,23 @@ module gamewxsaoleihb.page {
                         //红包已经领完了
                         info = "您的红包被领完"
                         break;
-                    case WxSaoLeiHBMapPage.EXTRA_TYPE_ZL:
-                        //中雷信息
-                        let isZl = this._wxsaoleihbMgr.isYuZLJudge(lq_data_arr, this._data.ld_str);
-                        let json_ld_arr = JSON.stringify(ld_arr);
-                        let zl_arr = this._wxsaoleihbMgr.ZlShuCalculate(this._data);
-                        let json_zl_arr = JSON.stringify(zl_arr);
-                        if (isZl) {
-                            //预中雷赔付
-                            info = StringU.substitute("多雷结算,全部雷点{0},中雷雷点{1},总共获赔{2}元", json_ld_arr, json_zl_arr, pf_money * zl_arr.length);
-                        } else {
-                            //预中雷没有赔付
-                            info = StringU.substitute("多雷结算,全部雷点{0}中雷雷点{1},免赔付", json_ld_arr, json_zl_arr);
-                        }
-                        break
+                    // case WxSaoLeiHBMapPage.EXTRA_TYPE_ZL_SETTLE:
+                    //多雷结算信息
+                    // let isZl = this._wxsaoleihbMgr.isYuZLJudge(lq_data_arr, this._data.ld_str);
+                    // let json_ld_arr = JSON.stringify(ld_arr);
+                    // let zl_arr = this._wxsaoleihbMgr.ZlShuCalculate(this._data);
+                    // let json_zl_arr = JSON.stringify(zl_arr);
+                    // if (isZl) {
+                    //     //预中雷赔付
+                    //     info = StringU.substitute("多雷结算,全部雷点{0},中雷雷点{1},总共获赔{2}元", json_ld_arr, json_zl_arr, pf_money * zl_arr.length);
+                    // } else {
+                    //     //预中雷没有赔付
+                    //     info = StringU.substitute("多雷结算,全部雷点{0}中雷雷点{1},免赔付", json_ld_arr, json_zl_arr);
+                    // }
+                    // break
                 }
             }
-            TextFieldU.setHtmlText(this.lb_info.text, info, false);//支持HTML
+            TextFieldU.setHtmlText(this.lb_info, info, false);//支持HTML
         }
     }
 }

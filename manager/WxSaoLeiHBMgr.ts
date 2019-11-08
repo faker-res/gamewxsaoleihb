@@ -17,18 +17,18 @@ module gamewxsaoleihb.manager {
 		public static readonly DUOLEI_BET: Array<number> = [1.2, 1.05, 1.28, 1.8, 2.5];
 		// static readonly MAPINFO_OFFLINE: string = "WxSaoLeiHBMgr.MAPINFO_OFFLINE";//假精灵
 		public static readonly MAP_HB_INFO = "WxSaoLeiHBMgr.MAP_HB_INFO";//红包数据
-		public static readonly MAP_HB_LQ_INFO = "WxSaoLeiHBMgr.MAP_HB_LQ_INFO";//红包领取数据
-		public static readonly HB_ADD: number = 1;	//红包新增
-		public static readonly HB_REMOVE: number = 2;	//红包移除
-		public static readonly HB_UPDATE: number = 3;	//红包更新
-		public static readonly HB_LQ_UPDATE: number = 4;	//红包领取数据更新
+		public static readonly MAP_HB_LQ_INFO = "WxSaoLeiHBMgr.MAP_HB_LQ_INFO";//红包领取数据详情
+		public static readonly MAP_HB_LQ_MSG = "WxSaoLeiHBMgr.MAP_HB_LQ_MSG";//红包领取数据消息
 		public static readonly HB_TIME: number = 90;	//红包持续时间
 
-		private _hb_data: Array<any> = [];
+		private _hb_data: Array<any> = [];	//红包总数据
+		//判断玩家是否操作该红包，从领取记录中查询是否有自己有操作过
+		private _hb_lq_jl: any	//红包领取记录
 		constructor(game: Game) {
 			super(game)
 			this._game.network.addHanlder(Protocols.SMSG_WXSAOLEIHB_INFO, this, this.onOptHandler);
 			this._game.network.addHanlder(Protocols.SMSG_WXSAOLEIHB_SEND_LQJL, this, this.onOptHandler);
+			this._game.network.addHanlder(Protocols.SMSG_WXSAOLEIHB_LQ_INFO, this, this.onOptHandler);
 		}
 
 		public get hbData() {
@@ -38,27 +38,51 @@ module gamewxsaoleihb.manager {
 		private onOptHandler(optcode: number, msg: any): void {
 			switch (optcode) {
 				case Protocols.SMSG_WXSAOLEIHB_INFO:
-					//筛选数据，没有加进去，有就更新这个红包状态
-					if (msg.info == "") return;
-					let obj = JSON.parse(msg.info);
-					if (msg.op_type == WxSaoLeiHBMgr.HB_ADD) {
+					//红包数据
+					let hb_data = msg.hb_info != "" ? JSON.parse(msg.hb_info) : "";
+					if (!hb_data) return;
+					let lq_data = "";
+					if (msg.op_type == GlobalDef.WXSAOLEI_HB_ADD) {
 						//新增
-						this._hb_data.push(obj);
-					} else if (msg.op_type == WxSaoLeiHBMgr.HB_REMOVE) {
+						for (let i = 0; i < hb_data.length; i++) {
+							let cur_hb_data = hb_data[i];
+							this._hb_data.push(cur_hb_data);
+						}
+					} else if (msg.op_type == GlobalDef.WXSAOLEI_HB_REMOVE) {
 						//移除
-						let index = this.findHBDataById(obj.hb_id);
-						this._hb_data.splice(index, 1);
-					} else if (msg.op_type == WxSaoLeiHBMgr.HB_UPDATE) {
+						for (let i = 0; i < hb_data.length; i++) {
+							let cur_hb_data = hb_data[i];
+							let index = this.findHBDataById(cur_hb_data.hb_id);
+							this._hb_data.splice(index, 1);
+						}
+					} else if (msg.op_type == GlobalDef.WXSAOLEI_HB_UPDATE) {
 						//更新
-						let index = this.findHBDataById(obj.hb_id);
-						this._hb_data[index] = obj;
+						for (let i = 0; i < hb_data.length; i++) {
+							let cur_hb_data = hb_data[i];
+							let index = this.findHBDataById(cur_hb_data.hb_id);
+							this._hb_data[index] = hb_data;
+						}
+					} else if (msg.op_type == GlobalDef.WXSAOLEI_HB_TOTAL) {
+						//全量红包下发
+						for (var key in hb_data) {
+							if (hb_data.hasOwnProperty(key)) {
+								let element = hb_data[key];
+								this._hb_data.push(element)
+							}
+						}
 					}
-					this.event(WxSaoLeiHBMgr.MAP_HB_INFO, [msg.op_type, obj]);
+					this.event(WxSaoLeiHBMgr.MAP_HB_INFO, [msg.op_type, hb_data, lq_data]);
 					break
 				case Protocols.SMSG_WXSAOLEIHB_SEND_LQJL:
 					if (msg.inffo == "") return
 					let lq_datas = JSON.parse(msg.lq_datas);
 					this.event(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, [msg.op_type, lq_datas]);
+					break
+				case Protocols.SMSG_WXSAOLEIHB_LQ_INFO:
+					//领取信息
+					lq_data = msg.lq_data != "" ? JSON.parse(msg.lq_data) : "";
+					if (!lq_data) return;
+					this.event(WxSaoLeiHBMgr.MAP_HB_LQ_MSG, [lq_data]);
 					break
 			}
 
@@ -73,7 +97,6 @@ module gamewxsaoleihb.manager {
 					return i;
 				}
 			}
-			return
 		}
 
 		//单雷赔付计算
@@ -123,10 +146,25 @@ module gamewxsaoleihb.manager {
 			}
 			return zl_nums;
 		}
+
+		//中雷判断
+		isZhongLei(ld_str, money): boolean {
+			let ld_arr = ld_str ? ld_str.split(",") : [];
+			if (!ld_arr || ld_arr.length < 0) return false;
+			let end_num = Number(money.substr(-1, 1));
+			for (let i = 0; i < ld_arr.length; i++) {
+				let num = ld_arr[i]
+				if (num == end_num) {
+					return true
+				}
+			}
+			return false
+		}
+
 		//预中雷判断
 		isYuZLJudge(lq_data_arr: Array<any>, ld_str: any): boolean {
 			if (!lq_data_arr || lq_data_arr.length < 0) return false;
-			let ld_arr = ld_str ? ld_str.split(",") : "";
+			let ld_arr = ld_str ? ld_str.split(",") : [];
 			if (!ld_arr || ld_arr.length < 0) return false;
 			let copy_ld_arr = [].concat(ld_arr);
 			for (let i = 0; i < lq_data_arr.length; i++) {
@@ -159,6 +197,8 @@ module gamewxsaoleihb.manager {
 
 		clear(fource?: boolean) {
 			this._game.network.removeHanlder(Protocols.SMSG_WXSAOLEIHB_INFO, this, this.onOptHandler);
+			this._game.network.removeHanlder(Protocols.SMSG_WXSAOLEIHB_SEND_LQJL, this, this.onOptHandler);
+			this._game.network.removeHanlder(Protocols.SMSG_WXSAOLEIHB_LQ_INFO, this, this.onOptHandler);
 			Laya.timer.clearAll(this);
 		}
 	}

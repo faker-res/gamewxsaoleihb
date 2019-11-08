@@ -9,6 +9,9 @@ module gamewxsaoleihb.page {
 		private _leiDian: Array<number> = [];//雷点数
 		private _money: number;//红包金额
 		private _mapinfo: WxSaoLeiHBMapInfo;
+		private _moneyMin: number;
+		private _moneyMax: number;
+		private _wxSaoLeiMgr: WxSaoLeiHBMgr;
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);
 			this._isNeedBlack = true;
@@ -37,8 +40,8 @@ module gamewxsaoleihb.page {
 			this._viewUI.hb_danL_num1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.hb_danL_num2.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.hb_duoL_num1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
-
-
+			let story: WxSaoLeiHBStory = this._game.sceneObjectMgr.story;
+			this._wxSaoLeiMgr = story.wxSaoLeiHBMgr;
 			this._viewUI.tab_hb.selectedIndex = 0;
 			this.updateViewUI();
 		}
@@ -57,7 +60,9 @@ module gamewxsaoleihb.page {
 			let mapLv = this._mapinfo.GetMapLevel();
 			let index = WxSaoLeiHBMgr.ALL_GAME_ROOM_CONFIG_ID.indexOf(mapLv);
 			if (index < 0) index = 0;
-			this._viewUI.lb_range.text = StringU.substitute("红包发放范围：{0}-{1}", WxSaoLeiHBMgr.MIN_TEMP[index], WxSaoLeiHBMgr.MAX_TEMP[index]);
+			this._moneyMin = WxSaoLeiHBMgr.MIN_TEMP[index];
+			this._moneyMax = WxSaoLeiHBMgr.MAX_TEMP[index]
+			this._viewUI.lb_range.text = StringU.substitute("红包发放范围：{0}-{1}", this._moneyMin, this._moneyMax);
 		}
 
 		private onLeiDianClick(index: number): void {
@@ -86,7 +91,7 @@ module gamewxsaoleihb.page {
 						this._leiDian = [randomNum];
 					} else if (this._type = WxSaoLeiHBMgr.TYPE_DUOLEI - 1) {
 						//随机雷点数
-						let leiDianNum = MathU.randomRange(1, WxSaoLeiHBMgr.LEI_MAX_NUM);
+						let leiDianNum = MathU.randomRange(1, WxSaoLeiHBMgr.LEI_MAX_NUM - 1);
 						//随机雷点
 						let leiDianNums = [].concat(WxSaoLeiHBMgr.LEI_HAO);	//预防数组引用
 						while (leiDianNum > 0) {
@@ -100,17 +105,30 @@ module gamewxsaoleihb.page {
 					break
 				case this._viewUI.btn_send:
 					//发红包
-					if (this._type != 0 && !this._type) this._game.showTips("请选择红包类型哦~");
-					if (this._baoNum < 0) this._game.showTips("红包数不能为空");
-					if (!this._leiDian || this._leiDian.length < 0) this._game.showTips("雷点数不能为空");
+					if (this._type != 0 && !this._type) {
+						this._game.showTips("请选择红包类型哦~");
+						return
+					}
+					if (this._baoNum <= 0) {
+						this._game.showTips("红包数不能为空");
+						return
+					}
+					if (!this._leiDian || this._leiDian.length <= 0) {
+						this._game.showTips("雷点数不能为空");
+						return
+					}
 					this._money = Number(this._viewUI.txtInput.text);
-					if (this._money < 0) this._game.showTips("金额不能为空哦~");
+					if (this._money <= 0 || this._money < this._moneyMin || this._money > this._moneyMax) {
+						this._game.showTips("金额数错误");
+						return;
+					}
 					let leiDianStr = "";
 					for (let i = 0; i < this._leiDian.length; i++) {
 						if (i > 0) leiDianStr += ","
 						leiDianStr += this._leiDian[i];
 					}
 					this._game.network.call_wxsaoleihb_sendhb(this._type + 1, this._baoNum, leiDianStr, this._money);
+					this.close();
 					break
 				case this._viewUI.hb_danL_num1:
 					this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[0];

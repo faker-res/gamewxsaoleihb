@@ -16,6 +16,8 @@ module gamewxsaoleihb.page {
 		static PAGE_WXSLHB_FAHB: string = "5";
 		//红包详情
 		static PAGE_WXSLHB_HB_INFO: string = "6";
+		//房间信息
+		static PAGE_WXSLHB_HB_ROOM_INFO: string = "7";
 		//红包游戏规则界面
 		static PAGE_WXSLHB_RULE: string = "101";
 
@@ -31,10 +33,11 @@ module gamewxsaoleihb.page {
 			PageDef._pageClassMap[WxsaoleihbPageDef.PAGE_WXSLHB_FAHB] = WxSaoLeiHBFAHBPage;
 			PageDef._pageClassMap[WxsaoleihbPageDef.PAGE_WXSLHB_RULE] = WxSaoLeiHBRulePage;
 			PageDef._pageClassMap[WxsaoleihbPageDef.PAGE_WXSLHB_HB_INFO] = WxSaoLeiHBInfoPage;
+			PageDef._pageClassMap[WxsaoleihbPageDef.PAGE_WXSLHB_HB_ROOM_INFO] = WxSaoLeiHBRoomInfoPage;
 
-			this.ROOM_INFO[Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_1] = { mode: Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_1, name: "新手场", minGold: 1 };
+			this.ROOM_INFO[Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_1] = { mode: Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_1, name: "小资场", minGold: 1 };
 			this.ROOM_INFO[Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_2] = { mode: Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_2, name: "老板场", minGold: 10 };
-			this.ROOM_INFO[Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_3] = { mode: Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_3, name: "土豪场", minGold: 40 };
+			this.ROOM_INFO[Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_3] = { mode: Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_3, name: "富豪场", minGold: 40 };
 
 			this["__needLoadAsset"] = [
 				PathGameTongyong.atlas_game_ui_tongyong + "hud.atlas",

@@ -3,7 +3,13 @@
 */
 module gamewxsaoleihb.page {
 	export class WxSaoLeiHBRulePage extends game.gui.base.Page {
+		public static OUTSIDE_RULE: number = 1;
+		public static INNER_RULE: number = 2;
+
+		private static TYPE_WANFA_JIESHAO:number = 0;
+		private static TYPE_CARD_PEIFU:number = 1;
 		private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLei_GuiZeUI;
+		private _curType: number = 1;
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);
 			this._isNeedBlack = true;
@@ -13,6 +19,7 @@ module gamewxsaoleihb.page {
 				PathGameTongyong.atlas_game_ui_tongyong + "dating.atlas",
 				PathGameTongyong.atlas_game_ui_tongyong + "hud.atlas",
 				Path_game_wxSaoLeiHB.atlas_game_ui + "saolei.atlas",
+				Path_game_wxSaoLeiHB.atlas_game_ui + "guize.atlas",
 			];
 		}
 
@@ -23,9 +30,46 @@ module gamewxsaoleihb.page {
 
 		}
 
+		setData(): void {
+			this._curType = WxSaoLeiHBRulePage.INNER_RULE;
+		}
+
 		// 页面打开时执行函数
 		protected onOpen(): void {
 			super.onOpen();
+			this._viewUI.box_out.visible = this._curType == WxSaoLeiHBRulePage.OUTSIDE_RULE;
+			this._viewUI.box_inner.visible = this._curType == WxSaoLeiHBRulePage.INNER_RULE;
+			this._viewUI.btn_back.on(LEvent.CLICK, this, this.onBtnClickWithTween);
+			this._viewUI.btn_close.on(LEvent.CLICK, this, this.onBtnClickWithTween);
+			this._viewUI.panel_inner.vScrollBarSkin = "";
+			this._viewUI.panel_inner.vScrollBar.autoHide = true;
+			this._viewUI.panel_inner.vScrollBar.elasticDistance = 100;
+			this._viewUI.panel_out.vScrollBarSkin = "";
+			this._viewUI.panel_out.vScrollBar.autoHide = true;
+			this._viewUI.panel_out.vScrollBar.elasticDistance = 100;
+			this._viewUI.tab_Type.selectHandler = Handler.create(this, this.selectHandler, null, false);
+			this._viewUI.tab_Type.selectedIndex = 0;
+			//界面是否需要旋转90度
+
+		}
+
+		private selectHandler(index: number): void {
+			this._viewUI.img_pf.visible = this._viewUI.tab_Type.selectedIndex == WxSaoLeiHBRulePage.TYPE_WANFA_JIESHAO;
+			this._viewUI.panel_out.visible = this._viewUI.tab_Type.selectedIndex == WxSaoLeiHBRulePage.TYPE_CARD_PEIFU;
+		}
+
+		/**按钮点击事件缓动完 回调 该做啥就做啥 */
+		protected onBtnTweenEnd(e: any, target: any): void {
+			let mainPlayer = this._game.sceneObjectMgr.mainPlayer;
+			if (!mainPlayer) return;
+			switch (target) {
+				case this._viewUI.btn_back:
+					this.close();
+					break
+				case this._viewUI.btn_close:
+					this.close();
+					break
+			}
 		}
 
 		public close(): void {
