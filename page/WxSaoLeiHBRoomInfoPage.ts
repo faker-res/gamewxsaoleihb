@@ -65,7 +65,7 @@ module gamewxsaoleihb.page {
 					this._viewUI.player_info.visible = true;
 					break
 				case this._viewUI.box_rule:
-					this._game.uiRoot.HUD.open(WxsaoleihbPageDef.PAGE_WXSLHB_RULE, (page: WxSaoLeiHBRulePage) => {
+					this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_RULE, (page: WxSaoLeiHBRulePage) => {
 						page.setData();
 					});
 					break

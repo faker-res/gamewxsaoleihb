@@ -6,8 +6,8 @@ module gamewxsaoleihb.page {
 		public static OUTSIDE_RULE: number = 1;
 		public static INNER_RULE: number = 2;
 
-		private static TYPE_WANFA_JIESHAO:number = 0;
-		private static TYPE_CARD_PEIFU:number = 1;
+		private static TYPE_WANFA_JIESHAO: number = 0;
+		private static TYPE_CARD_PEIFU: number = 1;
 		private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLei_GuiZeUI;
 		private _curType: number = 1;
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
@@ -49,8 +49,6 @@ module gamewxsaoleihb.page {
 			this._viewUI.panel_out.vScrollBar.elasticDistance = 100;
 			this._viewUI.tab_Type.selectHandler = Handler.create(this, this.selectHandler, null, false);
 			this._viewUI.tab_Type.selectedIndex = 0;
-			//界面是否需要旋转90度
-
 		}
 
 		private selectHandler(index: number): void {

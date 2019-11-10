@@ -15,7 +15,7 @@ module gamewxsaoleihb {
         static init(): void {
             this.MONEY_FONT = {
                 source: Path_game_wxSaoLeiHB.atlas_game_ui + "saolei.atlas",
-                url: Path_game_wxSaoLeiHB.ui_wxsaoleihb + 'clip_0-9.png',
+                url: Path_game_wxSaoLeiHB.ui_wxsaoleihb + 'saolei/clip_0-9.png',
                 clipWidth: 52,
                 clipHeight: 79,
                 clipX: 11,

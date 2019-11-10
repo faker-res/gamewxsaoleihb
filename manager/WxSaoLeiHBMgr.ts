@@ -21,7 +21,14 @@ module gamewxsaoleihb.manager {
 		public static readonly MAP_HB_LQ_MSG = "WxSaoLeiHBMgr.MAP_HB_LQ_MSG";//红包领取数据消息
 		public static readonly HB_TIME: number = 90;	//红包持续时间
 
+		public static readonly HB_STATE_ING: number = 1;
+		public static readonly HB_STATE_END: number = 2;
+
 		private _hb_data: Array<any> = [];	//红包总数据
+		public get hbData() {
+			return this._hb_data;
+		}
+		public pf_data: Array<any> = [];	//赔付数据
 		//判断玩家是否操作该红包，从领取记录中查询是否有自己有操作过
 		private _hb_lq_jl: any	//红包领取记录
 		constructor(game: Game) {
@@ -31,9 +38,6 @@ module gamewxsaoleihb.manager {
 			this._game.network.addHanlder(Protocols.SMSG_WXSAOLEIHB_LQ_INFO, this, this.onOptHandler);
 		}
 
-		public get hbData() {
-			return this._hb_data;
-		}
 
 		private onOptHandler(optcode: number, msg: any): void {
 			switch (optcode) {
@@ -74,9 +78,9 @@ module gamewxsaoleihb.manager {
 					this.event(WxSaoLeiHBMgr.MAP_HB_INFO, [msg.op_type, hb_data, lq_data]);
 					break
 				case Protocols.SMSG_WXSAOLEIHB_SEND_LQJL:
-					if (msg.inffo == "") return
+					if (msg.lq_datas == "") return
 					let lq_datas = JSON.parse(msg.lq_datas);
-					this.event(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, [msg.op_type, lq_datas]);
+					this.event(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, [lq_datas]);
 					break
 				case Protocols.SMSG_WXSAOLEIHB_LQ_INFO:
 					//领取信息
@@ -89,7 +93,7 @@ module gamewxsaoleihb.manager {
 		}
 
 		//查找指定红包
-		private findHBDataById(hb_id: number): number {
+		public findHBDataById(hb_id: number): number {
 			for (let i = 0; i < this._hb_data.length; i++) {
 				let hb_data = this._hb_data[i];
 				if (!hb_data) continue;
@@ -195,6 +199,81 @@ module gamewxsaoleihb.manager {
 			return index;
 		}
 
+		//------------------------红包雨start---------------
+		public static readonly HB_RAIN_TIME: number = 600;	//秒
+		public static MAX_HB_NUM = 50;
+		private _asset_url = "";
+		private _refAsset: RefAsset;
+		private _stageWidth;
+		private _stageHeight;
+		private _widthRate: number = 1;
+		private _hbCells: HBCell[] = [];
+		public showHBRain(times: number = 1): void {
+			this._asset_url = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_fl.png";
+			if (!this._refAsset) {
+				this._refAsset = RefAsset.Get(this._asset_url)
+				this._refAsset.retain();
+			}
+			this._stageWidth = this._game.clientWidth
+			this._stageHeight = this._game.clientHeight;
+			let refAsset = this._refAsset;
+			if (!refAsset.parseComplete) {
+				refAsset.once(LEvent.COMPLETE, this, () => {
+					this.onStart(times);
+				});
+			}
+			else {
+				this.onStart(times);
+			}
+		}
+
+		private onStart(times) {
+			for (var i = 0; i < times; i++) {
+				Laya.timer.once(100 * i, this, () => { this.start() });
+			}
+		}
+
+		private start() {
+			for (let index = 0; index < WxSaoLeiHBMgr.MAX_HB_NUM; index++) {
+				Laya.timer.once(100 * index, this, () => {
+					let hbcell: HBCell = HBCell.create(this._stageWidth, this._widthRate, this._asset_url);
+					hbcell.on(LEvent.CLICK, this, this.onBtnHbClick)
+					this._hbCells.push(hbcell);
+				})
+			}
+		}
+
+		//点击领取福利红包
+		private onBtnHbClick(): void {
+			let mapPage: gamewxsaoleihb.page.WxSaoLeiHBMapPage = this._game.uiRoot.HUD.getPage(WxsaoleihbPageDef.PAGE_WXSLHB_MAP) as gamewxsaoleihb.page.WxSaoLeiHBMapPage;
+			if (mapPage) {
+				mapPage.initHBGetUI(gamewxsaoleihb.page.WxSaoLeiHBMapPage.TYPE_HBY, "");
+			}
+		}
+
+		update(diff: number) {
+			super.update(diff);
+			if (!this._hbCells || this._hbCells.length < 0) return;
+			if (Camera.ins.map_width_px != this._stageWidth || Camera.ins.map_height_px != this._stageHeight) {
+				Camera.ins.setMapSize(this._stageWidth, this._stageHeight);
+				Camera.ins.update();
+			}
+			this._game.uiRoot.top.graphics.clear();
+			for (let index = 0; index < this._hbCells.length; index++) {
+				let hbcell = this._hbCells[index];
+				if (hbcell.isDestroy) {
+					this._hbCells.splice(index, 1);
+					ObjectPools.free(hbcell);
+					index--;
+				} else {
+					hbcell.onDraw(diff, this._game.uiRoot.top.graphics, this._stageWidth, this._stageHeight, this._widthRate);
+				}
+			}
+			if (this._widthRate != 1)
+				this._widthRate = 1;
+		}
+		//-----------------------红包雨end----------------
+
 		clear(fource?: boolean) {
 			this._game.network.removeHanlder(Protocols.SMSG_WXSAOLEIHB_INFO, this, this.onOptHandler);
 			this._game.network.removeHanlder(Protocols.SMSG_WXSAOLEIHB_SEND_LQJL, this, this.onOptHandler);
@@ -202,5 +281,87 @@ module gamewxsaoleihb.manager {
 			Laya.timer.clearAll(this);
 		}
 	}
+	class HBCell extends Laya.Sprite implements IPoolsObject {
+		isDestroy: boolean = false;
+		private _stageWidth;
+		private _stageHeight;
+		private _widthRate: number = 1;
+		private _acceleration: number;//加速度
+		private _duration: number = 0;
+		private _asset_url: string = "";
+		private _curTexture: Texture;
+		private _bornPos: Vector2 = new Vector2();//出生的位置
+		private _curPos: Vector2 = new Vector2();//当前位置
+		constructor() {
+			super();
+		}
 
+		poolName: string = "HBCell";
+        /**
+         * 进池 （相当于对象dispose函数）
+         */
+		intoPool(...arg: any[]): void {
+			this.dispose();
+		}
+        /**
+         * 出池 （相当于对象初始化函数）
+         */
+		outPool(...arg: any[]): void {
+
+		}
+
+		static create(width: number, widthRate: number, asset_url: string): HBCell {
+			let obj = ObjectPools.malloc(HBCell) as HBCell;
+			obj.create(width, widthRate, asset_url);
+			return obj;
+		}
+
+		private create(width: number, widthRate: number, asset_url: string) {
+			this.isDestroy = false;
+			this._stageWidth = width;
+			this._widthRate = widthRate;
+			this._asset_url = asset_url;
+			this.initTexture();
+		}
+
+		private initTexture(): void {
+			let texture: Texture;
+			this._curTexture = Loader.getRes(this._asset_url);
+			this.calInfo();
+		}
+
+		private calInfo(): void {
+			this._duration = 0;
+			//隨機開始x
+			this._curPos.x = this._bornPos.x = MathU.randomRange(0, this._stageWidth * this._widthRate);
+			//隨機開始y
+			this._curPos.y = this._bornPos.y = MathU.randomRange(-1280, -360);
+			//随机加速度
+			this._acceleration = 0.3;
+		}
+
+		onDraw(diff: number, g: Graphics, width: number, height: number, widthRate: number) {
+			let texture = this._curTexture;
+			if (!texture) return;
+			let tw: number = texture.sourceWidth;
+			let th: number = texture.sourceHeight;
+			let matrix = new Laya.Matrix();
+
+			this._duration += diff;
+			this._curPos.x = this._curPos.x * widthRate;
+			this._curPos.y = this._curPos.y + this._acceleration * this._duration * (diff / 1000);
+
+			if (this._curPos.y >= height)
+				this.isDestroy = true;
+
+			matrix.tx = -tw / 2;
+			matrix.ty = -th / 2;
+			matrix.tx += Camera.ins.getScenePxByCellX(this._curPos.x);
+			matrix.ty += Camera.ins.getScenePxByCellY(this._curPos.y);
+			g.drawTexture(texture, 0, 0, tw, th, matrix);
+		}
+
+		private dispose() {
+		}
+	}
 }

@@ -22,16 +22,16 @@ module gamewxsaoleihb.page {
 		protected init(): void {
 			this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLeiHB_InfoUI');
 			this.addChild(this._viewUI);
-		}
-
-		// 页面打开时执行函数
-		protected onOpen(): void {
-			super.onOpen();
 			this._viewUI.hb_info_list.vScrollBarSkin = "";
 			this._viewUI.hb_info_list.scrollBar.elasticDistance = 100;
 			this._viewUI.hb_info_list.itemRender = this.createChildren("game_ui.wxsaoleihb.component.WXSaoLei_LBUI", HBLingQuMX);
 			this._viewUI.hb_info_list.renderHandler = new Handler(this, this.renderHandler);
 			this.initClip();
+		}
+
+		// 页面打开时执行函数
+		protected onOpen(): void {
+			super.onOpen();
 			this._viewUI.btn_back.on(LEvent.CLICK, this, this.close);
 			this._viewUI.lb_hbjl.on(LEvent.CLICK, this, this.openHbJL);
 		}
@@ -41,7 +41,7 @@ module gamewxsaoleihb.page {
 			if (!this._moneyNum) {
 				this._moneyNum = new ClipUtil(WxSaoLeiHBClip.MONEY_FONT);
 				this._moneyNum.centerX = this._viewUI.clip_hb_num.centerX;
-				this._moneyNum.centerY = this._viewUI.clip_hb_num.centerX;
+				this._moneyNum.centerY = this._viewUI.clip_hb_num.centerY;
 				this._viewUI.clip_hb_num.parent.addChild(this._moneyNum);
 				this._viewUI.clip_hb_num.removeSelf();
 			}
@@ -49,7 +49,7 @@ module gamewxsaoleihb.page {
 
 		//打开红包记录界面
 		private openHbJL(): void {
-			this._game.uiRoot.HUD.open(WxsaoleihbPageDef.PAGE_WXSLHB_JL);
+			this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_JL);
 		}
 
 		private _hbData: any
@@ -64,18 +64,17 @@ module gamewxsaoleihb.page {
 				this._viewUI.rain_money.text = money.toString();
 			} else if (type == WxSaoLeiHBInfoPage.TYPE_HB_INFO) {
 				if (!hbData || !lqData) return;
+				let story: WxSaoLeiHBStory = this._game.sceneObjectMgr.story;
+				this._maxIndex = story.wxSaoLeiHBMgr.searchMaxMoney(lqData);
 				this._hbData = hbData;
 				this._lqData = lqData;
 				this._viewUI.hb_info_list.dataSource = this._lqData;
 				this._moneyNum.setText(this._hbData.money);
 				this._viewUI.img_head.skin = TongyongUtil.getHeadUrl(this._hbData.head);
 				this._viewUI.lb_name.text = this._hbData.name;
-				this._viewUI.lb_hb_num.text = this._hbData.bao_num;
-				let ld_arr = this._hbData.ld_str.split(',');
-				this._viewUI.lb_ld.text = JSON.stringify(ld_arr);
+				this._viewUI.lb_hb_num.text = this._hbData.bao_num + "个红包";
+				this._viewUI.lb_ld.text = "雷号:" +  this._hbData.ld_str
 				this._viewUI.lb_lq.text = StringU.substitute("领取{0}/{1}个", this._hbData.lq_num, this._hbData.bao_num);
-				let story: WxSaoLeiHBStory = this._game.sceneObjectMgr.story;
-				this._maxIndex = story.wxSaoLeiHBMgr.searchMaxMoney(lqData);
 			}
 		}
 
@@ -108,14 +107,14 @@ module gamewxsaoleihb.page {
 			if (!data) return;
 			//免死金牌
 			this.img_head.skin = this._data.status == 1 ? TongyongUtil.getHeadUrl(this._data.lq_head) : Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_msjp.png";
-			this.lb_money.text = this._data.money;
-			this.lb_time.text = Sync.getTimeShortStr2(this._data.lq_money)
+			this.lb_money.text = this._data.lq_money;
+			this.lb_time.text = Sync.getTimeShortStr2(this._data.lq_time)
 			this.lb_name.text = this._data.name;
+			//是否中雷
+			this.img_zl.visible = this._data.pf_money > 0;
 			//手气最佳
 			this.img_sqzj.visible = isMax;
-			this.img_sqzj.x = this._data.is_zl ? 505 : 594;
-			//是否中雷
-			this.img_zl.visible = this._data.is_zl;
+			this.img_sqzj.x = this.img_zl.visible ? 505 : 594;
 		}
 	}
 }
