@@ -15,7 +15,6 @@ module gamewxsaoleihb.manager {
 		public static readonly GMAE_ROOME_NAME = ["小资场", "老板场", "富豪场"];
 		public static readonly DANLEI_BET: Array<number> = [1.6, 1.2];
 		public static readonly DUOLEI_BET: Array<number> = [1.2, 1.05, 1.28, 1.8, 2.5];
-		// static readonly MAPINFO_OFFLINE: string = "WxSaoLeiHBMgr.MAPINFO_OFFLINE";//假精灵
 		public static readonly MAP_HB_INFO = "WxSaoLeiHBMgr.MAP_HB_INFO";//红包数据
 		public static readonly MAP_HB_LQ_INFO = "WxSaoLeiHBMgr.MAP_HB_LQ_INFO";//红包领取数据详情
 		public static readonly MAP_HB_LQ_MSG = "WxSaoLeiHBMgr.MAP_HB_LQ_MSG";//红包领取数据消息
@@ -28,14 +27,24 @@ module gamewxsaoleihb.manager {
 		public get hbData() {
 			return this._hb_data;
 		}
-		public pf_data: Array<any> = [];	//赔付数据
-		//判断玩家是否操作该红包，从领取记录中查询是否有自己有操作过
-		private _hb_lq_jl: any	//红包领取记录
+		private _self_hb_data: Array<any> = [];//自己发的红包数据
+		public get selfHbData() {
+			return this._self_hb_data;
+		}
+		public pf_data: Array<any> = [];	//预中雷赔付数据{hb_id:,pf_money:}
+		public static readonly PF_INFO_UPDATE = "WxSaoLeiHBMgr.PF_INFO_UPDATE";
+		public self_hb_lqjl: Array<any> = []	//自己红包领取记录{领取数据}
+		public self_show_settle_dl_info: Array<any> = [];//多雷结算显示记录显示数据{红包id}
+		public self_hb_show: Array<any> = [];//自己的红包结算记录显示数据{红包id}
+		private _mainPlayer: PlayerData;
+		private _mainPlayerUid: string;
 		constructor(game: Game) {
 			super(game)
 			this._game.network.addHanlder(Protocols.SMSG_WXSAOLEIHB_INFO, this, this.onOptHandler);
 			this._game.network.addHanlder(Protocols.SMSG_WXSAOLEIHB_SEND_LQJL, this, this.onOptHandler);
 			this._game.network.addHanlder(Protocols.SMSG_WXSAOLEIHB_LQ_INFO, this, this.onOptHandler);
+			this._mainPlayer = this._game.sceneObjectMgr.mainPlayer;
+			if (this._mainPlayer) this._mainPlayerUid = this._mainPlayer.GetUserId();
 		}
 
 
@@ -43,7 +52,16 @@ module gamewxsaoleihb.manager {
 			switch (optcode) {
 				case Protocols.SMSG_WXSAOLEIHB_INFO:
 					//红包数据
-					let hb_data = msg.hb_info != "" ? JSON.parse(msg.hb_info) : "";
+					let hb_data
+					if (msg.hb_info != "") {
+						try {
+							hb_data = JSON.parse(msg.hb_info);
+						} catch (error) {
+							logd('parse WxSaoLeiHBMgr HB Data fail');
+						}
+					} else {
+						hb_data = ""
+					}
 					if (!hb_data) return;
 					let lq_data = "";
 					if (msg.op_type == GlobalDef.WXSAOLEI_HB_ADD) {
@@ -51,33 +69,41 @@ module gamewxsaoleihb.manager {
 						for (let i = 0; i < hb_data.length; i++) {
 							let cur_hb_data = hb_data[i];
 							this._hb_data.push(cur_hb_data);
+							this.updateSelfHbData(cur_hb_data);
 						}
 					} else if (msg.op_type == GlobalDef.WXSAOLEI_HB_REMOVE) {
 						//移除
 						for (let i = 0; i < hb_data.length; i++) {
 							let cur_hb_data = hb_data[i];
-							let index = this.findHBDataById(cur_hb_data.hb_id);
+							let index = this.findHBDataIndexById(cur_hb_data.hb_id);
 							this._hb_data.splice(index, 1);
 						}
 					} else if (msg.op_type == GlobalDef.WXSAOLEI_HB_UPDATE) {
 						//更新
 						for (let i = 0; i < hb_data.length; i++) {
 							let cur_hb_data = hb_data[i];
-							let index = this.findHBDataById(cur_hb_data.hb_id);
-							this._hb_data[index] = hb_data;
+							let index = this.findHBDataIndexById(cur_hb_data.hb_id);
+							if (index && index > -1) {
+								this._hb_data[index] = cur_hb_data;
+							} else {
+								this._hb_data.push(cur_hb_data);
+							}
+							this.updateSelfHbData(cur_hb_data);
 						}
 					} else if (msg.op_type == GlobalDef.WXSAOLEI_HB_TOTAL) {
 						//全量红包下发
 						for (var key in hb_data) {
 							if (hb_data.hasOwnProperty(key)) {
 								let element = hb_data[key];
-								this._hb_data.push(element)
+								this._hb_data.push(element);
+								this.updateSelfHbData(element);
 							}
 						}
 					}
 					this.event(WxSaoLeiHBMgr.MAP_HB_INFO, [msg.op_type, hb_data, lq_data]);
 					break
 				case Protocols.SMSG_WXSAOLEIHB_SEND_LQJL:
+					//当前红包的领取详情
 					if (msg.lq_datas == "") return
 					let lq_datas = JSON.parse(msg.lq_datas);
 					this.event(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, [lq_datas]);
@@ -89,16 +115,57 @@ module gamewxsaoleihb.manager {
 					this.event(WxSaoLeiHBMgr.MAP_HB_LQ_MSG, [lq_data]);
 					break
 			}
-
 		}
 
-		//查找指定红包
-		public findHBDataById(hb_id: number): number {
+		//更新自己的红包数据
+		updateSelfHbData(hb_data: any): void {
+			if (hb_data.uid && this._mainPlayerUid && Number(hb_data.uid) == Number(this._mainPlayerUid)) {
+				let isUpdate: boolean = false
+				for (let i = 0; i < this._self_hb_data.length; i++) {
+					let cur_hb_data = this._self_hb_data[i];
+					if (!cur_hb_data) continue;
+					if (cur_hb_data.hb_id == hb_data.hb_id) {
+						//更新
+						isUpdate = true;
+						this._self_hb_data[i] = hb_data;
+					}
+				}
+				if (!isUpdate) {
+					//没有更新代表没有这条数据
+					this._self_hb_data.push(hb_data);
+				}
+			}
+		}
+
+		//查找赔付数据
+		public findPFDataByid(hb_id: number): any {
+			for (let i = 0; i < this.pf_data.length; i++) {
+				let pfData = this.pf_data[i];
+				if (!pfData) continue;
+				if (hb_id == pfData.hb_id) {
+					return pfData;
+				}
+			}
+		}
+
+		//查找指定红包在数组中的位置
+		public findHBDataIndexById(hb_id: number): number {
 			for (let i = 0; i < this._hb_data.length; i++) {
 				let hb_data = this._hb_data[i];
 				if (!hb_data) continue;
 				if (hb_data.hb_id == hb_id) {
 					return i;
+				}
+			}
+		}
+
+		//查找指定红包数据
+		public findHBDataById(hb_id: number): any {
+			for (let i = 0; i < this._hb_data.length; i++) {
+				let hb_data = this._hb_data[i];
+				if (!hb_data) continue;
+				if (hb_data.hb_id == hb_id) {
+					return hb_data;
 				}
 			}
 		}
@@ -122,7 +189,7 @@ module gamewxsaoleihb.manager {
 		//多雷赔付计算
 		LqDuoLeiPFMoney(hb_data): number {
 			let hb_money = hb_data.money
-			let subZLMonney  //扣钱数
+			let subZLMonney: number  //扣钱数
 			let loss_bet  //赔率
 			let bet_data  //赔率数据
 			//根据雷点数进行赔付
@@ -200,15 +267,17 @@ module gamewxsaoleihb.manager {
 		}
 
 		//------------------------红包雨start---------------
-		public static readonly HB_RAIN_TIME: number = 600;	//秒
-		public static MAX_HB_NUM = 50;
+		public static CREATE_HB_RAIN_TIME: number = 5;
+		public static MAX_HB_NUM = 30;
 		private _asset_url = "";
 		private _refAsset: RefAsset;
 		private _stageWidth;
 		private _stageHeight;
 		private _widthRate: number = 1;
 		private _hbCells: HBCell[] = [];
-		public showHBRain(times: number = 1): void {
+		private _end_time: number;	//红包雨结束时间
+		public isHbRain: boolean = false;
+		public showHBRain(endTime: number): void {
 			this._asset_url = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_fl.png";
 			if (!this._refAsset) {
 				this._refAsset = RefAsset.Get(this._asset_url)
@@ -219,46 +288,82 @@ module gamewxsaoleihb.manager {
 			let refAsset = this._refAsset;
 			if (!refAsset.parseComplete) {
 				refAsset.once(LEvent.COMPLETE, this, () => {
-					this.onStart(times);
+					this.onStart(endTime);
 				});
 			}
 			else {
-				this.onStart(times);
+				this.onStart(endTime);
 			}
 		}
 
-		private onStart(times) {
-			for (var i = 0; i < times; i++) {
-				Laya.timer.once(100 * i, this, () => { this.start() });
-			}
+		private onStart(endTime) {
+			this.isHbRain = true;
+			this._end_time = endTime;
+			this._game.uiRoot.general.on(LEvent.CLICK, this, this.onBtnHbClick);
 		}
 
-		private start() {
+		private crateHB() {
+			let cur_time = this._game.sync.serverTimeBys;
+			if (this._create_time && this._create_time > cur_time) return;
+			this._create_time = cur_time + WxSaoLeiHBMgr.CREATE_HB_RAIN_TIME;
 			for (let index = 0; index < WxSaoLeiHBMgr.MAX_HB_NUM; index++) {
 				Laya.timer.once(100 * index, this, () => {
 					let hbcell: HBCell = HBCell.create(this._stageWidth, this._widthRate, this._asset_url);
-					hbcell.on(LEvent.CLICK, this, this.onBtnHbClick)
+					// hbcell.on(LEvent.CLICK, this, this.onBtnHbClick)
 					this._hbCells.push(hbcell);
 				})
 			}
 		}
 
+		//红包雨结束
+		private end() {
+			this.isHbRain = false;
+			this._game.uiRoot.HUD.off(LEvent.CLICK, this, this.onBtnHbClick);
+			this._game.uiRoot.HUD.graphics.clear();
+			for (let index = 0; index < this._hbCells.length; index++) {
+				let hbcell = this._hbCells[index];
+				hbcell.isDestroy = true;
+				if (hbcell.isDestroy) {
+					this._hbCells.splice(index, 1);
+					ObjectPools.free(hbcell);
+					index--;
+				}
+			}
+		}
+
 		//点击领取福利红包
 		private onBtnHbClick(): void {
+			if (!this.isHbRain) return;
 			let mapPage: gamewxsaoleihb.page.WxSaoLeiHBMapPage = this._game.uiRoot.HUD.getPage(WxsaoleihbPageDef.PAGE_WXSLHB_MAP) as gamewxsaoleihb.page.WxSaoLeiHBMapPage;
 			if (mapPage) {
 				mapPage.initHBGetUI(gamewxsaoleihb.page.WxSaoLeiHBMapPage.TYPE_HBY, "");
 			}
 		}
 
+		//每隔5秒创建指定数据的红包
+		private _create_time: number = 0;
 		update(diff: number) {
 			super.update(diff);
-			if (!this._hbCells || this._hbCells.length < 0) return;
+			if (!this._hbCells) return;
+			if (this._end_time) {
+				if (this._end_time <= this._game.sync.serverTimeBys || !this.isHbRain) {
+					//红包雨结束
+					this.end();
+					return;
+				} else {
+					//红包开启 
+					this.crateHB();
+				}
+			}
+			this.updateHbRain(diff);
+		}
+
+		private updateHbRain(diff) {
 			if (Camera.ins.map_width_px != this._stageWidth || Camera.ins.map_height_px != this._stageHeight) {
 				Camera.ins.setMapSize(this._stageWidth, this._stageHeight);
 				Camera.ins.update();
 			}
-			this._game.uiRoot.top.graphics.clear();
+			this._game.uiRoot.HUD.graphics.clear();
 			for (let index = 0; index < this._hbCells.length; index++) {
 				let hbcell = this._hbCells[index];
 				if (hbcell.isDestroy) {
@@ -266,7 +371,7 @@ module gamewxsaoleihb.manager {
 					ObjectPools.free(hbcell);
 					index--;
 				} else {
-					hbcell.onDraw(diff, this._game.uiRoot.top.graphics, this._stageWidth, this._stageHeight, this._widthRate);
+					hbcell.onDraw(diff, this._game.uiRoot.HUD.graphics, this._stageWidth, this._stageHeight, this._widthRate);
 				}
 			}
 			if (this._widthRate != 1)
@@ -297,15 +402,15 @@ module gamewxsaoleihb.manager {
 		}
 
 		poolName: string = "HBCell";
-        /**
-         * 进池 （相当于对象dispose函数）
-         */
+		/**
+		 * 进池 （相当于对象dispose函数）
+		 */
 		intoPool(...arg: any[]): void {
 			this.dispose();
 		}
-        /**
-         * 出池 （相当于对象初始化函数）
-         */
+		/**
+		 * 出池 （相当于对象初始化函数）
+		 */
 		outPool(...arg: any[]): void {
 
 		}
@@ -327,6 +432,10 @@ module gamewxsaoleihb.manager {
 		private initTexture(): void {
 			let texture: Texture;
 			this._curTexture = Loader.getRes(this._asset_url);
+			this.width = this._curTexture.sourceWidth;
+			this.height = this._curTexture.sourceHeight;
+			this.loadImage(Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_fl.png");
+			this.rotation = 90;
 			this.calInfo();
 		}
 
@@ -359,6 +468,7 @@ module gamewxsaoleihb.manager {
 			matrix.tx += Camera.ins.getScenePxByCellX(this._curPos.x);
 			matrix.ty += Camera.ins.getScenePxByCellY(this._curPos.y);
 			g.drawTexture(texture, 0, 0, tw, th, matrix);
+			this.pos(tw, th);
 		}
 
 		private dispose() {

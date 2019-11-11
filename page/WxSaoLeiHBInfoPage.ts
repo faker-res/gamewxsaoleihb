@@ -41,7 +41,7 @@ module gamewxsaoleihb.page {
 			if (!this._moneyNum) {
 				this._moneyNum = new ClipUtil(WxSaoLeiHBClip.MONEY_FONT);
 				this._moneyNum.centerX = this._viewUI.clip_hb_num.centerX;
-				this._moneyNum.centerY = this._viewUI.clip_hb_num.centerY;
+				this._moneyNum.y = this._viewUI.clip_hb_num.y;
 				this._viewUI.clip_hb_num.parent.addChild(this._moneyNum);
 				this._viewUI.clip_hb_num.removeSelf();
 			}
@@ -70,10 +70,12 @@ module gamewxsaoleihb.page {
 				this._lqData = lqData;
 				this._viewUI.hb_info_list.dataSource = this._lqData;
 				this._moneyNum.setText(this._hbData.money);
+				this._viewUI.lb_yuan.centerX = this._moneyNum.centerX + this._moneyNum.width;
+				this._viewUI.lb_yuan.y = this._moneyNum.y + this._moneyNum.height - this._viewUI.lb_yuan.height;
 				this._viewUI.img_head.skin = TongyongUtil.getHeadUrl(this._hbData.head);
 				this._viewUI.lb_name.text = this._hbData.name;
 				this._viewUI.lb_hb_num.text = this._hbData.bao_num + "个红包";
-				this._viewUI.lb_ld.text = "雷号:" +  this._hbData.ld_str
+				this._viewUI.lb_ld.text = "雷号:" + this._hbData.ld_str
 				this._viewUI.lb_lq.text = StringU.substitute("领取{0}/{1}个", this._hbData.lq_num, this._hbData.bao_num);
 			}
 		}
@@ -108,13 +110,13 @@ module gamewxsaoleihb.page {
 			//免死金牌
 			this.img_head.skin = this._data.status == 1 ? TongyongUtil.getHeadUrl(this._data.lq_head) : Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_msjp.png";
 			this.lb_money.text = this._data.lq_money;
-			this.lb_time.text = Sync.getTimeShortStr2(this._data.lq_time)
-			this.lb_name.text = this._data.name;
+			this.lb_time.text = Sync.getTimeShortStr(this._data.lq_time)
+			this.lb_name.text = this._data.status == 1 ? this._data.name : "免死金牌";
 			//是否中雷
 			this.img_zl.visible = this._data.pf_money > 0;
 			//手气最佳
 			this.img_sqzj.visible = isMax;
-			this.img_sqzj.x = this.img_zl.visible ? 505 : 594;
+			this.img_sqzj.right = this.img_zl.visible ? 113 : 26;
 		}
 	}
 }
