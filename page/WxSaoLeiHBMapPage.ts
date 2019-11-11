@@ -318,7 +318,7 @@ module gamewxsaoleihb.page {
                     //领取红包
                     if (!this._curHbData) return;
                     //判断状态
-                    if (this._curHbData.hb_state == 1) {
+                    if (this._curHbData.hb_state == WxSaoLeiHBMgr.HB_STATE_ING) {
                         //判断是否有操作过 操作过，直接打开红包详情界面，否则发领取协议
                         this._game.network.call_wxsaoleihb_opt(this._curHbData.hb_id);
                     } else {
