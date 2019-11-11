@@ -277,8 +277,10 @@ module gamewxsaoleihb.manager {
 		private _hbCells: HBCell[] = [];
 		private _end_time: number;	//红包雨结束时间
 		public isHbRain: boolean = false;
-		public showHBRain(endTime: number): void {
+		private _parent: gamewxsaoleihb.page.WxSaoLeiHBMapPage;
+		public showHBRain(endTime: number, parent: gamewxsaoleihb.page.WxSaoLeiHBMapPage): void {
 			this._asset_url = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_fl.png";
+			this._parent = parent;
 			if (!this._refAsset) {
 				this._refAsset = RefAsset.Get(this._asset_url)
 				this._refAsset.retain();
@@ -299,7 +301,6 @@ module gamewxsaoleihb.manager {
 		private onStart(endTime) {
 			this.isHbRain = true;
 			this._end_time = endTime;
-			this._game.uiRoot.general.on(LEvent.CLICK, this, this.onBtnHbClick);
 		}
 
 		private crateHB() {
@@ -308,23 +309,22 @@ module gamewxsaoleihb.manager {
 			this._create_time = cur_time + WxSaoLeiHBMgr.CREATE_HB_RAIN_TIME;
 			for (let index = 0; index < WxSaoLeiHBMgr.MAX_HB_NUM; index++) {
 				Laya.timer.once(100 * index, this, () => {
-					let hbcell: HBCell = HBCell.create(this._stageWidth, this._widthRate, this._asset_url);
-					// hbcell.on(LEvent.CLICK, this, this.onBtnHbClick)
+					let hbcell: HBCell = HBCell.create(this._stageWidth, this._widthRate, this._asset_url, this._parent);
+					hbcell.on(LEvent.CLICK, this, this.onBtnHbClick)
 					this._hbCells.push(hbcell);
 				})
 			}
 		}
 
 		//红包雨结束
-		private end() {
+		public end() {
 			this.isHbRain = false;
-			this._game.uiRoot.HUD.off(LEvent.CLICK, this, this.onBtnHbClick);
-			this._game.uiRoot.HUD.graphics.clear();
 			for (let index = 0; index < this._hbCells.length; index++) {
 				let hbcell = this._hbCells[index];
 				hbcell.isDestroy = true;
 				if (hbcell.isDestroy) {
 					this._hbCells.splice(index, 1);
+					hbcell.off(LEvent.CLICK, this, this.onBtnHbClick);
 					ObjectPools.free(hbcell);
 					index--;
 				}
@@ -359,19 +359,15 @@ module gamewxsaoleihb.manager {
 		}
 
 		private updateHbRain(diff) {
-			if (Camera.ins.map_width_px != this._stageWidth || Camera.ins.map_height_px != this._stageHeight) {
-				Camera.ins.setMapSize(this._stageWidth, this._stageHeight);
-				Camera.ins.update();
-			}
-			this._game.uiRoot.HUD.graphics.clear();
 			for (let index = 0; index < this._hbCells.length; index++) {
 				let hbcell = this._hbCells[index];
 				if (hbcell.isDestroy) {
 					this._hbCells.splice(index, 1);
+					hbcell.off(LEvent.CLICK, this, this.onBtnHbClick);
 					ObjectPools.free(hbcell);
 					index--;
 				} else {
-					hbcell.onDraw(diff, this._game.uiRoot.HUD.graphics, this._stageWidth, this._stageHeight, this._widthRate);
+					hbcell.updatePos(diff, this._stageWidth, this._stageHeight, this._widthRate);
 				}
 			}
 			if (this._widthRate != 1)
@@ -394,9 +390,9 @@ module gamewxsaoleihb.manager {
 		private _acceleration: number;//加速度
 		private _duration: number = 0;
 		private _asset_url: string = "";
-		private _curTexture: Texture;
 		private _bornPos: Vector2 = new Vector2();//出生的位置
 		private _curPos: Vector2 = new Vector2();//当前位置
+		private _parentNode;
 		constructor() {
 			super();
 		}
@@ -415,28 +411,25 @@ module gamewxsaoleihb.manager {
 
 		}
 
-		static create(width: number, widthRate: number, asset_url: string): HBCell {
+		static create(width: number, widthRate: number, asset_url: string, parent: any): HBCell {
 			let obj = ObjectPools.malloc(HBCell) as HBCell;
-			obj.create(width, widthRate, asset_url);
+			obj.create(width, widthRate, asset_url, parent);
 			return obj;
 		}
 
-		private create(width: number, widthRate: number, asset_url: string) {
+		private create(width: number, widthRate: number, asset_url: string, parent) {
 			this.isDestroy = false;
 			this._stageWidth = width;
 			this._widthRate = widthRate;
 			this._asset_url = asset_url;
+			this._parentNode = parent;
 			this.initTexture();
 		}
 
 		private initTexture(): void {
-			let texture: Texture;
-			this._curTexture = Loader.getRes(this._asset_url);
-			this.width = this._curTexture.sourceWidth;
-			this.height = this._curTexture.sourceHeight;
-			this.loadImage(Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_fl.png");
-			this.rotation = 90;
 			this.calInfo();
+			this._parentNode.addChild(this);
+			this.loadImage(this._asset_url);
 		}
 
 		private calInfo(): void {
@@ -445,33 +438,24 @@ module gamewxsaoleihb.manager {
 			this._curPos.x = this._bornPos.x = MathU.randomRange(0, this._stageWidth * this._widthRate);
 			//隨機開始y
 			this._curPos.y = this._bornPos.y = MathU.randomRange(-1280, -360);
+			this.x = this._curPos.x;
+			this.y = this._curPos.y;
 			//随机加速度
 			this._acceleration = 0.3;
 		}
 
-		onDraw(diff: number, g: Graphics, width: number, height: number, widthRate: number) {
-			let texture = this._curTexture;
-			if (!texture) return;
-			let tw: number = texture.sourceWidth;
-			let th: number = texture.sourceHeight;
-			let matrix = new Laya.Matrix();
-
+		updatePos(diff: number, width: number, height: number, widthRate: number) {
 			this._duration += diff;
 			this._curPos.x = this._curPos.x * widthRate;
 			this._curPos.y = this._curPos.y + this._acceleration * this._duration * (diff / 1000);
-
 			if (this._curPos.y >= height)
 				this.isDestroy = true;
-
-			matrix.tx = -tw / 2;
-			matrix.ty = -th / 2;
-			matrix.tx += Camera.ins.getScenePxByCellX(this._curPos.x);
-			matrix.ty += Camera.ins.getScenePxByCellY(this._curPos.y);
-			g.drawTexture(texture, 0, 0, tw, th, matrix);
-			this.pos(tw, th);
+			this.x = this._curPos.x;
+			this.y = this._curPos.y;
 		}
 
 		private dispose() {
+			this.removeSelf();
 		}
 	}
 }

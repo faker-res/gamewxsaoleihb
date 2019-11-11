@@ -118,7 +118,7 @@ module gamewxsaoleihb.page {
                     case Operation_Fields.OPRATE_GAME_WXSAOLEIHB_START_RAIN_MONEY:
                         //金币雨开启
                         let end_time = Number(msg.data);
-                        this._wxSaoLeiMgr.showHBRain(end_time);
+                        this._wxSaoLeiMgr.showHBRain(end_time, this);
                         break
                 }
             }
@@ -258,7 +258,6 @@ module gamewxsaoleihb.page {
                     this._game.datingGame.wxShareQrcodeImg("", "", Web_operation_fields.WXSCENESESSION)
                     break
                 case this._viewUI.btn_hbjl:
-                    this._wxSaoLeiMgr.showHBRain(this._game.sync.serverTimeBys + 30);
                     break
                 case this._viewUI.btn_ye:
                     this._viewUI.box_ye.visible = true;
@@ -303,6 +302,9 @@ module gamewxsaoleihb.page {
                         this._game.showTips("您已发的红包尚未结束，请稍后再试~")
                         return
                     }
+                    //清除红包
+                    if (this._wxSaoLeiMgr.isHbRain)
+                        this._wxSaoLeiMgr.end();
                     this._game.sceneObjectMgr.leaveStory(true);
                     break
                 case this._viewUI.btn_more:
