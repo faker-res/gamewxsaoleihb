@@ -896,10 +896,8 @@ module gamewxsaoleihb.page {
                 }
             }
             this.lb_info.text = info;
-            this.box_main.size(this.lb_info.width, this.lb_info.height);
-            this.img_di.anchorX = 0.5;
-            this.img_di.anchorY = 0.5;
-            this.img_di.size(this.lb_info.width, this.lb_info.height);
+            // this.box_main.size(this.lb_info.width, this.lb_info.height);
+            // this.img_di.size(this.lb_info.width, this.lb_info.height);
             TextFieldU.setHtmlText(this.lb_info, info, false);//支持HTML
         }
     }
