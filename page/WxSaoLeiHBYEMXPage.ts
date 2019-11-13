@@ -21,6 +21,10 @@ module gamewxsaoleihb.page {
 		protected init(): void {
 			this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLei_MXUI');
 			this.addChild(this._viewUI);
+			if (this._viewUI) {
+                this._viewUI.box_main.scaleX = 1.77;
+                this._viewUI.box_main.scaleY = 1.77;
+            }
 			this._viewUI.btn_back.on(LEvent.CLICK, this, this.close);
 			this._viewUI.list_ye.vScrollBarSkin = "";
 			this._viewUI.list_ye.scrollBar.elasticDistance = 100;

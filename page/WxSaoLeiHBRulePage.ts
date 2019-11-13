@@ -27,7 +27,6 @@ module gamewxsaoleihb.page {
 		protected init(): void {
 			this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLei_GuiZeUI');
 			this.addChild(this._viewUI);
-
 		}
 
 		setData(): void {
@@ -39,8 +38,13 @@ module gamewxsaoleihb.page {
 			super.onOpen();
 			this._viewUI.box_out.visible = this._curType == WxSaoLeiHBRulePage.OUTSIDE_RULE;
 			this._viewUI.box_inner.visible = this._curType == WxSaoLeiHBRulePage.INNER_RULE;
-			if (this._curType == WxSaoLeiHBRulePage.INNER_RULE)
+			if (this._curType == WxSaoLeiHBRulePage.INNER_RULE) {
 				this._defaultSoundPath = Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.btn;
+				if (this._viewUI) {
+					this._viewUI.box_main.scaleX = 1.77;
+					this._viewUI.box_main.scaleY = 1.77;
+				}
+			}
 			this._viewUI.btn_back.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.btn_close.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.panel_inner.vScrollBarSkin = "";

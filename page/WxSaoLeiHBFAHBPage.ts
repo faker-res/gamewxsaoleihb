@@ -30,6 +30,10 @@ module gamewxsaoleihb.page {
 		protected init(): void {
 			this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLei_HBUI');
 			this.addChild(this._viewUI);
+			if (this._viewUI) {
+                this._viewUI.box_main.scaleX = 1.77;
+                this._viewUI.box_main.scaleY = 1.77;
+            }
 		}
 
 		// 页面打开时执行函数
@@ -68,6 +72,8 @@ module gamewxsaoleihb.page {
 		}
 
 		private onLeiDianClick(index: number): void {
+			//点击音效
+			this._game.playSound(this._defaultSoundPath);
 			let have_index = this._leiDian.indexOf(index)
 			if (have_index > -1) {
 				//有的要去除掉
@@ -134,15 +140,8 @@ module gamewxsaoleihb.page {
 						if (i > 0) leiDianStr += ","
 						leiDianStr += this._leiDian[i];
 					}
-					let obj = {
-						type: this._type + 1,
-						money: this._money,
-						bao_num: this._baoNum,
-						ld_str:leiDianStr
-					}
-					let pf_money = this._wxSaoLeiMgr.GetPFMoneyByData(obj);
 					if (!this._mainPlayer) return;
-					if (this._mainPlayer.playerInfo.money < pf_money) {
+					if (this._mainPlayer.playerInfo.money < this._money) {
 						this._game.showTips("余额不足,请充值!");
 						this.close();
 						return

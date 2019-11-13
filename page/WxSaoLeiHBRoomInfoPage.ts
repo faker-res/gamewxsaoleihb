@@ -7,6 +7,7 @@ module gamewxsaoleihb.page {
 		private static TYPE_PLAYER_INFO: number = 2;
 		private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLei_GDUI;
 		private _wxSaoLeiMapInfo: WxSaoLeiHBMapInfo;
+		private _curType: number;
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);
 			this._isNeedBlack = true;
@@ -24,13 +25,16 @@ module gamewxsaoleihb.page {
 		protected init(): void {
 			this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLei_GDUI');
 			this.addChild(this._viewUI);
-
+			if (this._viewUI) {
+				this._viewUI.box_main.scaleX = 1.77;
+				this._viewUI.box_main.scaleY = 1.77;
+			}
 		}
 
 		// 页面打开时执行函数
 		protected onOpen(): void {
 			super.onOpen();
-			this._viewUI.btn_back.on(LEvent.CLICK, this, this.close);
+			this._viewUI.btn_back.on(LEvent.CLICK, this, this.btnClose);
 			this._viewUI.box_player.on(LEvent.CLICK, this, this.onBtnClick);
 			this._viewUI.box_rule.on(LEvent.CLICK, this, this.onBtnClick);
 			this._viewUI.list_player.vScrollBarSkin = "";
@@ -41,27 +45,43 @@ module gamewxsaoleihb.page {
 			this.initUI();
 		}
 
+		private btnClose(): void {
+			if (this._curType == WxSaoLeiHBRoomInfoPage.TYPE_PLAYER_INFO) {
+				this._viewUI.room_info.visible = true;
+				this._viewUI.player_info.visible = false;
+				this._curType = WxSaoLeiHBRoomInfoPage.TYPE_ROOM_INFO
+			} else if (this._curType == WxSaoLeiHBRoomInfoPage.TYPE_ROOM_INFO) {
+				this.close();
+			}
+		}
+
 		private renderHandler(cell: WXSaoLeiTX, index: number) {
 			if (!cell) return;
 			cell.setData(this._game, cell.dataSource);
 		}
 
-		getUnitArrData(): Array<Unit> {
+		private _unitInfo: Array<any>
+		getUnitArrData() {
 			let unitObjs = this._game.sceneObjectMgr.unitDic;
-			let unitArr = [];
+			this._unitInfo = [];
 			for (let key in unitObjs) {
 				if (unitObjs.hasOwnProperty(key)) {
 					let unit: Unit = unitObjs[key];
-					unitArr.push(unit);
+					let obj = {
+						head: unit.GetHeadImg(),
+						name: unit.GetName(),
+					}
+					this._unitInfo.push(obj);
 				}
 			}
-			return unitArr;
 		}
 
 		private onBtnClick(e: LEvent): void {
 			switch (e.currentTarget) {
 				case this._viewUI.box_player:
-					this._viewUI.list_player.dataSource = this.getUnitArrData();
+					if (!this._unitInfo) this.getUnitArrData();
+					this._curType = WxSaoLeiHBRoomInfoPage.TYPE_PLAYER_INFO
+					this._viewUI.list_player.dataSource = this._unitInfo;
 					this._viewUI.room_info.visible = false;
 					this._viewUI.player_info.visible = true;
 					break
@@ -76,6 +96,7 @@ module gamewxsaoleihb.page {
 		private initUI(): void {
 			this._viewUI.player_info.visible = false;
 			this._viewUI.room_info.visible = true;
+			this._curType = WxSaoLeiHBRoomInfoPage.TYPE_ROOM_INFO;
 			//房间名
 			this._wxSaoLeiMapInfo = this._game.sceneObjectMgr.mapInfo as WxSaoLeiHBMapInfo;
 			let mapLv = this._wxSaoLeiMapInfo.GetMapLevel();
@@ -84,7 +105,7 @@ module gamewxsaoleihb.page {
 			this._viewUI.lb_name.text = WxSaoLeiHBMgr.GMAE_ROOME_NAME[index];
 			//发包金额
 			if (index < 0) index = 0;
-			this._viewUI.lb_money.text = StringU.substitute("红包发放范围：{0}.00-{1}.00", WxSaoLeiHBMgr.MIN_TEMP[index], WxSaoLeiHBMgr.MAX_TEMP[index]);
+			this._viewUI.lb_money.text = StringU.substitute("{0}.00-{1}.00", WxSaoLeiHBMgr.MIN_TEMP[index], WxSaoLeiHBMgr.MAX_TEMP[index]);
 		}
 
 		public close(): void {
@@ -99,10 +120,10 @@ module gamewxsaoleihb.page {
 			super();
 		}
 
-		setData(game: Game, data: Unit) {
+		setData(game: Game, data: any) {
 			if (!data) return;
-			this.img_head.skin = TongyongUtil.getHeadUrl(data.GetHeadImg());
-			this.lb_name.text = data.GetName();
+			this.img_head.skin = TongyongUtil.getHeadUrl(data.head);
+			this.lb_name.text = data.name;
 		}
 	}
 }

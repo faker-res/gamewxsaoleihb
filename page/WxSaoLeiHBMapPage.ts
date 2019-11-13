@@ -40,6 +40,7 @@ module gamewxsaoleihb.page {
         protected init(): void {
             this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLeiUI');
             this.addChild(this._viewUI);
+
             this._viewUI.panel_hb.vScrollBarSkin = "";
             this._viewUI.panel_hb.vScrollBar.autoHide = true;
             this._viewUI.panel_hb.vScrollBar.elasticDistance = 100;
@@ -58,13 +59,24 @@ module gamewxsaoleihb.page {
             this._wxSaoLeiMgr.on(WxSaoLeiHBMgr.MAP_HB_LQ_MSG, this, this.updateLqMsg);  //红包领取消息
             this._wxSaoLeiMgr.on(WxSaoLeiHBMgr.PF_INFO_UPDATE, this, this.updateMainInfo);
             //初始化所有的红包
-            this.updateHBdata(GlobalDef.WXSAOLEI_HB_TOTAL, null);
+            Laya.timer.frameOnce(1, this, () => {
+                this.updateHBdata(GlobalDef.WXSAOLEI_HB_TOTAL, null);
+            });
             this._viewUI.mouseThrough = true;
             //初始房间名字
             let mapLv = this._wxSaoLeiMapInfo.GetMapLevel();
             let index = WxSaoLeiHBMgr.ALL_GAME_ROOM_CONFIG_ID.indexOf(mapLv);
             if (index < 0) index = 0;
             this._viewUI.lb_map_name.text = WxSaoLeiHBMgr.GMAE_ROOME_NAME[index];
+        }
+
+        // 重新布局
+        protected layout(): void {
+            super.layout();
+            if (this._viewUI) {
+                this._viewUI.box_main.scaleX = 1.77;
+                this._viewUI.box_main.scaleY = 1.77;
+            }
         }
 
         // 页面打开时执行函数
@@ -196,6 +208,12 @@ module gamewxsaoleihb.page {
                 case this._viewUI.btn_di1:
                     this._viewUI.box_di2.visible = true;
                     this._viewUI.box_di1.visible = false;
+                    this._viewUI.box_di1_down.visible = false;
+                    this._viewUI.box_di1_up.top = 138;
+                    this._viewUI.img_di1_bg.height = 74;
+                    this._viewUI.img_di1_bg.y = 164;
+                    this._viewUI.panel_hb.height = 1087;
+                    this._viewUI.panel_hb.y = 663;
                     break
                 case this._viewUI.btn_di2:
                     this._viewUI.box_di2.visible = false;
@@ -204,7 +222,9 @@ module gamewxsaoleihb.page {
                     this._isShowInfo = false;
                     this._viewUI.box_di1_up.top = 138;
                     this._viewUI.img_di1_bg.height = 74;
-                    this._viewUI.img_di1_bg.bottom = 0;
+                    this._viewUI.img_di1_bg.y = 164;
+                    this._viewUI.panel_hb.height = 1087;
+                    this._viewUI.panel_hb.y = 663;
                     break
                 case this._viewUI.finsh_check:
                     //发送红包查询记录
@@ -219,16 +239,16 @@ module gamewxsaoleihb.page {
                 this._viewUI.box_di1_down.visible = true;
                 this._viewUI.box_di1_up.top = 17;
                 this._viewUI.img_di1_bg.height = 207;
-                // this._viewUI.img_di1_bg.bottom = 0;
-                this._viewUI.panel_hb.top = this._viewUI.img_up.top + this._viewUI.img_up.height;
-                this._viewUI.panel_hb.bottom = this._viewUI.img_di1_bg.bottom + this._viewUI.img_di1_bg.height;
+                this._viewUI.img_di1_bg.y = 99;
+                this._viewUI.panel_hb.height = 962;
+                this._viewUI.panel_hb.y = 600;
             } else {
                 this._viewUI.box_di1_down.visible = false;
                 this._viewUI.box_di1_up.top = 138;
                 this._viewUI.img_di1_bg.height = 74;
-                // this._viewUI.img_di1_bg.bottom = 0;
-                this._viewUI.panel_hb.top = this._viewUI.img_up.top + this._viewUI.img_up.height;
-                this._viewUI.panel_hb.bottom = this._viewUI.img_di1_bg.bottom + this._viewUI.img_di1_bg.height;
+                this._viewUI.img_di1_bg.y = 164;
+                this._viewUI.panel_hb.height = 1087;
+                this._viewUI.panel_hb.y = 663;
             }
             this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
         }
@@ -466,21 +486,18 @@ module gamewxsaoleihb.page {
         public static readonly EXTRA_TYPE_FINSH: number = 1;    //红包已领完
         public static readonly EXTRA_TYPE_ZL_SETTLE: number = 2;    //预中雷信息结算
         private _hbUIY: number = 0;
-        private _diffY: number = 12;
+        private _diffY: number = 30;
         addHB(hbData: any, isSelf: boolean = false, type: number, extraType: number = 0, lq_data: any = "") {
             let uiHb: any;
             switch (type) {
                 case WxSaoLeiHBMapPage.MAIN_HB:
                     if (!isSelf) {
                         uiHb = new HBLeft();
-                        uiHb.left = 40;
-                        uiHb.right = this._clientRealWidth * 0.5;
+                        uiHb.left = 20;
                     } else {
                         uiHb = new HBRight();
-                        uiHb.right = 40;
-                        uiHb.left = this._clientRealWidth * 0.5;
+                        uiHb.right = 20;
                     }
-                    uiHb.height = 200;
                     break
                 case WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO:
                     if (extraType == 0 && !lq_data) return;
@@ -722,6 +739,10 @@ module gamewxsaoleihb.page {
             this.img_light.visible = false;
             //红包状态结束
             if (this._data.hb_state == WxSaoLeiHBMgr.HB_STATE_END) {
+                if (this.ani3.isPlaying) {
+                    this.img_eff.visible = false;
+                    this.ani3.stop();
+                }
                 if (this.ani1.isPlaying)
                     this.ani1.stop();
                 if (this.ani2.isPlaying)

@@ -23,6 +23,10 @@ module gamewxsaoleihb.page {
 		protected init(): void {
 			this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLeiHB_InfoUI');
 			this.addChild(this._viewUI);
+			if (this._viewUI) {
+                this._viewUI.box_main.scaleX = 1.77;
+                this._viewUI.box_main.scaleY = 1.77;
+            }
 			this._viewUI.hb_info_list.vScrollBarSkin = "";
 			this._viewUI.hb_info_list.scrollBar.elasticDistance = 100;
 			this._viewUI.hb_info_list.itemRender = this.createChildren("game_ui.wxsaoleihb.component.WXSaoLei_LBUI", HBLingQuMX);
@@ -71,6 +75,9 @@ module gamewxsaoleihb.page {
 				this._maxIndex = story.wxSaoLeiHBMgr.searchMaxMoney(lqData);
 				this._hbData = hbData;
 				this._lqData = lqData;
+				this._lqData.sort((a: any, b: any) => {
+					return b.lq_time - a.lq_time
+				})
 				this._viewUI.hb_info_list.dataSource = this._lqData;
 				this._moneyNum.setText(this._hbData.money);
 				this._viewUI.lb_yuan.centerX = this._moneyNum.centerX + this._moneyNum.width;
