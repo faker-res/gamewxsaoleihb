@@ -14,7 +14,7 @@ module gamewxsaoleihb.manager {
 		public static readonly ALL_GAME_ROOM_CONFIG_ID = [252, 253, 254];// 可进入的maplv
 		public static readonly GMAE_ROOME_NAME = ["小资场", "老板场", "富豪场"];
 		public static readonly DANLEI_BET: Array<number> = [1.6, 1.2];
-		public static readonly DUOLEI_BET: Array<number> = [1.2, 1.05, 1.28, 1.8, 2.5];
+		public static readonly DUOLEI_BET: Array<number> = [1.2, 1.05, 1.28, 1.8, 2.5, 2.5, 2.5, 2.5, 2.5];
 		public static readonly MAP_HB_INFO = "WxSaoLeiHBMgr.MAP_HB_INFO";//红包数据
 		public static readonly MAP_HB_LQ_INFO = "WxSaoLeiHBMgr.MAP_HB_LQ_INFO";//红包领取数据详情
 		public static readonly MAP_HB_LQ_MSG = "WxSaoLeiHBMgr.MAP_HB_LQ_MSG";//红包领取数据消息
@@ -63,62 +63,84 @@ module gamewxsaoleihb.manager {
 						hb_data = ""
 					}
 					if (!hb_data) return;
-					let lq_data = "";
 					if (msg.op_type == GlobalDef.WXSAOLEI_HB_ADD) {
 						//新增
-						for (let i = 0; i < hb_data.length; i++) {
-							let cur_hb_data = hb_data[i];
-							this._hb_data.push(cur_hb_data);
-							this.updateSelfHbData(cur_hb_data);
+						for (var key in hb_data) {
+							if (hb_data.hasOwnProperty(key)) {
+								let cur_hb_data = hb_data[key];
+								this.updateTotalHBData(cur_hb_data);
+								this.updateSelfHbData(cur_hb_data);
+							}
 						}
 					} else if (msg.op_type == GlobalDef.WXSAOLEI_HB_REMOVE) {
 						//移除
-						for (let i = 0; i < hb_data.length; i++) {
-							let cur_hb_data = hb_data[i];
-							let index = this.findHBDataIndexById(cur_hb_data.hb_id);
-							this._hb_data.splice(index, 1);
+						for (var key in hb_data) {
+							if (hb_data.hasOwnProperty(key)) {
+								let cur_hb_data = hb_data[key];
+								let index = this.findHBDataIndexById(cur_hb_data.hb_id);
+								this._hb_data.splice(index, 1);
+							}
 						}
 					} else if (msg.op_type == GlobalDef.WXSAOLEI_HB_UPDATE) {
 						//更新
-						for (let i = 0; i < hb_data.length; i++) {
-							let cur_hb_data = hb_data[i];
-							let index = this.findHBDataIndexById(cur_hb_data.hb_id);
-							if (index && index > -1) {
-								this._hb_data[index] = cur_hb_data;
-							} else {
-								this._hb_data.push(cur_hb_data);
+						for (var key in hb_data) {
+							if (hb_data.hasOwnProperty(key)) {
+								let cur_hb_data = hb_data[key];
+								if (!cur_hb_data) continue;
+								this.updateTotalHBData(cur_hb_data);
+								this.updateSelfHbData(cur_hb_data);
 							}
-							this.updateSelfHbData(cur_hb_data);
 						}
 					} else if (msg.op_type == GlobalDef.WXSAOLEI_HB_TOTAL) {
 						//全量红包下发
 						for (var key in hb_data) {
 							if (hb_data.hasOwnProperty(key)) {
 								let element = hb_data[key];
-								this._hb_data.push(element);
+								if (!element) continue;
+								this.updateTotalHBData(element);
 								this.updateSelfHbData(element);
 							}
 						}
 					}
-					this.event(WxSaoLeiHBMgr.MAP_HB_INFO, [msg.op_type, hb_data, lq_data]);
+					//红包排序下
+					this._hb_data.sort((a: any, b: any) => {
+						return a.hb_id - b.hb_id
+					})
+					this.event(WxSaoLeiHBMgr.MAP_HB_INFO, [msg.op_type, hb_data]);
 					break
 				case Protocols.SMSG_WXSAOLEIHB_SEND_LQJL:
 					//当前红包的领取详情
-					if (msg.lq_datas == "") return
-					let lq_datas = JSON.parse(msg.lq_datas);
+					let lq_datas
+					if (msg.lq_datas == "{}") {
+						lq_datas = [];
+					} else {
+						lq_datas = JSON.parse(msg.lq_datas);
+					}
 					this.event(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, [lq_datas]);
 					break
 				case Protocols.SMSG_WXSAOLEIHB_LQ_INFO:
 					//领取信息
-					lq_data = msg.lq_data != "" ? JSON.parse(msg.lq_data) : "";
+					let lq_data = msg.lq_data != "" ? JSON.parse(msg.lq_data) : "";
 					if (!lq_data) return;
 					this.event(WxSaoLeiHBMgr.MAP_HB_LQ_MSG, [lq_data]);
 					break
 			}
 		}
 
+		//更新红包总数据
+		private updateTotalHBData(single_hb: any): void {
+			if (!single_hb) return;
+			let cur_hb_data = single_hb;
+			let index = this.findHBDataIndexById(cur_hb_data.hb_id);
+			if (index > -1) {
+				this._hb_data[index] = cur_hb_data;
+			} else {
+				this._hb_data.push(cur_hb_data);
+			}
+		}
+
 		//更新自己的红包数据
-		updateSelfHbData(hb_data: any): void {
+		private updateSelfHbData(hb_data: any): void {
 			if (hb_data.uid && this._mainPlayerUid && Number(hb_data.uid) == Number(this._mainPlayerUid)) {
 				let isUpdate: boolean = false
 				for (let i = 0; i < this._self_hb_data.length; i++) {
@@ -148,6 +170,21 @@ module gamewxsaoleihb.manager {
 			}
 		}
 
+
+		//判断某个红包自己是否操作过
+		public isOptHBById(hb_id: number): boolean {
+			let is_opt: boolean = false;
+			for (let i = 0; i < this.self_hb_lqjl.length; i++) {
+				let lq_data = this.self_hb_lqjl[i];
+				if (!lq_data) continue;
+				if (lq_data.hb_id == hb_id) {
+					is_opt = true;
+					break
+				}
+			}
+			return is_opt;
+		}
+
 		//查找指定红包在数组中的位置
 		public findHBDataIndexById(hb_id: number): number {
 			for (let i = 0; i < this._hb_data.length; i++) {
@@ -158,7 +195,6 @@ module gamewxsaoleihb.manager {
 				}
 			}
 		}
-
 		//查找指定红包数据
 		public findHBDataById(hb_id: number): any {
 			for (let i = 0; i < this._hb_data.length; i++) {
@@ -168,6 +204,17 @@ module gamewxsaoleihb.manager {
 					return hb_data;
 				}
 			}
+		}
+
+		//获取当前红包的赔付钱数
+		GetPFMoneyByData(hb_data): number {
+			let pf_money = 0;
+			if (hb_data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
+				pf_money = this.LqDanLeiPFMoney(hb_data);
+			} else if (hb_data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
+				pf_money = this.LqDuoLeiPFMoney(hb_data);
+			}
+			return pf_money;
 		}
 
 		//单雷赔付计算
@@ -253,7 +300,7 @@ module gamewxsaoleihb.manager {
 
 		//寻找一组数据中的最大值
 		searchMaxMoney(lq_datas): number {
-			if (!lq_datas || lq_datas.length < 0) return;
+			if (!lq_datas || lq_datas.length <= 0) return;
 			let maxNum = lq_datas[0].lq_money;
 			let index = 0;
 			for (let i = 1; i < lq_datas.length; i++) {
@@ -264,6 +311,13 @@ module gamewxsaoleihb.manager {
 				}
 			}
 			return index;
+		}
+
+		clear(fource?: boolean) {
+			this._game.network.removeHanlder(Protocols.SMSG_WXSAOLEIHB_INFO, this, this.onOptHandler);
+			this._game.network.removeHanlder(Protocols.SMSG_WXSAOLEIHB_SEND_LQJL, this, this.onOptHandler);
+			this._game.network.removeHanlder(Protocols.SMSG_WXSAOLEIHB_LQ_INFO, this, this.onOptHandler);
+			Laya.timer.clearAll(this);
 		}
 
 		//------------------------红包雨start---------------
@@ -374,13 +428,6 @@ module gamewxsaoleihb.manager {
 				this._widthRate = 1;
 		}
 		//-----------------------红包雨end----------------
-
-		clear(fource?: boolean) {
-			this._game.network.removeHanlder(Protocols.SMSG_WXSAOLEIHB_INFO, this, this.onOptHandler);
-			this._game.network.removeHanlder(Protocols.SMSG_WXSAOLEIHB_SEND_LQJL, this, this.onOptHandler);
-			this._game.network.removeHanlder(Protocols.SMSG_WXSAOLEIHB_LQ_INFO, this, this.onOptHandler);
-			Laya.timer.clearAll(this);
-		}
 	}
 	class HBCell extends Laya.Sprite implements IPoolsObject {
 		isDestroy: boolean = false;

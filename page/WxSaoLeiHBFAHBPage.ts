@@ -12,10 +12,12 @@ module gamewxsaoleihb.page {
 		private _moneyMin: number;
 		private _moneyMax: number;
 		private _wxSaoLeiMgr: WxSaoLeiHBMgr;
+		private _mainPlayer: PlayerData;
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);
 			this._isNeedBlack = true;
 			this._isClickBlack = true;
+			this._defaultSoundPath = Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.btn;
 			this._asset = [
 				PathGameTongyong.atlas_game_ui_tongyong + "general.atlas",
 				PathGameTongyong.atlas_game_ui_tongyong + "dating.atlas",
@@ -47,9 +49,9 @@ module gamewxsaoleihb.page {
 		}
 
 		private updateViewUI(): void {
-			let mainPlayer: PlayerData = this._game.sceneObjectMgr.mainPlayer;
-			if (!mainPlayer) return;
-			let playerInfo = mainPlayer.playerInfo;
+			this._mainPlayer = this._game.sceneObjectMgr.mainPlayer;
+			if (!this._mainPlayer) return;
+			let playerInfo = this._mainPlayer.playerInfo;
 			if (!playerInfo) return;
 			for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {
 				this._viewUI["btn_" + i].on(LEvent.CLICK, this, this.onLeiDianClick, [i]);
@@ -74,6 +76,10 @@ module gamewxsaoleihb.page {
 				if (this._type == WxSaoLeiHBMgr.TYPE_DANLEI - 1) {
 					this._leiDian = [index];
 				} else if (this._type == WxSaoLeiHBMgr.TYPE_DUOLEI - 1) {
+					if (this._leiDian.length >= this._baoNum) {
+						this._game.showTips("雷点数量不能大于发包数量!");
+						return;
+					}
 					this._leiDian.push(index);
 				}
 			}
@@ -118,14 +124,28 @@ module gamewxsaoleihb.page {
 						return
 					}
 					this._money = Number(this._viewUI.txtInput.text);
-					if (this._money <= 0 || this._money < this._moneyMin || this._money > this._moneyMax) {
+					if (this._money <= 0 || this._money < this._moneyMin || this._money > this._moneyMax || typeof (this._money) != "number" || isNaN(this._money)) {
 						this._game.showTips("金额数错误");
 						return;
 					}
+					//造假数据
 					let leiDianStr = "";
 					for (let i = 0; i < this._leiDian.length; i++) {
 						if (i > 0) leiDianStr += ","
 						leiDianStr += this._leiDian[i];
+					}
+					let obj = {
+						type: this._type + 1,
+						money: this._money,
+						bao_num: this._baoNum,
+						ld_str:leiDianStr
+					}
+					let pf_money = this._wxSaoLeiMgr.GetPFMoneyByData(obj);
+					if (!this._mainPlayer) return;
+					if (this._mainPlayer.playerInfo.money < pf_money) {
+						this._game.showTips("余额不足,请充值!");
+						this.close();
+						return
 					}
 					this._game.network.call_wxsaoleihb_sendhb(this._type + 1, this._baoNum, leiDianStr, this._money);
 					this.close();
@@ -160,6 +180,9 @@ module gamewxsaoleihb.page {
 					this._viewUI["btn_" + i].selected = false;
 				}
 			}
+			this._leiDian.sort((a: any, b: any) => {
+				return a - b
+			});
 			let str = ""
 			for (let i = 0; i < this._leiDian.length; i++) {
 				if (i > 0) str += ",";
@@ -180,8 +203,8 @@ module gamewxsaoleihb.page {
 			for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {
 				this._viewUI["btn_" + i].selected = false;
 			}
-			if (isChangeTab) this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[0];
 			if (this._type == WxSaoLeiHBMgr.TYPE_DANLEI - 1) {
+				if (isChangeTab) this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[0];
 				this._viewUI.lb_hbDanl_num.text = this._baoNum + "包";
 				this._viewUI.box_danL.visible = true;
 				this._viewUI.hb_danL_num1.selected = this._baoNum == WxSaoLeiHBMgr.BAO_NUMS[0];
@@ -189,6 +212,7 @@ module gamewxsaoleihb.page {
 				let bet = WxSaoLeiHBMgr.DANLEI_BET[WxSaoLeiHBMgr.BAO_NUMS.indexOf(this._baoNum)];
 				this._viewUI.lb_danL_info.text = StringU.substitute("赔率:{0}", bet);
 			} else if (this._type == WxSaoLeiHBMgr.TYPE_DUOLEI - 1) {
+				if (isChangeTab) this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[1];
 				this._viewUI.lb_hbDuol_num.text = this._baoNum + "包";
 				this._viewUI.box_duoL.visible = true;
 				this._viewUI.hb_duoL_num1.selected = true;

@@ -10,6 +10,7 @@ module gamewxsaoleihb.page {
 			super(v, onOpenFunc, onCloseFunc);
 			this._isNeedBlack = true;
 			this._isClickBlack = true;
+			this._defaultSoundPath = Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.btn;
 			this._asset = [
 				PathGameTongyong.atlas_game_ui_tongyong + "general.atlas",
 				PathGameTongyong.atlas_game_ui_tongyong + "dating.atlas",
@@ -56,6 +57,7 @@ module gamewxsaoleihb.page {
 		private _lqData: any
 		private _story: WxSaoLeiHBStory;
 		private _maxIndex: number;
+		private _isComlete: boolean = false;//当前这个红包是否都领完了
 		setData(hbData: any, lqData: any, type: number, money: number = 0): void {
 			this._viewUI.box_info.visible = type == WxSaoLeiHBInfoPage.TYPE_HB_INFO;
 			this._viewUI.box_rain.visible = type == WxSaoLeiHBInfoPage.TYPE_HB_RAIN;
@@ -64,6 +66,7 @@ module gamewxsaoleihb.page {
 				this._viewUI.rain_money.text = money.toString();
 			} else if (type == WxSaoLeiHBInfoPage.TYPE_HB_INFO) {
 				if (!hbData || !lqData) return;
+				this._isComlete = lqData.length == hbData.bao_num;
 				let story: WxSaoLeiHBStory = this._game.sceneObjectMgr.story;
 				this._maxIndex = story.wxSaoLeiHBMgr.searchMaxMoney(lqData);
 				this._hbData = hbData;
@@ -76,14 +79,14 @@ module gamewxsaoleihb.page {
 				this._viewUI.lb_name.text = this._hbData.name;
 				this._viewUI.lb_hb_num.text = this._hbData.bao_num + "个红包";
 				this._viewUI.lb_ld.text = "雷号:" + this._hbData.ld_str
-				this._viewUI.lb_lq.text = StringU.substitute("领取{0}/{1}个", this._hbData.lq_num, this._hbData.bao_num);
+				this._viewUI.lb_lq.text = StringU.substitute("领取{0}/{1}个", lqData.length, this._hbData.bao_num);
 			}
 		}
 
 		private renderHandler(cell: HBLingQuMX, index: number) {
 			if (cell) {
 				let isMax = index == this._maxIndex;
-				cell.setData(this._game, cell.dataSource, isMax);
+				cell.setData(this._game, cell.dataSource, isMax, this._isComlete);
 			}
 		}
 
@@ -101,22 +104,40 @@ module gamewxsaoleihb.page {
 	class HBLingQuMX extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_LBUI {
 		private _game: Game;
 		private _data: any;
+		private _mainPlayer: PlayerData;
+		private _mainPlayerUid;
 		constructor() {
 			super();
 		}
-		setData(game: Game, data: any, isMax: boolean) {
+		setData(game: Game, data: any, isMax: boolean, isComplete: boolean) {
 			this._data = data;
 			if (!data) return;
+			this._game = game;
+			if (!this._game) return;
+			this.left = -1;
+			this.right = -1;
+			this._mainPlayer = this._game.sceneObjectMgr.mainPlayer;
+			if (this._mainPlayer) this._mainPlayerUid = this._mainPlayer.GetUserId();
+			let isSelf = data.uid && this._mainPlayerUid && Number(data.uid) == Number(this._mainPlayerUid);
+			let color = isSelf ? "#f76a4a" : "#000000";
 			//免死金牌
 			this.img_head.skin = this._data.status == 1 ? TongyongUtil.getHeadUrl(this._data.lq_head) : Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_msjp.png";
-			this.lb_money.text = this._data.lq_money;
-			this.lb_time.text = Sync.getTimeShortStr(this._data.lq_time)
+			this.lb_time.text = Sync.getTimeShortStr(this._data.lq_time * 1000);
+			this.lb_name.color = color;
+			this.lb_name.strokeColor = color;
 			this.lb_name.text = this._data.status == 1 ? this._data.name : "免死金牌";
-			//是否中雷
-			this.img_zl.visible = this._data.pf_money > 0;
-			//手气最佳
-			this.img_sqzj.visible = isMax;
-			this.img_sqzj.right = this.img_zl.visible ? 113 : 26;
+			if (isComplete) {
+				this.lb_money.text = this._data.lq_money;
+				//是否中雷
+				this.img_zl.visible = this._data.pf_money > 0;
+				//手气最佳
+				this.img_sqzj.visible = isMax;
+				this.img_sqzj.right = this.img_zl.visible ? 113 : 26;
+			} else {
+				this.lb_money.text = "***";
+				this.img_zl.visible = false;
+				this.img_sqzj.visible = false;
+			}
 		}
 	}
 }

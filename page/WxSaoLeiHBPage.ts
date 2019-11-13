@@ -105,17 +105,17 @@ module gamewxsaoleihb.page {
          * @param mode 
          */
 		public checkMoneyToStory(mode: number): void {
-			let mainPlayer = this._game.sceneObjectMgr.mainPlayer;
-			if (!mainPlayer) return;
-			let haveMoney = mainPlayer.playerInfo.money;
-			let roomInfo = WxsaoleihbPageDef.getRoomInfoByMode(mode);
-			if (haveMoney < roomInfo.minGold) {
-				let str = StringU.substitute("老板，您的金币少于{0}哦~\n补充点金币去大杀四方吧~", roomInfo.minGold);
-				this.gotoRecharge(str);
-			} else {
-				//进入
-				this._game.sceneObjectMgr.intoStory(WxsaoleihbPageDef.GAME_NAME, mode.toString(), true);
-			}
+			// let mainPlayer = this._game.sceneObjectMgr.mainPlayer;
+			// if (!mainPlayer) return;
+			// let haveMoney = mainPlayer.playerInfo.money;
+			// let roomInfo = WxsaoleihbPageDef.getRoomInfoByMode(mode);
+			// if (haveMoney < roomInfo.minGold) {
+			// 	let str = StringU.substitute("老板，您的金币少于{0}哦~\n补充点金币去大杀四方吧~", roomInfo.minGold);
+			// 	this.gotoRecharge(str);
+			// } else {
+			//进入
+			this._game.sceneObjectMgr.intoStory(WxsaoleihbPageDef.GAME_NAME, mode.toString(), true);
+			// }
 		}
 
         /**
