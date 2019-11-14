@@ -3,7 +3,7 @@
 */
 module gamewxsaoleihb.page {
 	export class WxsaoleihbPageDef extends game.gui.page.PageDef {
-		static GAME_NAME: string;
+		static GAME_NAME: string = "wxsaoleihb";
 		//红包HUD界面
 		static PAGE_WXSLHB_HUD: string = "1";
 		//红包地图

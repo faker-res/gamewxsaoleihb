@@ -237,7 +237,7 @@ module gamewxsaoleihb.page {
             if (this._isShowInfo) {
                 //显示下层
                 this._viewUI.box_di1_down.visible = true;
-                this._viewUI.box_di1_up.top = 17;
+                this._viewUI.box_di1_up.top = -5;
                 this._viewUI.img_di1_bg.height = 207;
                 this._viewUI.img_di1_bg.y = 99;
                 this._viewUI.panel_hb.height = 962;
@@ -642,7 +642,7 @@ module gamewxsaoleihb.page {
                 let diffTime = this._game.sync.serverTimeBys - this._data.create_time;
                 let isLQFinsh = this._data.lq_num >= this._data.bao_num;
                 let isTimeOut = diffTime > WxSaoLeiHBMgr.HB_TIME;
-                this.img_di.alpha = 0.7;
+                this.img_di.alpha = 0.4;
                 if (this._data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
                     this.img_hb.skin = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_hb.png";
                 } else if (this._data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
@@ -750,7 +750,7 @@ module gamewxsaoleihb.page {
                 let diffTime = this._game.sync.serverTimeBys - this._data.create_time;
                 let isLQFinsh = this._data.lq_num >= this._data.bao_num;
                 let isTimeOut = diffTime > WxSaoLeiHBMgr.HB_TIME;
-                this.img_di.alpha = 0.7;
+                this.img_di.alpha = 0.4;
                 if (this._data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
                     this.img_hb.skin = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_hb.png";
                 } else if (this._data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {

@@ -23,6 +23,11 @@ module gamewxsaoleihb.manager {
 		public static readonly HB_STATE_ING: number = 1;
 		public static readonly HB_STATE_END: number = 2;
 
+		public static readonly TYPE_INFO = [
+			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FLHB,"福利包",
+			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_GHB,"领红包",
+			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FHB,"发红包"]
+
 		private _hb_data: Array<any> = [];	//红包总数据
 		public get hbData() {
 			return this._hb_data;
@@ -321,8 +326,8 @@ module gamewxsaoleihb.manager {
 		}
 
 		//------------------------红包雨start---------------
-		public static CREATE_HB_RAIN_TIME: number = 5;
-		public static MAX_HB_NUM = 30;
+		public static CREATE_HB_RAIN_TIME: number = 1;
+		public static MAX_HB_NUM = 20;
 		private _asset_url = "";
 		private _refAsset: RefAsset;
 		private _stageWidth;
@@ -488,7 +493,7 @@ module gamewxsaoleihb.manager {
 			this.x = this._curPos.x;
 			this.y = this._curPos.y;
 			//随机加速度
-			this._acceleration = 0.3;
+			this._acceleration = 0.15;
 		}
 
 		updatePos(diff: number, width: number, height: number, widthRate: number) {
