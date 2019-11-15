@@ -31,9 +31,9 @@ module gamewxsaoleihb.page {
 			this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLei_HBUI');
 			this.addChild(this._viewUI);
 			if (this._viewUI) {
-                this._viewUI.box_main.scaleX = 1.77;
-                this._viewUI.box_main.scaleY = 1.77;
-            }
+				this._viewUI.box_main.scaleX = 1.77;
+				this._viewUI.box_main.scaleY = 1.77;
+			}
 		}
 
 		// 页面打开时执行函数
@@ -142,7 +142,7 @@ module gamewxsaoleihb.page {
 					}
 					if (!this._mainPlayer) return;
 					if (this._mainPlayer.playerInfo.money < this._money) {
-						this._game.showTips("余额不足,请充值!");
+						this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_YEBZ);
 						this.close();
 						return
 					}

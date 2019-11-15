@@ -209,9 +209,8 @@ module gamewxsaoleihb.page {
                     this._viewUI.box_di2.visible = true;
                     this._viewUI.box_di1.visible = false;
                     this._viewUI.box_di1_down.visible = false;
-                    this._viewUI.box_di1_up.top = 138;
-                    this._viewUI.img_di1_bg.height = 74;
-                    this._viewUI.img_di1_bg.y = 164;
+                    this._isShowInfo = false;
+                    this._viewUI.box_di1.height = 68;
                     this._viewUI.panel_hb.height = 1087;
                     this._viewUI.panel_hb.y = 663;
                     break
@@ -220,9 +219,7 @@ module gamewxsaoleihb.page {
                     this._viewUI.box_di1.visible = true;
                     this._viewUI.box_di1_down.visible = false;
                     this._isShowInfo = false;
-                    this._viewUI.box_di1_up.top = 138;
-                    this._viewUI.img_di1_bg.height = 74;
-                    this._viewUI.img_di1_bg.y = 164;
+                    this._viewUI.box_di1.height = 68;
                     this._viewUI.panel_hb.height = 1087;
                     this._viewUI.panel_hb.y = 663;
                     break
@@ -237,16 +234,12 @@ module gamewxsaoleihb.page {
             if (this._isShowInfo) {
                 //显示下层
                 this._viewUI.box_di1_down.visible = true;
-                this._viewUI.box_di1_up.top = -5;
-                this._viewUI.img_di1_bg.height = 207;
-                this._viewUI.img_di1_bg.y = 99;
+                this._viewUI.box_di1.height = 200;
                 this._viewUI.panel_hb.height = 962;
                 this._viewUI.panel_hb.y = 600;
             } else {
                 this._viewUI.box_di1_down.visible = false;
-                this._viewUI.box_di1_up.top = 138;
-                this._viewUI.img_di1_bg.height = 74;
-                this._viewUI.img_di1_bg.y = 164;
+                this._viewUI.box_di1.height = 68;
                 this._viewUI.panel_hb.height = 1087;
                 this._viewUI.panel_hb.y = 663;
             }
@@ -294,6 +287,7 @@ module gamewxsaoleihb.page {
                     this._game.datingGame.wxShareQrcodeImg("", "", Web_operation_fields.WXSCENESESSION)
                     break
                 case this._viewUI.btn_hbjl:
+                    this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_JL);
                     break
                 case this._viewUI.btn_ye:
                     this._viewUI.box_ye.visible = true;
@@ -362,7 +356,7 @@ module gamewxsaoleihb.page {
                     let pf_money = this._wxSaoLeiMgr.GetPFMoneyByData(this._curHbData);
                     if (!this._mainPlayer) return;
                     if (this._mainPlayer.playerInfo.money < pf_money) {
-                        this._game.showTips("余额不足,请充值!");
+                        this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_YEBZ);
                         return
                     }
                     //判断状态
