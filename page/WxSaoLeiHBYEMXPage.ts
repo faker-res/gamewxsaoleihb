@@ -8,6 +8,7 @@ module gamewxsaoleihb.page {
 			super(v, onOpenFunc, onCloseFunc);
 			this._isNeedBlack = true;
 			this._isClickBlack = true;
+			this._isNeedDuang = false;
 			this._defaultSoundPath = Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.btn;
 			this._asset = [
 				PathGameTongyong.atlas_game_ui_tongyong + "general.atlas",

@@ -17,6 +17,7 @@ module gamewxsaoleihb.page {
 			super(v, onOpenFunc, onCloseFunc);
 			this._isNeedBlack = true;
 			this._isClickBlack = true;
+			this._isNeedDuang = false;
 			this._defaultSoundPath = Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.btn;
 			this._asset = [
 				PathGameTongyong.atlas_game_ui_tongyong + "general.atlas",
@@ -52,6 +53,11 @@ module gamewxsaoleihb.page {
 			this.updateViewUI();
 		}
 
+		update(diff: number) {
+			super.update(diff);
+			this.updateBtn();
+		}
+
 		private updateViewUI(): void {
 			this._mainPlayer = this._game.sceneObjectMgr.mainPlayer;
 			if (!this._mainPlayer) return;
@@ -60,7 +66,8 @@ module gamewxsaoleihb.page {
 			for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {
 				this._viewUI["btn_" + i].on(LEvent.CLICK, this, this.onLeiDianClick, [i]);
 			}
-			this._viewUI.lb_ye.text = playerInfo.money.toString();
+			let money: number = playerInfo.money;
+			this._viewUI.lb_ye.text = money.toFixed(2);
 			//红包发放范围
 			this._mapinfo = this._game.sceneObjectMgr.mapInfo as WxSaoLeiHBMapInfo;
 			let mapLv = this._mapinfo.GetMapLevel();
@@ -90,6 +97,26 @@ module gamewxsaoleihb.page {
 				}
 			}
 			this.updateLeiDianUI();
+		}
+
+		private updateBtn(): void {
+			let btn_is_gray = false;
+			if (this._type != 0 && !this._type) {
+				btn_is_gray = true;
+			}
+			if (this._baoNum <= 0) {
+				btn_is_gray = true;
+				return
+			}
+			if (!this._leiDian || this._leiDian.length <= 0) {
+				btn_is_gray = true;
+			}
+			this._money = Number(this._viewUI.txtInput.text);
+			if (this._viewUI.txtInput.text == "" || typeof (this._money) != "number" || isNaN(this._money)) {
+				btn_is_gray = true;
+			}
+			this._viewUI.btn_send.alpha = btn_is_gray ? 0.5 : 1;
+			this._viewUI.btn_send.mouseEnabled = !btn_is_gray;
 		}
 
 		protected onBtnTweenEnd(e: any, target: any) {

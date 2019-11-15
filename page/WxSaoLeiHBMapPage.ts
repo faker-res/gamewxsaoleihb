@@ -183,6 +183,7 @@ module gamewxsaoleihb.page {
             this._viewUI.open_name.text = hbData.name;
             this._viewUI.open_hb_name.text = hbData.money + "元";
             this._viewUI.open_ld.text = hbData.ld_str;
+            this._viewUI.box_lh.width = this._viewUI.open_ld.width + 87;
         }
 
         //红包雨
@@ -263,8 +264,8 @@ module gamewxsaoleihb.page {
                 dj_money += pf_money;
             }
             let mainPlayerInfo = this._mainPlayer.playerInfo;
-            this._viewUI.lb_ye.text = StringU.substitute("余额：{0}", mainPlayerInfo.money - dj_money);
-            this._viewUI.lb_dj.text = StringU.substitute("冻结：{0}", dj_money);
+            this._viewUI.lb_ye.text = StringU.substitute("余额：{0}", (mainPlayerInfo.money - dj_money).toFixed(2));
+            this._viewUI.lb_dj.text = StringU.substitute("冻结：{0}", (dj_money).toFixed(2));
         }
 
         private onUpdateMapInfo(): void {
@@ -357,6 +358,7 @@ module gamewxsaoleihb.page {
                     if (!this._mainPlayer) return;
                     if (this._mainPlayer.playerInfo.money < pf_money) {
                         this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_YEBZ);
+                        this._viewUI.box_hb_open.visible = false;
                         return
                     }
                     //判断状态
@@ -480,7 +482,7 @@ module gamewxsaoleihb.page {
         public static readonly EXTRA_TYPE_FINSH: number = 1;    //红包已领完
         public static readonly EXTRA_TYPE_ZL_SETTLE: number = 2;    //预中雷信息结算
         private _hbUIY: number = 0;
-        private _diffY: number = 30;
+        private _diffY: number = 0;
         addHB(hbData: any, isSelf: boolean = false, type: number, extraType: number = 0, lq_data: any = "") {
             let uiHb: any;
             switch (type) {

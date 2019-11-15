@@ -308,7 +308,7 @@ module gamewxsaoleihb.manager {
 			if (!lq_datas || lq_datas.length <= 0) return;
 			let maxNum = lq_datas[0].lq_money;
 			let index = 0;
-			for (let i = 1; i < lq_datas.length; i++) {
+			for (let i = 0; i < lq_datas.length; i++) {
 				let curMoney: number = lq_datas[i].lq_money;
 				if (curMoney > maxNum) {
 					maxNum = curMoney;

@@ -6,6 +6,7 @@ module gamewxsaoleihb.page {
 		public static readonly TYPE_HB_RAIN: number = 1	//红包雨
 		public static readonly TYPE_HB_INFO: number = 2	//红包详情界面
 		private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLeiHB_InfoUI;
+		private _mianSiJinPaiData: any;
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);
 			this._isNeedBlack = true;
@@ -23,10 +24,22 @@ module gamewxsaoleihb.page {
 		protected init(): void {
 			this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLeiHB_InfoUI');
 			this.addChild(this._viewUI);
+			this._mianSiJinPaiData = {
+				status: 2,
+				hb_id: "",
+				uid: "",
+				oid: "",
+				pf_money: 0,
+				name: "",
+				lq_head: 0,
+				lq_time: 0,
+				lq_money: 0,
+				sp_money_num: 0,
+			};
 			if (this._viewUI) {
-                this._viewUI.box_main.scaleX = 1.77;
-                this._viewUI.box_main.scaleY = 1.77;
-            }
+				this._viewUI.box_main.scaleX = 1.77;
+				this._viewUI.box_main.scaleY = 1.77;
+			}
 			this._viewUI.hb_info_list.vScrollBarSkin = "";
 			this._viewUI.hb_info_list.scrollBar.elasticDistance = 100;
 			this._viewUI.hb_info_list.itemRender = this.createChildren("game_ui.wxsaoleihb.component.WXSaoLei_LBUI", HBLingQuMX);
@@ -72,12 +85,14 @@ module gamewxsaoleihb.page {
 				if (!hbData || !lqData) return;
 				this._isComlete = lqData.length == hbData.bao_num;
 				let story: WxSaoLeiHBStory = this._game.sceneObjectMgr.story;
-				this._maxIndex = story.wxSaoLeiHBMgr.searchMaxMoney(lqData);
 				this._hbData = hbData;
 				this._lqData = lqData;
+				this._lqData = this.optLqData(this._lqData);
 				this._lqData.sort((a: any, b: any) => {
 					return b.lq_time - a.lq_time
 				})
+				//查找最大值
+				this._maxIndex = story.wxSaoLeiHBMgr.searchMaxMoney(lqData);
 				this._viewUI.hb_info_list.dataSource = this._lqData;
 				this._moneyNum.setText(this._hbData.money);
 				this._viewUI.lb_yuan.centerX = this._moneyNum.centerX + this._moneyNum.width;
@@ -88,6 +103,36 @@ module gamewxsaoleihb.page {
 				this._viewUI.lb_ld.text = "雷号:" + this._hbData.ld_str
 				this._viewUI.lb_lq.text = StringU.substitute("领取{0}/{1}个", lqData.length, this._hbData.bao_num);
 			}
+		}
+
+		//领取数据操作
+		private optLqData(data: Array<any>): any {
+			let lq_datas = [].concat(data);
+			let isHaveMainSi = false;
+			let index_mian = 0;
+			//如果没有免死金牌数据，客户端造假
+			let short_time = 0;	//最短时间
+			for (let key in lq_datas) {
+				if (lq_datas.hasOwnProperty(key)) {
+					let lq_data = lq_datas[key];
+					if (!short_time) short_time = lq_data.lq_time;
+					if (short_time > lq_data.lq_time) short_time = lq_data.lq_time;
+					if (lq_data && lq_data.status == 2) {
+						isHaveMainSi = true;
+						index_mian = Number(key);
+					}
+				}
+			}
+			if (isHaveMainSi) {
+				//修改时间
+				lq_datas[index_mian].lq_time = short_time - 1;
+			} else {
+				//添加免死金牌数据
+				if (!short_time) short_time = this._game.sync.serverWebTimeBys;
+				this._mianSiJinPaiData.lq_time = short_time - 1;
+				lq_datas.push(this._mianSiJinPaiData);
+			}
+			return lq_datas;
 		}
 
 		private renderHandler(cell: HBLingQuMX, index: number) {
@@ -133,14 +178,15 @@ module gamewxsaoleihb.page {
 			this.lb_name.color = color;
 			this.lb_name.strokeColor = color;
 			this.lb_name.text = this._data.status == 1 ? this._data.name : "免死金牌";
-			if (isComplete) {
+			if (isComplete || isSelf) {
 				this.lb_money.text = this._data.lq_money;
 				//是否中雷
 				this.img_zl.visible = this._data.pf_money > 0;
 				//手气最佳
 				this.img_sqzj.visible = isMax;
-				this.img_sqzj.right = this.img_zl.visible ? 113 : 26;
+				this.img_sqzj.right = this.img_zl.visible ? 133 : 53;
 			} else {
+				//未完成且不是自己
 				this.lb_money.text = "***";
 				this.img_zl.visible = false;
 				this.img_sqzj.visible = false;
