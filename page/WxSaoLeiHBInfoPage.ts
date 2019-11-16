@@ -92,7 +92,7 @@ module gamewxsaoleihb.page {
 					return b.lq_time - a.lq_time
 				})
 				//查找最大值
-				this._maxIndex = story.wxSaoLeiHBMgr.searchMaxMoney(lqData);
+				this._maxIndex = story.wxSaoLeiHBMgr.searchMaxMoney(this._lqData);
 				this._viewUI.hb_info_list.dataSource = this._lqData;
 				this._moneyNum.setText(this._hbData.money);
 				this._viewUI.lb_yuan.centerX = this._moneyNum.centerX + this._moneyNum.width;
