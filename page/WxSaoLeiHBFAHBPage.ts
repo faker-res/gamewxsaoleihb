@@ -91,6 +91,26 @@ module gamewxsaoleihb.page {
 			this._moneyMin = WxSaoLeiHBMgr.MIN_TEMP[index];
 			this._moneyMax = WxSaoLeiHBMgr.MAX_TEMP[index]
 			this._viewUI.lb_range.text = StringU.substitute("红包发放范围：{0}-{1}", this._moneyMin, this._moneyMax);
+
+			let hb_data_str = localGetItem("hb_data");
+			if (hb_data_str) {
+				let hb_data = JSON.parse(hb_data_str);
+				if (hb_data) {
+					this._type = hb_data.type - 1;
+					this._viewUI.tab_hb.selectedIndex = this._type;
+					this._baoNum = hb_data.baoNum;
+					this.updateBaoUI();
+					this._leiDian = hb_data.ld_str.split(",");
+					for (var key in this._leiDian) {
+						if (this._leiDian.hasOwnProperty(key)) {
+							this._leiDian[key] = Number(this._leiDian[key]);
+						}
+					}
+					this.updateLeiDianUI();
+					this._money = hb_data.money;
+					this._viewUI.txtInput.text = this._money.toString();
+				}
+			}
 		}
 
 		private onLeiDianClick(index: number): void {
@@ -188,6 +208,14 @@ module gamewxsaoleihb.page {
 						this.close();
 						return
 					}
+					//存下来
+					let obj = {
+						type: this._type + 1,
+						baoNum: this._baoNum,
+						ld_str: leiDianStr,
+						money: this._money,
+					}
+					localSetItem("hb_data", JSON.stringify(obj));
 					this._game.network.call_wxsaoleihb_sendhb(this._type + 1, this._baoNum, leiDianStr, this._money);
 					this.close();
 					break
