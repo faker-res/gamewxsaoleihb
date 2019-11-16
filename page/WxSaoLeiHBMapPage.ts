@@ -122,6 +122,7 @@ module gamewxsaoleihb.page {
         //弹出红包详情界面
         private openHBInfoPage(lq_datas: any): void {
             this._viewUI.box_hb_open.visible = false;
+            if (!lq_datas || lq_datas.length <= 0) return;
             this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_INFO, (page: WxSaoLeiHBInfoPage) => {
                 page.setData(this._curHbData, lq_datas, WxSaoLeiHBInfoPage.TYPE_HB_INFO);
             })
@@ -913,7 +914,7 @@ module gamewxsaoleihb.page {
                                 //达到中雷数,中雷数*中雷人数
                                 let totalMoney = Number(pf_money) * this._data.zl_num;
                                 totalMoney = Number(totalMoney.toFixed(2));
-                                info += StringU.substitute("获赔付{0}元",  HtmlFormat.addHtmlColor(totalMoney.toString(), TeaStyle.COLOR_RED));
+                                info += StringU.substitute("获赔付{0}元", HtmlFormat.addHtmlColor(totalMoney.toString(), TeaStyle.COLOR_RED));
                                 infoText += StringU.substitute("获赔付{0}元", totalMoney);
                             } else {
                                 //未中奖

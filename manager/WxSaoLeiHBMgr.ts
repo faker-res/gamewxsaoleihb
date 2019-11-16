@@ -510,7 +510,6 @@ module gamewxsaoleihb.manager {
 			this._widthRate = widthRate;
 			this._asset_url = asset_url;
 			this._parentNode = parent;
-			this.scale(0.8, 0.8);
 			this.initTexture();
 		}
 
