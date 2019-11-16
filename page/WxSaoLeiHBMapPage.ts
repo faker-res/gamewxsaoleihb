@@ -910,10 +910,10 @@ module gamewxsaoleihb.page {
                             info = StringU.substitute("多雷结算,全部雷点[{0}],中雷雷点[{1}],", HtmlFormat.addHtmlColor(this._data.ld_str, TeaStyle.COLOR_RED), HtmlFormat.addHtmlColor(this._data.zl_str, TeaStyle.COLOR_RED));
                             infoText = StringU.substitute("多雷结算,全部雷点[{0}],中雷雷点[{1}],", this._data.ld_str, this._data.zl_str);
                             if (hb_is_zl) {
-                                //达到中雷数
-                                let totalMoney = Number(pf_money) * zl_arr.length;
+                                //达到中雷数,中雷数*中雷人数
+                                let totalMoney = Number(pf_money) * this._data.zl_num;
                                 totalMoney = Number(totalMoney.toFixed(2));
-                                info += StringU.substitute("获赔付{0}元", totalMoney);
+                                info += StringU.substitute("获赔付{0}元",  HtmlFormat.addHtmlColor(totalMoney.toString(), TeaStyle.COLOR_RED));
                                 infoText += StringU.substitute("获赔付{0}元", totalMoney);
                             } else {
                                 //未中奖
