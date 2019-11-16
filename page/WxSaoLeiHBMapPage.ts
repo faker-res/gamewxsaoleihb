@@ -58,6 +58,7 @@ module gamewxsaoleihb.page {
             this._wxSaoLeiMgr.on(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, this, this.openHBInfoPage);  //红包领取数据详情
             this._wxSaoLeiMgr.on(WxSaoLeiHBMgr.MAP_HB_LQ_MSG, this, this.updateLqMsg);  //红包领取消息
             this._wxSaoLeiMgr.on(WxSaoLeiHBMgr.PF_INFO_UPDATE, this, this.updateMainInfo);
+            this._viewUI.box_hb_rain.visible = false;
             //初始化所有的红包
             Laya.timer.frameOnce(1, this, () => {
                 this.updateHBdata(GlobalDef.WXSAOLEI_HB_TOTAL, null);
@@ -94,6 +95,7 @@ module gamewxsaoleihb.page {
             this._viewUI.box_fhb.on(LEvent.CLICK, this, this.onBtnClickWithTween)
             this._viewUI.btn_back.on(LEvent.CLICK, this, this.onBtnClickWithTween)
             this._viewUI.btn_more.on(LEvent.CLICK, this, this.onBtnClickWithTween)
+            // this._viewUI.box_hb.on(LEvent.CLICK, this, this.onBtnClickWithTween)
 
             this._viewUI.btn_hb_close.on(LEvent.CLICK, this, this.onBtnClickWithTween);
             this._viewUI.btn_hb_open.on(LEvent.CLICK, this, this.onBtnClickWithTween);
@@ -181,6 +183,7 @@ module gamewxsaoleihb.page {
         private updateGetHBUI(hbData: any): void {
             this._viewUI.open_head.skin = TongyongUtil.getHeadUrl(hbData.head);
             this._viewUI.open_name.text = hbData.name;
+            this._viewUI.box_open_info.width = this._viewUI.open_head.width + this._viewUI.open_name.width;
             this._viewUI.open_hb_name.text = hbData.money + "元";
             this._viewUI.open_ld.text = hbData.ld_str;
             this._viewUI.box_lh.width = this._viewUI.open_ld.width + 87;
@@ -336,7 +339,11 @@ module gamewxsaoleihb.page {
                     //清除红包
                     if (this._wxSaoLeiMgr.isHbRain)
                         this._wxSaoLeiMgr.end();
-                    this._game.sceneObjectMgr.leaveStory(true);
+                    this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_FZTS, (page: WxSaoLeiHBFZTSPage) => {
+                        page.isInner = true;
+                    }, () => {
+                        this._game.sceneObjectMgr.leaveStory(true);
+                    })
                     break
                 case this._viewUI.btn_more:
                     //成员列表
@@ -381,6 +388,10 @@ module gamewxsaoleihb.page {
                     //红包雨领取红包
                     this._game.network.call_wxsaoleihb_opt(-1);
                     break
+                // case this._viewUI.box_hb:
+                //     //红包雨领取红包
+                //     this._wxSaoLeiMgr.showHBRain(this._game.sync.serverTimeBys + 30, this._viewUI.box_hb_rain);
+                //     break
             }
         }
 
@@ -825,6 +836,7 @@ module gamewxsaoleihb.page {
             this._wxsaoleihbMgr = story.wxSaoLeiHBMgr;
             if (this._extraType == 0 && !this._lq_data) return;
             let info = "";  //信息
+            let infoText = "";//没有html假信息
             //赔付金额
             let mainUid = mainPlayer.GetUserId();
             if (this._extraType == 0) {
@@ -836,13 +848,15 @@ module gamewxsaoleihb.page {
                 let lq_money: string = this._lq_data.lq_money.toString(); //领取的金钱
                 let zl_num = Number(lq_money.substr(-1, 1));;  //中雷号
                 let is_zl = pf_money > 0;      //是否中雷
+
                 if (isSelf) {
                     //领取了别人的红包
                     name = this._data.name;    //发红包人的名字
                     if (is_zl) {
                         if (this._data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
                             this._game.playSound(Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.zhonglei);
-                            info = StringU.substitute("您领取了<span color='{0}'>{1}</span>玩家的红包,获得{2}元,中雷{3}赔付{4}元", color, name, HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED), zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
+                            info = StringU.substitute("您领取了{0}玩家的红包,获得{1}元,中雷{2}赔付{3}元", HtmlFormat.addHtmlColor(name.toString(), color), HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED), zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
+                            infoText = StringU.substitute("您领取了{0}玩家的红包,获得{1}元,中雷{2}赔付{3}元", name.toString(), lq_money.toString(), zl_num, pf_money.toString());
                         } else if (this._data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
                             this._game.playSound(Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.no_zhonglei);
                             //冻结钱数
@@ -852,11 +866,13 @@ module gamewxsaoleihb.page {
                             }
                             this._wxsaoleihbMgr.pf_data.push(obj)
                             this._wxsaoleihbMgr.event
-                            info = StringU.substitute("您领取了<span color='{0}'>{1}</span>玩家的红包,获得{2}元,预中雷{3}冻结{4}元", color, name, HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED), zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
+                            info = StringU.substitute("您领取了{0}玩家的红包,获得{1}元,预中雷{2}冻结{3}元", HtmlFormat.addHtmlColor(name.toString(), color), HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED), zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
+                            infoText = StringU.substitute("您领取了{0}玩家的红包,获得{1}元,预中雷{2}冻结{3}元", name.toString(), lq_money.toString(), zl_num, pf_money.toString());
                         }
                     } else {
                         this._game.playSound(Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.no_zhonglei);
-                        info = StringU.substitute("您领取了<span color='{0}'>{1}</span>玩家的红包,获得{2}元", color, name, HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED));
+                        info = StringU.substitute("您领取了{0}玩家的红包,获得{1}元", HtmlFormat.addHtmlColor(name.toString(), color), HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED));
+                        infoText = StringU.substitute("您领取了{0}玩家的红包,获得{1}元", name.toString(), lq_money.toString());
                     }
                     this._wxsaoleihbMgr.self_hb_lqjl.push(this._lq_data);
                 } else {
@@ -864,12 +880,15 @@ module gamewxsaoleihb.page {
                     name = this._lq_data.name;
                     if (is_zl) {
                         if (this._data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
-                            info = StringU.substitute("<span color='{0}'>{1}</span>玩家领取了您的红包,中雷{2}赔付{3}元", color, name, zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
+                            info = StringU.substitute("{0}玩家领取了您的红包,中雷{1}赔付{2}元", HtmlFormat.addHtmlColor(name.toString(), color), zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
+                            infoText = StringU.substitute("{0}玩家领取了您的红包,中雷{1}赔付{2}元", name.toString(), zl_num, pf_money.toString());
                         } else if (this._data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
-                            info = StringU.substitute("<span color='{0}'>{1}</span>玩家领取了您的红包,预中雷{2}冻结{3}元", color, name, zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
+                            info = StringU.substitute("{0}玩家领取了您的红包,预中雷{1}冻结{2}元", HtmlFormat.addHtmlColor(name.toString(), color), zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
+                            infoText = StringU.substitute("{0}玩家领取了您的红包,预中雷{1}冻结{2}元", name.toString(), zl_num, pf_money.toString());
                         }
                     } else {
-                        info = StringU.substitute("<span color='{0}'>{1}</span>玩家领取了您的红包", color, name);
+                        info = StringU.substitute("{0}玩家领取了您的红包", HtmlFormat.addHtmlColor(name.toString(), color));
+                        infoText = StringU.substitute("{0}玩家领取了您的红包", name.toString());
                     }
                 }
             } else {
@@ -877,6 +896,7 @@ module gamewxsaoleihb.page {
                     case WxSaoLeiHBMapPage.EXTRA_TYPE_FINSH:
                         //红包已经领完了
                         info = "您的红包被领完"
+                        infoText = "您的红包被领完"
                         break;
                     case WxSaoLeiHBMapPage.EXTRA_TYPE_ZL_SETTLE:
                         // 多雷结算信息
@@ -888,33 +908,53 @@ module gamewxsaoleihb.page {
                         if (is_self) {
                             //自己的多雷红包结算信息
                             info = StringU.substitute("多雷结算,全部雷点[{0}],中雷雷点[{1}],", HtmlFormat.addHtmlColor(this._data.ld_str, TeaStyle.COLOR_RED), HtmlFormat.addHtmlColor(this._data.zl_str, TeaStyle.COLOR_RED));
+                            infoText = StringU.substitute("多雷结算,全部雷点[{0}],中雷雷点[{1}],", this._data.ld_str, this._data.zl_str);
                             if (hb_is_zl) {
                                 //达到中雷数
                                 let totalMoney = Number(pf_money) * zl_arr.length;
                                 totalMoney = Number(totalMoney.toFixed(2));
                                 info += StringU.substitute("获赔付{0}元", totalMoney);
+                                infoText += StringU.substitute("获赔付{0}元", totalMoney);
                             } else {
                                 //未中奖
                                 info += "未获赔付";
+                                infoText += "未获赔付";
                             }
                         } else {
                             let pfData = this._wxsaoleihbMgr.findPFDataByid(this._data.hb_id);
                             //别人的多雷红包结算信息
                             info = StringU.substitute("玩家{0}多雷结算,全部雷点[{1}]中雷雷点[{2}],", HtmlFormat.addHtmlColor(this._data.name.toString(), "#3b72fe"), HtmlFormat.addHtmlColor(this._data.ld_str, TeaStyle.COLOR_RED), HtmlFormat.addHtmlColor(this._data.zl_str, TeaStyle.COLOR_RED));
+                            infoText = StringU.substitute("玩家{0}多雷结算,全部雷点[{1}]中雷雷点[{2}],", this._data.name.toString(), this._data.ld_str, this._data.zl_str);
                             //判断红包是否中雷，判断自己是否中雷，
                             if (hb_is_zl) {
                                 //中雷
                                 info += StringU.substitute("解除冻结{0},并赔付{1}元", HtmlFormat.addHtmlColor(pfData.pf_money, TeaStyle.COLOR_RED), HtmlFormat.addHtmlColor(pfData.pf_money, TeaStyle.COLOR_RED));
+                                infoText += StringU.substitute("解除冻结{0},并赔付{1}元", pfData.pf_money, pfData.pf_money);
                             } else {
                                 info += StringU.substitute("免赔付,解除冻结{0}元", HtmlFormat.addHtmlColor(pfData.pf_money, TeaStyle.COLOR_RED));
+                                infoText += StringU.substitute("免赔付,解除冻结{0}元", pfData.pf_money);
                             }
                         }
                         break
                 }
             }
-            this.lb_info.text = info;
-            // this.box_main.size(this.lb_info.width, this.lb_info.height);
-            // this.img_di.size(this.lb_info.width, this.lb_info.height);
+            this.lb_info.text = infoText;
+            let width = this.lb_info.width + 50;
+            let height = this.lb_info.height;
+            //最小值 600
+            if (this.lb_info.width > 600) {
+                this.lb_info.wordWrap = true;
+                this.lb_info.width = 600;
+                this.lb_info.height = 40;
+            }
+            if (this.lb_info.wordWrap) {
+                height += 50;
+            } else {
+                height += 25;
+            }
+            this.box_main.size(width, height);
+            this.img_di.size(width, height);
+            // this.lb_info.size(this.lb_info.width, this.lb_info.height);
             TextFieldU.setHtmlText(this.lb_info, info, false);//支持HTML
         }
     }

@@ -59,7 +59,7 @@ module gamewxsaoleihb.page {
 			if (!this._moneyNum) {
 				this._moneyNum = new ClipUtil(WxSaoLeiHBClip.MONEY_FONT);
 				this._moneyNum.centerX = this._viewUI.clip_hb_num.centerX;
-				this._moneyNum.y = this._viewUI.clip_hb_num.y;
+				this._moneyNum.top = this._viewUI.clip_hb_num.top;
 				this._viewUI.clip_hb_num.parent.addChild(this._moneyNum);
 				this._viewUI.clip_hb_num.removeSelf();
 			}
@@ -99,6 +99,7 @@ module gamewxsaoleihb.page {
 				this._viewUI.lb_yuan.y = this._moneyNum.y + this._moneyNum.height - this._viewUI.lb_yuan.height;
 				this._viewUI.img_head.skin = TongyongUtil.getHeadUrl(this._hbData.head);
 				this._viewUI.lb_name.text = this._hbData.name;
+				this._viewUI.box_player.width = this._viewUI.img_head.width + this._viewUI.lb_name.width;
 				this._viewUI.lb_hb_num.text = this._hbData.bao_num + "个红包";
 				this._viewUI.lb_ld.text = "雷号:" + this._hbData.ld_str
 				this._viewUI.lb_lq.text = StringU.substitute("领取{0}/{1}个", lqData.length, this._hbData.bao_num);

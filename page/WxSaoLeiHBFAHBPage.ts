@@ -43,14 +43,29 @@ module gamewxsaoleihb.page {
 			this._viewUI.tab_hb.selectHandler = Handler.create(this, this.selectHandler, null, false);
 			this._viewUI.btn_random.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.btn_send.on(LEvent.CLICK, this, this.onBtnClickWithTween);
-			this._viewUI.btn_back.on(LEvent.CLICK, this, this.close);
+			this._viewUI.btn_back.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.hb_danL_num1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.hb_danL_num2.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.hb_duoL_num1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
+			this._viewUI.txtInput.on(LEvent.BLUR, this, this.updateTxtInput);
 			let story: WxSaoLeiHBStory = this._game.sceneObjectMgr.story;
 			this._wxSaoLeiMgr = story.wxSaoLeiHBMgr;
 			this._viewUI.tab_hb.selectedIndex = 0;
 			this.updateViewUI();
+		}
+
+		private updateTxtInput(textInput: Laya.TextInput): void {
+			if (!textInput) return;
+			let money = parseInt(textInput.text);
+			if (isNaN(money)) return;
+			money = Math.max(this._moneyMin, money);
+			money = Math.min(this._moneyMax, money);
+			textInput.text = money.toString();
+		}
+
+		protected onMouseSoudHandle(e: LEvent): any {
+			this._game.playSound(this._defaultSoundPath);
+			return true;
 		}
 
 		update(diff: number) {
@@ -130,7 +145,7 @@ module gamewxsaoleihb.page {
 						this._leiDian = [randomNum];
 					} else if (this._type = WxSaoLeiHBMgr.TYPE_DUOLEI - 1) {
 						//随机雷点数
-						let leiDianNum = MathU.randomRange(1, WxSaoLeiHBMgr.LEI_MAX_NUM - 1);
+						let leiDianNum = this._wxSaoLeiMgr.getLeiDianNun();
 						//随机雷点
 						let leiDianNums = [].concat(WxSaoLeiHBMgr.LEI_HAO);	//预防数组引用
 						while (leiDianNum > 0) {
@@ -187,6 +202,9 @@ module gamewxsaoleihb.page {
 				case this._viewUI.hb_duoL_num1:
 					this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[1];
 					this.updateBaoUI()
+					break
+				case this._viewUI.btn_back:
+					this.close();
 					break
 			}
 		}

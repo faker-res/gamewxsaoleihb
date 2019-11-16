@@ -20,6 +20,8 @@ module gamewxsaoleihb.page {
 		static PAGE_WXSLHB_HB_ROOM_INFO: string = "7";
 		//余额不足
 		static PAGE_WXSLHB_HB_YEBZ: string = "8";
+		//翻转提示
+		static PAGE_WXSLHB_HB_FZTS: string = "9";
 		//红包游戏规则界面
 		static PAGE_WXSLHB_RULE: string = "101";
 
@@ -37,6 +39,7 @@ module gamewxsaoleihb.page {
 			PageDef._pageClassMap[WxsaoleihbPageDef.PAGE_WXSLHB_HB_INFO] = WxSaoLeiHBInfoPage;
 			PageDef._pageClassMap[WxsaoleihbPageDef.PAGE_WXSLHB_HB_ROOM_INFO] = WxSaoLeiHBRoomInfoPage;
 			PageDef._pageClassMap[WxsaoleihbPageDef.PAGE_WXSLHB_HB_YEBZ] = WxSaoLeiHBYEBZPage;
+			PageDef._pageClassMap[WxsaoleihbPageDef.PAGE_WXSLHB_HB_FZTS] = WxSaoLeiHBFZTSPage;
 
 			this.ROOM_INFO[Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_1] = { mode: Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_1, name: "小资场", minGold: 1 };
 			this.ROOM_INFO[Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_2] = { mode: Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_2, name: "老板场", minGold: 10 };

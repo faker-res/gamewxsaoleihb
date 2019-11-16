@@ -70,7 +70,6 @@ module gamewxsaoleihb.page {
 				this._clipMinList[index].setText(WxSaoLeiHBMgr.MIN_TEMP[index], true, false);
 				this._clipMaxList[index].setText(WxSaoLeiHBMgr.MAX_TEMP[index], true, false);
 			}
-			// this._game.playMusic(Path.music + "buyu/bg.mp3");
 		}
 
 		// 重新布局
@@ -95,7 +94,11 @@ module gamewxsaoleihb.page {
 				case this._viewUI.btn_join:
 					let maplv = TongyongUtil.getJoinMapLv(WxsaoleihbPageDef.GAME_NAME, mainPlayer.playerInfo.money);
 					if (!maplv) return;
-					this._game.sceneObjectMgr.intoStory(WxsaoleihbPageDef.GAME_NAME, maplv.toString(), true);
+					this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_FZTS, (page: WxSaoLeiHBFZTSPage) => {
+						page.isInner = false;
+					}, () => {
+						this._game.sceneObjectMgr.intoStory(WxsaoleihbPageDef.GAME_NAME, maplv.toString(), true);
+					})
 					break;
 			}
 		}
@@ -114,7 +117,11 @@ module gamewxsaoleihb.page {
 			// 	this.gotoRecharge(str);
 			// } else {
 			//进入
-			this._game.sceneObjectMgr.intoStory(WxsaoleihbPageDef.GAME_NAME, mode.toString(), true);
+			this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_FZTS, (page: WxSaoLeiHBFZTSPage) => {
+				page.isInner = false;
+			}, () => {
+				this._game.sceneObjectMgr.intoStory(WxsaoleihbPageDef.GAME_NAME, mode.toString(), true);
+			})
 			// }
 		}
 

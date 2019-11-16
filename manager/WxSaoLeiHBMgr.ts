@@ -24,9 +24,9 @@ module gamewxsaoleihb.manager {
 		public static readonly HB_STATE_END: number = 2;
 
 		public static readonly TYPE_INFO = [
-			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FLHB,"福利包",
-			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_GHB,"领红包",
-			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FHB,"发红包"]
+			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FLHB, "福利包",
+			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_GHB, "领红包",
+			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FHB, "发红包"]
 
 		private _hb_data: Array<any> = [];	//红包总数据
 		public get hbData() {
@@ -318,6 +318,39 @@ module gamewxsaoleihb.manager {
 			return index;
 		}
 
+		//根据指定规则获取雷点数
+		getLeiDianNun(): number {
+			let range = MathU.randomRange(1, 100);
+			let leiDianNum = 1;
+			if (range <= 1) {
+				leiDianNum = 9;
+			} else if (range <= 3) {
+				leiDianNum = 8;
+
+			} else if (range <= 6) {
+				leiDianNum = 7;
+
+			} else if (range <= 10) {
+				leiDianNum = 6;
+
+			} else if (range <= 20) {
+				leiDianNum = 5;
+			}
+			else if (range <= 40) {
+				leiDianNum = 4;
+			}
+			else if (range <= 65) {
+				leiDianNum = 3;
+			}
+			else if (range <= 90) {
+				leiDianNum = 2;
+			}
+			else if (range <= 100) {
+				leiDianNum = 1;
+			}
+			return leiDianNum
+		}
+
 		clear(fource?: boolean) {
 			this._game.network.removeHanlder(Protocols.SMSG_WXSAOLEIHB_INFO, this, this.onOptHandler);
 			this._game.network.removeHanlder(Protocols.SMSG_WXSAOLEIHB_SEND_LQJL, this, this.onOptHandler);
@@ -326,8 +359,8 @@ module gamewxsaoleihb.manager {
 		}
 
 		//------------------------红包雨start---------------
-		public static CREATE_HB_RAIN_TIME: number = 1;
-		public static MAX_HB_NUM = 20;
+		public static CREATE_HB_RAIN_TIME: number = 1.5;
+		public static MAX_HB_NUM = 10;
 		private _asset_url = "";
 		private _refAsset: RefAsset;
 		private _stageWidth;
@@ -336,10 +369,11 @@ module gamewxsaoleihb.manager {
 		private _hbCells: HBCell[] = [];
 		private _end_time: number;	//红包雨结束时间
 		public isHbRain: boolean = false;
-		private _parent: gamewxsaoleihb.page.WxSaoLeiHBMapPage;
-		public showHBRain(endTime: number, parent: gamewxsaoleihb.page.WxSaoLeiHBMapPage): void {
+		private _parent: any;
+		public showHBRain(endTime: number, parent: any): void {
 			this._asset_url = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_fl.png";
 			this._parent = parent;
+			this._parent.visible = true;
 			if (!this._refAsset) {
 				this._refAsset = RefAsset.Get(this._asset_url)
 				this._refAsset.retain();
@@ -378,6 +412,7 @@ module gamewxsaoleihb.manager {
 		//红包雨结束
 		public end() {
 			this.isHbRain = false;
+			this._parent.visible = false;
 			for (let index = 0; index < this._hbCells.length; index++) {
 				let hbcell = this._hbCells[index];
 				hbcell.isDestroy = true;
@@ -475,6 +510,7 @@ module gamewxsaoleihb.manager {
 			this._widthRate = widthRate;
 			this._asset_url = asset_url;
 			this._parentNode = parent;
+			this.scale(0.8, 0.8);
 			this.initTexture();
 		}
 

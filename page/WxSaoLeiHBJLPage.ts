@@ -31,6 +31,11 @@ module gamewxsaoleihb.page {
 			}
 		}
 
+		protected onMouseSoudHandle(e: LEvent): any {
+			this._game.playSound(this._defaultSoundPath);
+			return true;
+		}
+
 		// 页面打开时执行函数
 		protected onOpen(): void {
 			super.onOpen();
@@ -144,7 +149,7 @@ module gamewxsaoleihb.page {
 			this.lb_date.text = Sync.getTimeStr1(this._data.time * 1000);
 			this.lb_time.text = Sync.getTimeShortStr(this._data.time);
 			this.lb_money.text = this._data.money;
-			this.lb_type.text = WxSaoLeiHBMgr.TYPE_INFO[this._data.type_index + 1].toString();
+			// this.lb_type.text = WxSaoLeiHBMgr.TYPE_INFO[this._data.type_index + 1].toString();
 			this.lb_diff.text = this._data.shouzhi;
 			this.lb_diff.color = this._data.shouzhi > 0 ? TeaStyle.COLOR_GREEN : TeaStyle.COLOR_RED;
 			this.btn_jh.visible = curType == WxSaoLeiHBJLPage.TYPE_RECIVE_HB;

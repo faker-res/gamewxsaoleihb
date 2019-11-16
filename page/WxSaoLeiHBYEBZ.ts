@@ -22,8 +22,8 @@ module gamewxsaoleihb.page {
 			this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLei_YuEUI');
 			this.addChild(this._viewUI);
 			if (this._viewUI) {
-				this._viewUI.box_main.scaleX = 1.77;
-				this._viewUI.box_main.scaleY = 1.77;
+				this._viewUI.box_main.scaleX = 1.5;
+				this._viewUI.box_main.scaleY = 1.5;
 			}
 		}
 
