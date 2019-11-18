@@ -18,6 +18,7 @@ module gamewxsaoleihb.manager {
 		public static readonly MAP_HB_INFO = "WxSaoLeiHBMgr.MAP_HB_INFO";//红包数据
 		public static readonly MAP_HB_LQ_INFO = "WxSaoLeiHBMgr.MAP_HB_LQ_INFO";//红包领取数据详情
 		public static readonly MAP_HB_LQ_MSG = "WxSaoLeiHBMgr.MAP_HB_LQ_MSG";//红包领取数据消息
+		public static readonly PF_INFO_UPDATE = "WxSaoLeiHBMgr.PF_INFO_UPDATE";	//赔付数据修改
 		public static readonly HB_TIME: number = 90;	//红包持续时间
 
 		public static readonly HB_STATE_ING: number = 1;
@@ -37,7 +38,6 @@ module gamewxsaoleihb.manager {
 			return this._self_hb_data;
 		}
 		public pf_data: Array<any> = [];	//预中雷赔付数据{hb_id:,pf_money:}
-		public static readonly PF_INFO_UPDATE = "WxSaoLeiHBMgr.PF_INFO_UPDATE";
 		public self_hb_lqjl: Array<any> = []	//自己红包领取记录{领取数据}
 		public self_show_settle_dl_info: Array<any> = [];//多雷结算显示记录显示数据{红包id}
 		public self_hb_show: Array<any> = [];//自己的红包结算记录显示数据{红包id}
@@ -453,6 +453,7 @@ module gamewxsaoleihb.manager {
 		}
 
 		private updateHbRain(diff) {
+			if (this._hbCells.length <= 0) return;
 			for (let index = 0; index < this._hbCells.length; index++) {
 				let hbcell = this._hbCells[index];
 				if (hbcell.isDestroy) {
@@ -506,6 +507,7 @@ module gamewxsaoleihb.manager {
 
 		private create(width: number, widthRate: number, asset_url: string, parent) {
 			this.isDestroy = false;
+			this.scale(0.6, 0.6);
 			this._stageWidth = width;
 			this._widthRate = widthRate;
 			this._asset_url = asset_url;

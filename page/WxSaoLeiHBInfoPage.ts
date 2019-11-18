@@ -102,7 +102,7 @@ module gamewxsaoleihb.page {
 				this._viewUI.box_player.width = this._viewUI.img_head.width + this._viewUI.lb_name.width;
 				this._viewUI.lb_hb_num.text = this._hbData.bao_num + "个红包";
 				this._viewUI.lb_ld.text = "雷号:" + this._hbData.ld_str
-				this._viewUI.lb_lq.text = StringU.substitute("领取{0}/{1}个", lqData.length, this._hbData.bao_num);
+				this._viewUI.lb_lq.text = StringU.substitute("领取{0}/{1}个", this._lqData.length, this._hbData.bao_num);
 			}
 		}
 
@@ -180,7 +180,8 @@ module gamewxsaoleihb.page {
 			this.lb_name.strokeColor = color;
 			this.lb_name.text = this._data.status == 1 ? this._data.name : "免死金牌";
 			if (isComplete || isSelf) {
-				this.lb_money.text = this._data.lq_money;
+				let lq_money: number = this._data.lq_money
+				this.lb_money.text = lq_money.toFixed(2);
 				//是否中雷
 				this.img_zl.visible = this._data.pf_money > 0;
 				//手气最佳

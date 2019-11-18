@@ -87,7 +87,7 @@ module gamewxsaoleihb.page {
 			this._data = data;
 			if (!data) return;
 			this.lb_date.text = Sync.getTimeStr1(this._data.time * 1000);
-			this.lb_time.text = Sync.getTimeShortStr(this._data.time);
+			this.lb_time.text = Sync.getTimeShortStr(this._data.time * 1000);
 			this.lb_money.text = this._data.money;
 			this.lb_type.text = WxSaoLeiHBMgr.TYPE_INFO[this._data.type_index + 1].toString();
 			this.lb_diff.text = this._data.shouzhi;

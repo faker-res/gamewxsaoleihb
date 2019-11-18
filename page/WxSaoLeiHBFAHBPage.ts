@@ -13,6 +13,7 @@ module gamewxsaoleihb.page {
 		private _moneyMax: number;
 		private _wxSaoLeiMgr: WxSaoLeiHBMgr;
 		private _mainPlayer: PlayerData;
+		private _mapLv: number;
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);
 			this._isNeedBlack = true;
@@ -52,6 +53,25 @@ module gamewxsaoleihb.page {
 			this._wxSaoLeiMgr = story.wxSaoLeiHBMgr;
 			this._viewUI.tab_hb.selectedIndex = 0;
 			this.updateViewUI();
+			let hb_data_str = localGetItem("hb_data" + this._mapLv);
+			if (hb_data_str) {
+				let hb_data = JSON.parse(hb_data_str);
+				if (hb_data) {
+					this._type = hb_data.type - 1;
+					this._viewUI.tab_hb.selectedIndex = this._type;
+					this._baoNum = hb_data.baoNum;
+					this.updateBaoUI();
+					this._leiDian = hb_data.ld_str.split(",");
+					for (var key in this._leiDian) {
+						if (this._leiDian.hasOwnProperty(key)) {
+							this._leiDian[key] = Number(this._leiDian[key]);
+						}
+					}
+					this.updateLeiDianUI();
+					this._money = hb_data.money;
+					this._viewUI.txtInput.text = this._money.toString();
+				}
+			}
 		}
 
 		private updateTxtInput(textInput: Laya.TextInput): void {
@@ -61,6 +81,7 @@ module gamewxsaoleihb.page {
 			money = Math.max(this._moneyMin, money);
 			money = Math.min(this._moneyMax, money);
 			textInput.text = money.toString();
+			this._money = money;
 		}
 
 		protected onMouseSoudHandle(e: LEvent): any {
@@ -85,32 +106,13 @@ module gamewxsaoleihb.page {
 			this._viewUI.lb_ye.text = money.toFixed(2);
 			//红包发放范围
 			this._mapinfo = this._game.sceneObjectMgr.mapInfo as WxSaoLeiHBMapInfo;
-			let mapLv = this._mapinfo.GetMapLevel();
-			let index = WxSaoLeiHBMgr.ALL_GAME_ROOM_CONFIG_ID.indexOf(mapLv);
+			this._mapLv = this._mapinfo.GetMapLevel();
+			let index = WxSaoLeiHBMgr.ALL_GAME_ROOM_CONFIG_ID.indexOf(this._mapLv);
 			if (index < 0) index = 0;
 			this._moneyMin = WxSaoLeiHBMgr.MIN_TEMP[index];
 			this._moneyMax = WxSaoLeiHBMgr.MAX_TEMP[index]
 			this._viewUI.lb_range.text = StringU.substitute("红包发放范围：{0}-{1}", this._moneyMin, this._moneyMax);
 
-			let hb_data_str = localGetItem("hb_data");
-			if (hb_data_str) {
-				let hb_data = JSON.parse(hb_data_str);
-				if (hb_data) {
-					this._type = hb_data.type - 1;
-					this._viewUI.tab_hb.selectedIndex = this._type;
-					this._baoNum = hb_data.baoNum;
-					this.updateBaoUI();
-					this._leiDian = hb_data.ld_str.split(",");
-					for (var key in this._leiDian) {
-						if (this._leiDian.hasOwnProperty(key)) {
-							this._leiDian[key] = Number(this._leiDian[key]);
-						}
-					}
-					this.updateLeiDianUI();
-					this._money = hb_data.money;
-					this._viewUI.txtInput.text = this._money.toString();
-				}
-			}
 		}
 
 		private onLeiDianClick(index: number): void {
@@ -197,11 +199,7 @@ module gamewxsaoleihb.page {
 						return;
 					}
 					//造假数据
-					let leiDianStr = "";
-					for (let i = 0; i < this._leiDian.length; i++) {
-						if (i > 0) leiDianStr += ","
-						leiDianStr += this._leiDian[i];
-					}
+					let leiDianStr = this.changeLeiDianToStr();
 					if (!this._mainPlayer) return;
 					if (this._mainPlayer.playerInfo.money < this._money) {
 						this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_YEBZ);
@@ -209,13 +207,7 @@ module gamewxsaoleihb.page {
 						return
 					}
 					//存下来
-					let obj = {
-						type: this._type + 1,
-						baoNum: this._baoNum,
-						ld_str: leiDianStr,
-						money: this._money,
-					}
-					localSetItem("hb_data", JSON.stringify(obj));
+					this.updateLocalData();
 					this._game.network.call_wxsaoleihb_sendhb(this._type + 1, this._baoNum, leiDianStr, this._money);
 					this.close();
 					break
@@ -235,6 +227,26 @@ module gamewxsaoleihb.page {
 					this.close();
 					break
 			}
+		}
+
+		private changeLeiDianToStr(): string {
+			let leiDianStr = "";
+			for (let i = 0; i < this._leiDian.length; i++) {
+				if (i > 0) leiDianStr += ","
+				leiDianStr += this._leiDian[i];
+			}
+			return leiDianStr
+		}
+
+		private updateLocalData(): void {
+			let leiDianStr = this.changeLeiDianToStr();
+			let obj = {
+				type: this._type + 1,
+				baoNum: this._baoNum,
+				ld_str: leiDianStr,
+				money: this._money,
+			}
+			localSetItem("hb_data" + this._mapLv, JSON.stringify(obj));
 		}
 
 		private selectHandler(index: number): void {
@@ -293,6 +305,8 @@ module gamewxsaoleihb.page {
 		}
 
 		public close(): void {
+			//记录本地数据
+			this.updateLocalData();
 			if (this._viewUI) {
 				for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {
 					this._viewUI["btn_" + i].off(LEvent.CLICK, this, this.onLeiDianClick, [i]);
