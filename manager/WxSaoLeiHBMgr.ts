@@ -20,6 +20,7 @@ module gamewxsaoleihb.manager {
 		public static readonly MAP_HB_LQ_MSG = "WxSaoLeiHBMgr.MAP_HB_LQ_MSG";//红包领取数据消息
 		public static readonly PF_INFO_UPDATE = "WxSaoLeiHBMgr.PF_INFO_UPDATE";	//赔付数据修改
 		public static readonly HB_TIME: number = 90;	//红包持续时间
+		public static readonly HB_RAIN_TIME: number = 30;	//红包雨持续时间
 
 		public static readonly HB_STATE_ING: number = 1;
 		public static readonly HB_STATE_END: number = 2;

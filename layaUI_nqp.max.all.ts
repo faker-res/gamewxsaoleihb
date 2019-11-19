@@ -408,8 +408,9 @@ module ui.nqp.game_ui.wxsaoleihb {
 module ui.nqp.game_ui.wxsaoleihb {
     export class WXSaoLei_YuEUI extends View {
 		public box_main:Laya.Box;
+		public lb_info:Laya.Label;
 
-        public static  uiView:any ={"type":"View","props":{"width":720,"height":1280},"child":[{"type":"Box","props":{"width":510,"var":"box_main","height":260,"centerY":0,"centerX":0,"anchorY":0.5,"anchorX":0.5},"child":[{"type":"Image","props":{"y":129,"x":255,"width":510,"skin":"wxsaoleihb_ui/game_ui/wxsaoleihb/saolei/tu_d5.png","sizeGrid":"25,25,25,25","height":260,"anchorY":0.5,"anchorX":0.5,"alpha":0.9}},{"type":"Image","props":{"y":72,"x":255,"skin":"wxsaoleihb_ui/game_ui/wxsaoleihb/saolei/tu_qc.png","scaleY":1.5,"scaleX":1.5,"anchorY":0.5,"anchorX":0.5}},{"type":"Label","props":{"y":184,"x":94,"text":"余额不足，请充值！","fontSize":35,"color":"#ffffff","bold":true}}]}]};
+        public static  uiView:any ={"type":"View","props":{"width":720,"height":1280},"child":[{"type":"Box","props":{"width":510,"var":"box_main","height":260,"centerY":0,"centerX":0,"anchorY":0.5,"anchorX":0.5},"child":[{"type":"Image","props":{"y":129,"x":255,"width":510,"skin":"wxsaoleihb_ui/game_ui/wxsaoleihb/saolei/tu_d5.png","sizeGrid":"25,25,25,25","height":260,"anchorY":0.5,"anchorX":0.5,"alpha":0.9}},{"type":"Image","props":{"y":72,"x":255,"skin":"wxsaoleihb_ui/game_ui/wxsaoleihb/saolei/tu_qc.png","scaleY":1.5,"scaleX":1.5,"anchorY":0.5,"anchorX":0.5}},{"type":"Label","props":{"y":184,"var":"lb_info","text":"余额不足，请充值！","fontSize":35,"color":"#ffffff","centerX":0,"bold":true,"align":"center"}}]}]};
         constructor(){ super()}
         createChildren():void {
         

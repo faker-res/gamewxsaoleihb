@@ -127,7 +127,9 @@ module gamewxsaoleihb.page {
 					this._leiDian = [index];
 				} else if (this._type == WxSaoLeiHBMgr.TYPE_DUOLEI - 1) {
 					if (this._leiDian.length >= this._baoNum) {
-						this._game.showTips("雷点数量不能大于发包数量!");
+						this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_YEBZ,(page:WxSaoLeiHBYEBZPage)=>{
+							page.setData("雷点数量不能大于发包数量!");
+						});
 						return;
 					}
 					this._leiDian.push(index);

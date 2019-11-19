@@ -27,6 +27,12 @@ module gamewxsaoleihb.page {
 			}
 		}
 
+		setData(info): void {
+			if (info) {
+				this._viewUI.lb_info.text = info;
+			}
+		}
+
 		// 页面打开时执行函数
 		protected onOpen(): void {
 			super.onOpen();

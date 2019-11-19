@@ -184,9 +184,13 @@ module gamewxsaoleihb.page {
 				this.lb_money.text = lq_money.toFixed(2);
 				//是否中雷
 				this.img_zl.visible = this._data.pf_money > 0;
-				//手气最佳
-				this.img_sqzj.visible = isMax;
-				this.img_sqzj.right = this.img_zl.visible ? 133 : 53;
+				if (isComplete) {
+					//手气最佳
+					this.img_sqzj.visible = isMax;
+					this.img_sqzj.right = this.img_zl.visible ? 133 : 53;
+				} else {
+					this.img_sqzj.visible = false;
+				}
 			} else {
 				//未完成且不是自己
 				this.lb_money.text = "***";

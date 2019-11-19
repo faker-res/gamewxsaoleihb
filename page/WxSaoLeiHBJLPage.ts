@@ -213,7 +213,7 @@ module gamewxsaoleihb.page {
 				this.on(LEvent.CLICK, this, this.onBtnClick);
 			} else {
 				if (this._data.type == Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FLHB) {
-					this.lb_type.text = "福利包";
+					this.lb_type.text = "红包雨";
 				} else {
 					if (this._hb_data) {
 						this.lb_type.text = this._hb_data.name;
