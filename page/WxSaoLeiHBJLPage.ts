@@ -104,10 +104,10 @@ module gamewxsaoleihb.page {
 					if (cc) {
 						for (let index = 0; index < cc.length; index++) {
 							let aa = cc[index];
-							if (aa.type == Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FLHB || aa.type == Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_GHB) {
+							if (aa.type == Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FLHB || aa.type == Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_GHB || aa.type == Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_GHB_SETTLE) {
 								//领红包或者福利包数据
 								this._dataGetInfo.push(aa);
-							} else if (aa.type == Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FHB) {
+							} else if (aa.type == Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FHB || aa.type == Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FHB_SETTLE) {
 								//发红包数据
 								this._dataSendInfo.push(aa);
 							}
