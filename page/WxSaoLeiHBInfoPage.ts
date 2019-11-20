@@ -11,6 +11,7 @@ module gamewxsaoleihb.page {
 			super(v, onOpenFunc, onCloseFunc);
 			this._isNeedBlack = true;
 			this._isClickBlack = true;
+			this._isNeedDuang = false;
 			this._defaultSoundPath = Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.btn;
 			this._asset = [
 				PathGameTongyong.atlas_game_ui_tongyong + "general.atlas",
@@ -82,18 +83,24 @@ module gamewxsaoleihb.page {
 				if (money <= 0) return;
 				this._viewUI.rain_money.text = money.toString();
 			} else if (type == WxSaoLeiHBInfoPage.TYPE_HB_INFO) {
-				if (!hbData || !lqData) return;
-				this._isComlete = lqData.length == hbData.bao_num;
+				if (!hbData) return;
 				let story: WxSaoLeiHBStory = this._game.sceneObjectMgr.story;
 				this._hbData = hbData;
-				this._lqData = lqData;
-				this._lqData = this.optLqData(this._lqData);
-				this._lqData.sort((a: any, b: any) => {
-					return b.lq_time - a.lq_time
-				})
-				//查找最大值
-				this._maxIndex = story.wxSaoLeiHBMgr.searchMaxMoney(this._lqData);
-				this._viewUI.hb_info_list.dataSource = this._lqData;
+				if (lqData) {
+					this._isComlete = lqData.length == hbData.bao_num;
+					this._lqData = lqData;
+					this._lqData = this.optLqData(this._lqData);
+					this._lqData.sort((a: any, b: any) => {
+						return b.lq_time - a.lq_time
+					})
+					//查找最大值
+					this._maxIndex = story.wxSaoLeiHBMgr.searchMaxMoney(this._lqData);
+					this._viewUI.hb_info_list.dataSource = this._lqData;
+				} else {
+					this._lqData = [];
+					this._lqData = this.optLqData(this._lqData);
+					this._viewUI.hb_info_list.dataSource = this._lqData;
+				}
 				this._moneyNum.setText(this._hbData.money);
 				this._viewUI.lb_yuan.centerX = this._moneyNum.centerX + this._moneyNum.width;
 				this._viewUI.lb_yuan.y = this._moneyNum.y + this._moneyNum.height - this._viewUI.lb_yuan.height;
@@ -102,7 +109,7 @@ module gamewxsaoleihb.page {
 				this._viewUI.box_player.width = this._viewUI.img_head.width + this._viewUI.lb_name.width;
 				this._viewUI.lb_hb_num.text = this._hbData.bao_num + "个红包";
 				this._viewUI.lb_ld.text = "雷号:" + this._hbData.ld_str
-				this._viewUI.lb_lq.text = StringU.substitute("领取{0}/{1}个", this._lqData.length, this._hbData.bao_num);
+				this._viewUI.lb_lq.text = StringU.substitute("领取{0}/{1}个", this._lqData ? this._lqData.length : "0", this._hbData.bao_num);
 			}
 		}
 

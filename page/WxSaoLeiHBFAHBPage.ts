@@ -14,6 +14,8 @@ module gamewxsaoleihb.page {
 		private _wxSaoLeiMgr: WxSaoLeiHBMgr;
 		private _mainPlayer: PlayerData;
 		private _mapLv: number;
+		// private _zcInputMoney: MyTextInput;
+		// private _notStageClickUI: Laya.Node[]; //不响应舞台点击UI对象集合
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);
 			this._isNeedBlack = true;
@@ -33,14 +35,26 @@ module gamewxsaoleihb.page {
 			this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLei_HBUI');
 			this.addChild(this._viewUI);
 			if (this._viewUI) {
-				this._viewUI.box_main.scaleX = 1.77;
-				this._viewUI.box_main.scaleY = 1.77;
+				this._viewUI.box.scaleX = 1.77;
+				this._viewUI.box.scaleY = 1.77;
 			}
 		}
 
 		// 页面打开时执行函数
 		protected onOpen(): void {
 			super.onOpen();
+			// if (!this._zcInputMoney) {
+			// 	this._zcInputMoney = new MyTextInput();
+			// 	this._zcInputMoney.top = this._viewUI.txtInput.top;
+			// 	this._zcInputMoney.centerX = this._viewUI.txtInput.centerX;
+			// 	this._zcInputMoney.width = this._viewUI.txtInput.width;
+			// 	this._zcInputMoney.height = this._viewUI.txtInput.height;
+			// 	this._viewUI.txtInput.parent.addChild(this._zcInputMoney);
+			// 	this._viewUI.txtInput.removeSelf();
+			// }
+			// this._zcInputMoney.settext(this._game, "#7b7b7b", "发包金额", TeaStyle.COLOR_BLACK, 28, 3, [MyTextInput.TYPE_INPUT_NUMBER]);
+			// this._zcInputMoney.on(LEvent.CLICK, this, this.onBtnClickWithTween);
+
 			this._viewUI.tab_hb.selectHandler = Handler.create(this, this.selectHandler, null, false);
 			this._viewUI.btn_random.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.btn_send.on(LEvent.CLICK, this, this.onBtnClickWithTween);
@@ -48,6 +62,7 @@ module gamewxsaoleihb.page {
 			this._viewUI.hb_danL_num1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.hb_danL_num2.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.hb_duoL_num1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
+			// this._zcInputMoney.on(LEvent.BLUR, this, this.updateTxtInput);
 			this._viewUI.txtInput.on(LEvent.BLUR, this, this.updateTxtInput);
 			let story: WxSaoLeiHBStory = this._game.sceneObjectMgr.story;
 			this._wxSaoLeiMgr = story.wxSaoLeiHBMgr;
@@ -69,10 +84,24 @@ module gamewxsaoleihb.page {
 					}
 					this.updateLeiDianUI();
 					this._money = hb_data.money;
+					// this._zcInputMoney.setText_0(this._money.toString());
 					this._viewUI.txtInput.text = this._money.toString();
 				}
 			}
+			// this._notStageClickUI = [this._zcInputMoney];
 		}
+
+		// protected onMouseClick(e: LEvent) {
+		// 	for (let index = 0; index < this._notStageClickUI.length; index++) {
+		// 		let v = this._notStageClickUI[index];
+		// 		if (v.contains(e.target)) {
+		// 			return;
+		// 		}
+		// 	}
+		// 	if (this._viewUI == this._game.datingGame.jianPanMgr.pageUI) {
+		// 		this._game.datingGame.jianPanMgr.closeJianPan();
+		// 	}
+		// }
 
 		private updateTxtInput(textInput: Laya.TextInput): void {
 			if (!textInput) return;
@@ -112,7 +141,6 @@ module gamewxsaoleihb.page {
 			this._moneyMin = WxSaoLeiHBMgr.MIN_TEMP[index];
 			this._moneyMax = WxSaoLeiHBMgr.MAX_TEMP[index]
 			this._viewUI.lb_range.text = StringU.substitute("红包发放范围：{0}-{1}", this._moneyMin, this._moneyMax);
-
 		}
 
 		private onLeiDianClick(index: number): void {
@@ -127,7 +155,7 @@ module gamewxsaoleihb.page {
 					this._leiDian = [index];
 				} else if (this._type == WxSaoLeiHBMgr.TYPE_DUOLEI - 1) {
 					if (this._leiDian.length >= this._baoNum) {
-						this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_YEBZ,(page:WxSaoLeiHBYEBZPage)=>{
+						this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_YEBZ, (page: WxSaoLeiHBYEBZPage) => {
 							page.setData("雷点数量不能大于发包数量!");
 						});
 						return;
@@ -228,6 +256,9 @@ module gamewxsaoleihb.page {
 				case this._viewUI.btn_back:
 					this.close();
 					break
+				// case this._zcInputMoney:
+				// 	DatingGame.ins.jianPanMgr.openJianPan(target, this._viewUI);
+				// 	break;
 			}
 		}
 
@@ -308,6 +339,9 @@ module gamewxsaoleihb.page {
 
 		public close(): void {
 			//记录本地数据
+			// this._zcInputMoney.off(LEvent.CLICK, this, this.onBtnClickWithTween);
+			// this._zcInputMoney.destroy();
+			// this._zcInputMoney = null;
 			this.updateLocalData();
 			if (this._viewUI) {
 				for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {

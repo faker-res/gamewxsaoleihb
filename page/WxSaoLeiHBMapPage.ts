@@ -150,10 +150,10 @@ module gamewxsaoleihb.page {
         //弹出红包详情界面
         private openHBInfoPage(lq_datas: any): void {
             this._viewUI.box_hb_open.visible = false;
-            if (!lq_datas || lq_datas.length <= 0 || !this._curHbData) {
-                this._game.showTips("该红包已过期");
-                return;
-            }
+            // if (!lq_datas || lq_datas.length <= 0 || !this._curHbData) {
+            //     this._game.showTips("该红包已过期");
+            //     return;
+            // }
             let pageHBJl = this._game.uiRoot.general.getPage(WxsaoleihbPageDef.PAGE_WXSLHB_JL);
             if (pageHBJl) {
                 //是红包记录界面发出的请求
@@ -252,8 +252,7 @@ module gamewxsaoleihb.page {
                     this._viewUI.box_di1_down.visible = false;
                     this._isShowInfo = false;
                     this._viewUI.box_di1.height = 68;
-                    this._viewUI.panel_hb.height = 1087;
-                    this._viewUI.panel_hb.y = 663;
+                    this._viewUI.panel_hb.bottom = this._viewUI.box_di1.bottom + this._viewUI.box_di1.height;
                     break
                 case this._viewUI.btn_di2:
                     this._viewUI.box_di2.visible = false;
@@ -261,8 +260,7 @@ module gamewxsaoleihb.page {
                     this._viewUI.box_di1_down.visible = false;
                     this._isShowInfo = false;
                     this._viewUI.box_di1.height = 68;
-                    this._viewUI.panel_hb.height = 1087;
-                    this._viewUI.panel_hb.y = 663;
+                    this._viewUI.panel_hb.bottom = this._viewUI.box_di1.bottom + this._viewUI.box_di1.height;
                     break
                 case this._viewUI.finsh_check:
                     //发送红包查询记录
@@ -276,13 +274,11 @@ module gamewxsaoleihb.page {
                 //显示下层
                 this._viewUI.box_di1_down.visible = true;
                 this._viewUI.box_di1.height = 200;
-                this._viewUI.panel_hb.height = 962;
-                this._viewUI.panel_hb.y = 600;
+                this._viewUI.panel_hb.bottom = this._viewUI.box_di1.bottom + this._viewUI.box_di1.height;
             } else {
                 this._viewUI.box_di1_down.visible = false;
                 this._viewUI.box_di1.height = 68;
-                this._viewUI.panel_hb.height = 1087;
-                this._viewUI.panel_hb.y = 663;
+                this._viewUI.panel_hb.bottom = this._viewUI.box_di1.bottom + this._viewUI.box_di1.height;
             }
             if (!this._drage) {
                 this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
@@ -676,6 +672,8 @@ module gamewxsaoleihb.page {
         }
         //------------------红包主界面操作end---------
         public close(): void {
+            Laya.stage.screenMode = Stage.SCREEN_HORIZONTAL;
+            WebConfig.setMyOrientation(true);
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_INFO, this, this.updateHBdata);
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, this, this.openHBInfoPage);
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_LQ_MSG, this, this.updateLqMsg);
@@ -1027,10 +1025,12 @@ module gamewxsaoleihb.page {
             }
             this.lb_info.text = infoText;
             //最小值 600
-            if (this.lb_info.width > 600) {
+            if (this.lb_info.width >= 600) {
                 this.lb_info.wordWrap = true;
                 this.lb_info.width = 600;
                 this.lb_info.height = 40;
+            } else {
+                this.lb_info.wordWrap = false;
             }
             let width = this.lb_info.width + 50;
             let height = this.lb_info.height;

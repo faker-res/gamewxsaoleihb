@@ -73,8 +73,6 @@ module gamewxsaoleihb.story {
 
 		leavelMap() {
 			//各种判断
-			Laya.stage.screenMode = Stage.SCREEN_HORIZONTAL;
-			WebConfig.setMyOrientation(true);
 			this._game.network.call_leave_game();
 			return true;
 		}

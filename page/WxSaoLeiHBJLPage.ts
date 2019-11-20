@@ -96,6 +96,10 @@ module gamewxsaoleihb.page {
 		private _dataGetInfoMoney = 0;
 		private _dataSendInfoMoney = 0;
 		onUpdateDataInfo(date?): void {
+			this._dataGetInfoMoney = 0;
+			this._dataSendInfoMoney = 0;
+			this._dataGetInfo = [];
+			this._dataSendInfo = [];
 			!date && this._baoBiaoMgr.getData(1, this._game.sync.serverTimeBys, 6);
 			let value = this._baoBiaoMgr.getDataInfo(6);
 			for (let key in value) {
@@ -111,6 +115,35 @@ module gamewxsaoleihb.page {
 								//发红包数据
 								this._dataSendInfo.push(aa);
 							}
+						}
+					}
+				}
+			}
+
+			//合并重复红包数据
+			for (let i = this._dataGetInfo.length - 1; i >= 0; i--) {
+				let cur_data = this._dataGetInfo[i];
+				let cur_hb_data;
+				if (cur_data && cur_data.params) {
+					let params = JSON.parse(cur_data.params);
+					cur_hb_data = params.hb_data;
+				}
+				for (let j = i - 1; j >= 0; j--) {
+					let next_data = this._dataGetInfo[j];
+					//合并两条相同红包的个人信息数据，以时间大的值为基础，将两者收支数值合并
+					let next_hb_data
+					if (next_data && next_data.params) {
+						let params = JSON.parse(next_data.params);
+						next_hb_data = params.hb_data;
+					}
+					if (cur_hb_data && next_hb_data && cur_hb_data.hb_id_str == next_hb_data.hb_id_str) {
+						//合并收支
+						if (cur_data.time > next_data.time) {
+							cur_data.shouzhi += next_data.shouzhi;
+							this._dataGetInfo.splice(j, 1);
+						} else {
+							next_data.shouzhi += cur_data.shouzhi;
+							this._dataGetInfo.splice(i, 1);
 						}
 					}
 				}
@@ -155,12 +188,10 @@ module gamewxsaoleihb.page {
 			if (index == WxSaoLeiHBJLPage.TYPE_GET_HB) {
 				this._viewUI.lb_type.text = "共收";
 				this._viewUI.lb_num_money.text = this._dataGetInfoMoney.toFixed(2);
-				// this._viewUI.lb_num_money.color = this._dataGetInfoMoney > 0 ? TeaStyle.COLOR_GREEN : TeaStyle.COLOR_RED;
 				this._viewUI.lb_num_hb.text = this._dataGetInfo.length.toString();
 			} else if (index == WxSaoLeiHBJLPage.TYPE_SEND_HB) {
 				this._viewUI.lb_type.text = "共发";
 				this._viewUI.lb_num_money.text = this._dataSendInfoMoney.toFixed(2);
-				// this._viewUI.lb_num_money.color = this._dataSendInfoMoney > 0 ? TeaStyle.COLOR_GREEN : TeaStyle.COLOR_RED;
 				this._viewUI.lb_num_hb.text = this._dataSendInfo.length.toString();
 			}
 			if (this._curType == WxSaoLeiHBJLPage.TYPE_GET_HB) {
@@ -173,7 +204,6 @@ module gamewxsaoleihb.page {
 		public close(): void {
 			if (this._viewUI) {
 				BattleXiangQingMgr.ins.off(BattleXiangQingMgr.RECORD_CHANGE, this, this.openHBInfoPage);
-				// this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, this, this.openHBInfoPage);
 				this._baoBiaoMgr.off(BaoBiaoMgr.EVENT_CHANGE, this, this.onUpdateDataInfo);
 			}
 			super.close();
