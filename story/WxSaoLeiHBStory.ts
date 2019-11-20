@@ -35,6 +35,7 @@ module gamewxsaoleihb.story {
 			this.onMapInfoChange();
 			this._game.uiRoot.closeAll();
 			Laya.stage.screenMode = Stage.SCREEN_VERTICAL;
+			WebConfig.setMyOrientation(false);
 			this._game.uiRoot.HUD.open(WxsaoleihbPageDef.PAGE_WXSLHB_MAP);
 		}
 
@@ -73,6 +74,7 @@ module gamewxsaoleihb.story {
 		leavelMap() {
 			//各种判断
 			Laya.stage.screenMode = Stage.SCREEN_HORIZONTAL;
+			WebConfig.setMyOrientation(true);
 			this._game.network.call_leave_game();
 			return true;
 		}
