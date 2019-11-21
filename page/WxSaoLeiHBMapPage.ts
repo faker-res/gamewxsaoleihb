@@ -19,6 +19,7 @@ module gamewxsaoleihb.page {
         private _mainPlayer: PlayerData;
         private _mainUnit: Unit;
         private _mainUid: string;
+        private _isClickDrag: boolean = false;
         constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
             super(v, onOpenFunc, onCloseFunc);
             this._isNeedDuang = false;
@@ -158,6 +159,7 @@ module gamewxsaoleihb.page {
             this._viewUI.btn_hb_close.on(LEvent.CLICK, this, this.onBtnClickWithTween);
             this._viewUI.btn_hb_open.on(LEvent.CLICK, this, this.onBtnClickWithTween);
             this._viewUI.rain_open.on(LEvent.CLICK, this, this.onBtnClickWithTween);
+            this._viewUI.box_down.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 
             this._viewUI.btn_add.on(LEvent.CLICK, this, this.onBtnClick);
             this._viewUI.btn_di1.on(LEvent.CLICK, this, this.onBtnClick);
@@ -282,6 +284,7 @@ module gamewxsaoleihb.page {
                     this._viewUI.box_di1_down.visible = false;
                     this._isShowInfo = false;
                     this._viewUI.box_di1.height = 80;
+                    this._viewUI.box_down.bottom = 87;
                     this._viewUI.panel_hb.bottom = this._viewUI.box_di1.bottom + this._viewUI.box_di1.height;
                     break
                 case this._viewUI.btn_di2:
@@ -290,6 +293,7 @@ module gamewxsaoleihb.page {
                     this._viewUI.box_di1_down.visible = false;
                     this._isShowInfo = false;
                     this._viewUI.box_di1.height = 80;
+                    this._viewUI.box_down.bottom = 87;
                     this._viewUI.panel_hb.bottom = this._viewUI.box_di1.bottom + this._viewUI.box_di1.height;
                     break
                 case this._viewUI.finsh_check:
@@ -303,11 +307,13 @@ module gamewxsaoleihb.page {
             if (this._isShowInfo) {
                 //显示下层
                 this._viewUI.box_di1_down.visible = true;
+                this._viewUI.box_down.bottom = 230;
                 this._viewUI.box_di1.height = 210;
                 this._viewUI.panel_hb.bottom = this._viewUI.box_di1.bottom + this._viewUI.box_di1.height;
             } else {
                 this._viewUI.box_di1_down.visible = false;
                 this._viewUI.box_di1.height = 80;
+                this._viewUI.box_down.bottom = 87;
                 this._viewUI.panel_hb.bottom = this._viewUI.box_di1.bottom + this._viewUI.box_di1.height;
             }
             if (!this._drage) {
@@ -459,6 +465,17 @@ module gamewxsaoleihb.page {
                     //红包雨领取红包
                     this._wxSaoLeiMgr.showHBRain(this._game.sync.serverTimeBys + 30, this._viewUI.box_hb_rain);
                     break
+                case this._viewUI.box_down:
+                    //直达底部
+                    if (this._isClickDrag) return;
+                    this._isClickDrag = true;
+                    let maxValue = this._viewUI.panel_hb.vScrollBar.max;
+                    Laya.Tween.to(this._viewUI.panel_hb.vScrollBar, { value: maxValue }, 700, null, new Handler(this, () => {
+                        this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
+                        this._drage = false;
+                        this._isClickDrag = false;
+                    }));
+                    break
             }
         }
 
@@ -474,6 +491,14 @@ module gamewxsaoleihb.page {
                 }
             } else {
                 this._viewUI.lb_hby_tim.text = "00:00";
+            }
+            //箭头标志
+            let maxValue = this._viewUI.panel_hb.vScrollBar.max;
+            let curValue = this._viewUI.panel_hb.vScrollBar.value;
+            if (curValue < maxValue - 250) {
+                this._viewUI.box_down.visible = true;
+            } else {
+                this._viewUI.box_down.visible = false;
             }
         }
 
@@ -590,31 +615,40 @@ module gamewxsaoleihb.page {
             this._hbUIY += uiHb.height + this._diffY;
             this._arrHB.push(uiHb);
             //检测红包 显示最多不能超过10个
-            // this.checkHbArrUI();
+            this.checkHbArrUI();
         }
 
         //找出最远一位自己没有操作过的红包数据，清除掉
         checkHbArrUI(): void {
-            if (this._arrHB && this._arrHB.length > 25) {
+            if (this._arrHB && this._arrHB.length > 50) {
                 for (let i = 0; i < this._arrHB.length; i++) {
-                    //首先是不是自己的红包
                     let cur_hb_ui = this._arrHB[i];
-                    let hb_data = cur_hb_ui._data;
-                    if (hb_data && hb_data.uid == this._mainUid) continue;
-                    //其次是不是领取过的红包
-                    let is_opt = false;
-                    for (let k = 0; k < this._wxSaoLeiMgr.self_hb_lqjl.length; k++) {
-                        let cur_lq_data = this._wxSaoLeiMgr.self_hb_lqjl[k];
-                        if (cur_lq_data.hb_id == hb_data.hb_id) {
-                            is_opt = true;
-                            break
-                        }
-                    }
-                    if (is_opt) continue;
                     //经过筛选,干掉一个就行
-                    let removeUiHB = this._arrHB[i];
                     //自己的信息不能干掉
-                    if (removeUiHB instanceof HBInfo) continue;
+                    let hb_data = cur_hb_ui._data;
+                    let removeUiHB = this._arrHB[i];
+                    if (removeUiHB instanceof HBInfo) {
+                        //信息要拿到最新的红包数据
+                        let new_hb_data = this._wxSaoLeiMgr.findHBDataById(hb_data.hb_id);
+                        if (new_hb_data && new_hb_data.hb_state == WxSaoLeiHBMgr.HB_STATE_ING) {
+                            continue;
+                        }
+                    } else {
+                        //状态未结束的也不能删
+                        if (hb_data.hb_state == WxSaoLeiHBMgr.HB_STATE_ING) continue;
+                    }
+                    //首先是不是自己的红包
+                    // if (hb_data && hb_data.uid == this._mainUid) continue;
+                    // //其次是不是领取过的红包
+                    // let is_opt = false;
+                    // for (let k = 0; k < this._wxSaoLeiMgr.self_hb_lqjl.length; k++) {
+                    //     let cur_lq_data = this._wxSaoLeiMgr.self_hb_lqjl[k];
+                    //     if (cur_lq_data.hb_id == hb_data.hb_id) {
+                    //         is_opt = true;
+                    //         break
+                    //     }
+                    // }
+                    // if (is_opt) continue;
                     this.removeHB(i);
                     break
                 }
@@ -624,21 +658,22 @@ module gamewxsaoleihb.page {
         //移除红包
         removeHB(index: any) {
             let removeUiHB = this._arrHB[index];
-            let removeY: number = removeUiHB.y;
+            let startRemoveY: number = removeUiHB.y;
+            let height: number = removeUiHB.height;
             removeUiHB.removeSelf();
             this._arrHB.splice(index, 1);
             //在调整在它之后的所有的位置
-            let curUIY: number;
+            let diffY: number = 0;
             for (let i = index; i < this._arrHB.length; i++) {
-                if (index == i) curUIY = removeY;
                 let curUiHB = this._arrHB[i];
-                //保存当前位置
-                let saveY = curUiHB.y;
-                //将上一个位置赋值当前这个
-                curUiHB.y = curUIY;
-                //将当前位置保存
-                curUIY = saveY;
+                if (i == index) {
+                    diffY = curUiHB.y - startRemoveY;
+                    curUiHB.y = startRemoveY;
+                } else {
+                    curUiHB.y = curUiHB.y - diffY;
+                }
             }
+            this._hbUIY -= diffY;
         }
 
         //更新红包
@@ -1018,8 +1053,8 @@ module gamewxsaoleihb.page {
                         let pf_money = this._wxsaoleihbMgr.LqDuoLeiPFMoney(this._data)
                         if (is_self) {
                             //自己的多雷红包结算信息
-                            info = StringU.substitute("多雷结算,全部雷点[{0}],中雷雷点[{1}],", HtmlFormat.addHtmlColor(this._data.ld_str, TeaStyle.COLOR_RED), HtmlFormat.addHtmlColor(this._data.zl_str, TeaStyle.COLOR_RED));
-                            infoText = StringU.substitute("多雷结算,全部雷点[{0}],中雷雷点[{1}],", this._data.ld_str, this._data.zl_str);
+                            info = StringU.substitute("多雷结算,全部雷号[{0}],中雷雷号[{1}],", HtmlFormat.addHtmlColor(this._data.ld_str, TeaStyle.COLOR_RED), HtmlFormat.addHtmlColor(this._data.zl_str, TeaStyle.COLOR_RED));
+                            infoText = StringU.substitute("多雷结算,全部雷号[{0}],中雷雷号[{1}],", this._data.ld_str, this._data.zl_str);
                             if (hb_is_zl) {
                                 //达到中雷数,中雷数*中雷人数
                                 let totalMoney = Number(pf_money) * this._data.zl_num;
@@ -1040,8 +1075,8 @@ module gamewxsaoleihb.page {
                         } else {
                             let pfData = this._wxsaoleihbMgr.findPFDataByid(this._data.hb_id);
                             //别人的多雷红包结算信息
-                            info = StringU.substitute("玩家{0}多雷结算,全部雷点[{1}]中雷雷点[{2}],", HtmlFormat.addHtmlColor(this._data.name.toString(), "#3b72fe"), HtmlFormat.addHtmlColor(this._data.ld_str, TeaStyle.COLOR_RED), HtmlFormat.addHtmlColor(this._data.zl_str, TeaStyle.COLOR_RED));
-                            infoText = StringU.substitute("玩家{0}多雷结算,全部雷点[{1}]中雷雷点[{2}],", this._data.name.toString(), this._data.ld_str, this._data.zl_str);
+                            info = StringU.substitute("玩家{0}多雷结算,全部雷号[{1}]中雷雷号[{2}],", HtmlFormat.addHtmlColor(this._data.name.toString(), "#3b72fe"), HtmlFormat.addHtmlColor(this._data.ld_str, TeaStyle.COLOR_RED), HtmlFormat.addHtmlColor(this._data.zl_str, TeaStyle.COLOR_RED));
+                            infoText = StringU.substitute("玩家{0}多雷结算,全部雷号[{1}]中雷雷号[{2}],", this._data.name.toString(), this._data.ld_str, this._data.zl_str);
                             //判断红包是否中雷，判断自己是否中雷，
                             if (hb_is_zl) {
                                 //中雷
