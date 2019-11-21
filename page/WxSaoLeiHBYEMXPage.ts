@@ -27,6 +27,15 @@ module gamewxsaoleihb.page {
 				this._viewUI.box_main.scaleX = 1.77;
 				this._viewUI.box_main.scaleY = 1.77;
 			}
+			if (this._game.isFullScreen) {
+				let diff = 56
+				//有刘海
+				this._viewUI.img_up.height = 115 + diff;
+				this._viewUI.box_di.top = -1 + diff;
+			} else {
+				this._viewUI.img_up.height = 115;
+				this._viewUI.box_di.top = -1;
+			}
 			this._viewUI.btn_back.on(LEvent.CLICK, this, this.close);
 			this._viewUI.list_ye.vScrollBarSkin = "";
 			this._viewUI.list_ye.scrollBar.elasticDistance = 100;
@@ -37,6 +46,7 @@ module gamewxsaoleihb.page {
 		private _baoBiaoMgr: BaoBiaoMgr;
 		private _dataInfo: Array<any> = []
 		onUpdateDataInfo(date?): void {
+			this._dataInfo = [];
 			!date && this._baoBiaoMgr.getData(1, this._game.sync.serverTimeBys, 6);
 			let value = this._baoBiaoMgr.getDataInfo(6);
 			for (let key in value) {
@@ -88,10 +98,10 @@ module gamewxsaoleihb.page {
 			if (!data) return;
 			this.lb_date.text = Sync.getTimeStr1(this._data.time * 1000);
 			this.lb_time.text = Sync.getTimeShortStr(this._data.time * 1000);
-			this.lb_money.text = this._data.money;
+			this.lb_money.text = Number(this._data.money).toFixed(2);
 			this.lb_type.text = WxSaoLeiHBMgr.TYPE_INFO[this._data.type_index + 1].toString();
-			this.lb_diff.text = this._data.shouzhi;
-			this.lb_diff.color = this._data.shouzhi > 0 ? TeaStyle.COLOR_GREEN : TeaStyle.COLOR_RED;
+			this.lb_diff.text = Number(this._data.shouzhi).toFixed(2);
+			// this.lb_diff.color = this._data.shouzhi > 0 ? TeaStyle.COLOR_GREEN : TeaStyle.COLOR_RED;
 		}
 	}
 }

@@ -41,11 +41,26 @@ module gamewxsaoleihb.page {
         protected init(): void {
             this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLeiUI');
             this.addChild(this._viewUI);
-
+            //全面屏
+            if (this._game.isFullScreen) {
+                let diff = 56
+                //有刘海
+                this._viewUI.img_up.height = 115 + diff;
+                this._viewUI.panel_hb.top = 121 + diff;
+                this._viewUI.box_hb.y = 213 + diff;
+                this._viewUI.box_share.y = 337 + diff;
+            } else {
+                this._viewUI.img_up.height = 115;
+                this._viewUI.panel_hb.top = 121;
+                this._viewUI.box_hb.y = 213;
+                this._viewUI.box_share.y = 337;
+            }
             this._viewUI.panel_hb.vScrollBarSkin = "";
             this._viewUI.panel_hb.vScrollBar.autoHide = true;
             this._viewUI.panel_hb.vScrollBar.elasticDistance = 100;
             this._viewUI.panel_hb.vScrollBar.changeHandler = new Handler(this, this.panelChangeHandler);
+            this._viewUI.panel_hb.on(LEvent.MOUSE_DOWN, this, this.panelMouseHandle);
+            this._viewUI.panel_hb.on(LEvent.MOUSE_UP, this, this.panelMouseHandle);
             if (!this._pageHandle) {
                 this._pageHandle = PageHandle.Get("WxSaoLeiHBMapPage");//额外界面控制器
             }
@@ -89,14 +104,29 @@ module gamewxsaoleihb.page {
             }
         }
 
+        private panelChangeHandler(value: number) {
+            let maxValue = this._viewUI.panel_hb.vScrollBar.max;
+            if (value >= maxValue) {
+                this._drage = false;
+            }
+        }
+
         private _drage: boolean = false;
-        private panelChangeHandler(value: number): void {
-            // let maxValue = this._viewUI.panel_hb.vScrollBar.max;
-            // if (value < maxValue) {
-            //     this._drage = true;
-            // } else {
-            //     this._drage = false;
-            // }
+        private panelMouseHandle(e: LEvent): void {
+            let maxValue = this._viewUI.panel_hb.vScrollBar.max;
+            let value = this._viewUI.panel_hb.vScrollBar.value;
+            switch (e.type) {
+                case LEvent.MOUSE_DOWN:
+                    this._drage = true;
+                    break
+                case LEvent.MOUSE_UP:
+                    if (value >= maxValue) {
+                        this._drage = false;
+                    } else {
+                        this._drage = true;
+                    }
+                    break
+            }
         }
 
         // 重新布局
@@ -123,7 +153,7 @@ module gamewxsaoleihb.page {
             this._viewUI.box_fhb.on(LEvent.CLICK, this, this.onBtnClickWithTween)
             this._viewUI.btn_back.on(LEvent.CLICK, this, this.onBtnClickWithTween)
             this._viewUI.btn_more.on(LEvent.CLICK, this, this.onBtnClickWithTween)
-            // this._viewUI.box_hb.on(LEvent.CLICK, this, this.onBtnClickWithTween)
+            this._viewUI.box_hb.on(LEvent.CLICK, this, this.onBtnClickWithTween)
 
             this._viewUI.btn_hb_close.on(LEvent.CLICK, this, this.onBtnClickWithTween);
             this._viewUI.btn_hb_open.on(LEvent.CLICK, this, this.onBtnClickWithTween);
@@ -251,7 +281,7 @@ module gamewxsaoleihb.page {
                     this._viewUI.box_di1.visible = false;
                     this._viewUI.box_di1_down.visible = false;
                     this._isShowInfo = false;
-                    this._viewUI.box_di1.height = 68;
+                    this._viewUI.box_di1.height = 80;
                     this._viewUI.panel_hb.bottom = this._viewUI.box_di1.bottom + this._viewUI.box_di1.height;
                     break
                 case this._viewUI.btn_di2:
@@ -259,7 +289,7 @@ module gamewxsaoleihb.page {
                     this._viewUI.box_di1.visible = true;
                     this._viewUI.box_di1_down.visible = false;
                     this._isShowInfo = false;
-                    this._viewUI.box_di1.height = 68;
+                    this._viewUI.box_di1.height = 80;
                     this._viewUI.panel_hb.bottom = this._viewUI.box_di1.bottom + this._viewUI.box_di1.height;
                     break
                 case this._viewUI.finsh_check:
@@ -273,11 +303,11 @@ module gamewxsaoleihb.page {
             if (this._isShowInfo) {
                 //显示下层
                 this._viewUI.box_di1_down.visible = true;
-                this._viewUI.box_di1.height = 200;
+                this._viewUI.box_di1.height = 210;
                 this._viewUI.panel_hb.bottom = this._viewUI.box_di1.bottom + this._viewUI.box_di1.height;
             } else {
                 this._viewUI.box_di1_down.visible = false;
-                this._viewUI.box_di1.height = 68;
+                this._viewUI.box_di1.height = 80;
                 this._viewUI.panel_hb.bottom = this._viewUI.box_di1.bottom + this._viewUI.box_di1.height;
             }
             if (!this._drage) {
@@ -413,6 +443,7 @@ module gamewxsaoleihb.page {
                             //未操作过
                             this._game.playSound(Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.hongbao_tan);
                             this._game.network.call_wxsaoleihb_opt(this._curHbData.hb_id);
+                            this._viewUI.box_hb_open.visible = false;
                         }
                     } else {
                         //红包已领完
@@ -422,6 +453,7 @@ module gamewxsaoleihb.page {
                 case this._viewUI.rain_open:
                     //红包雨领取红包
                     this._game.network.call_wxsaoleihb_opt(-1);
+                    this._viewUI.box_hb_open.visible = false;
                     break
                 case this._viewUI.box_hb:
                     //红包雨领取红包
@@ -539,10 +571,10 @@ module gamewxsaoleihb.page {
                 case WxSaoLeiHBMapPage.MAIN_HB:
                     if (!isSelf) {
                         uiHb = new HBLeft();
-                        uiHb.left = 20;
+                        uiHb.left = 40;
                     } else {
                         uiHb = new HBRight();
-                        uiHb.right = 20;
+                        uiHb.right = 40;
                     }
                     break
                 case WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO:
@@ -563,7 +595,7 @@ module gamewxsaoleihb.page {
 
         //找出最远一位自己没有操作过的红包数据，清除掉
         checkHbArrUI(): void {
-            if (this._arrHB && this._arrHB.length > 10) {
+            if (this._arrHB && this._arrHB.length > 25) {
                 for (let i = 0; i < this._arrHB.length; i++) {
                     //首先是不是自己的红包
                     let cur_hb_ui = this._arrHB[i];

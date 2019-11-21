@@ -53,6 +53,7 @@ module gamewxsaoleihb.page {
 		// 页面打开时执行函数
 		protected onOpen(): void {
 			super.onOpen();
+			this._game.playMusic(Path_game_wxSaoLeiHB.music_wxsaoleihb + "back.mp3");
 			(this._viewUI.view_hud as TongyongHudNqpPage).onOpen(this._game, WxsaoleihbPageDef.GAME_NAME);
 			//按钮监听
 			this._viewUI.img_room0.on(LEvent.CLICK, this, this.onBtnClickWithTween);

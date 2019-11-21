@@ -26,9 +26,12 @@ module gamewxsaoleihb.manager {
 		public static readonly HB_STATE_END: number = 2;
 
 		public static readonly TYPE_INFO = [
-			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FLHB, "福利包",
-			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_GHB, "领红包",
-			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FHB, "发红包"]
+			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FLHB, "红包雨",
+			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_GHB, "抢红包",
+			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FHB, "发红包",
+			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_GHB_SETTLE, "抢红包结算",
+			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FHB_SETTLE, "发红包结算",
+		]
 
 		private _hb_data: Array<any> = [];	//红包总数据
 		public get hbData() {

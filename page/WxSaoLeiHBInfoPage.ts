@@ -41,6 +41,13 @@ module gamewxsaoleihb.page {
 				this._viewUI.box_main.scaleX = 1.77;
 				this._viewUI.box_main.scaleY = 1.77;
 			}
+			if (this._game.isFullScreen) {
+				let diff = 56
+				//有刘海
+				this._viewUI.box_main.top = -1 + diff;
+			} else {
+				this._viewUI.box_main.top = -1;
+			}
 			this._viewUI.hb_info_list.vScrollBarSkin = "";
 			this._viewUI.hb_info_list.scrollBar.elasticDistance = 100;
 			this._viewUI.hb_info_list.itemRender = this.createChildren("game_ui.wxsaoleihb.component.WXSaoLei_LBUI", HBLingQuMX);

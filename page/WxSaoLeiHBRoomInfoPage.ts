@@ -26,6 +26,20 @@ module gamewxsaoleihb.page {
 		protected init(): void {
 			this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLei_GDUI');
 			this.addChild(this._viewUI);
+			//全面屏
+			if (this._game.isFullScreen) {
+				let diff = 56
+				//有刘海
+				this._viewUI.img_up.height = 102 + diff;
+				this._viewUI.room_info.top = -1 + diff;
+				this._viewUI.player_info.top = -1 + diff;
+			} else {
+				this._viewUI.img_up.height = 102;
+				this._viewUI.room_info.top = -1;
+				this._viewUI.player_info.top = -1;
+			}
+
+
 			if (this._viewUI) {
 				this._viewUI.box_main.scaleX = 1.77;
 				this._viewUI.box_main.scaleY = 1.77;
@@ -82,7 +96,9 @@ module gamewxsaoleihb.page {
 			switch (e.currentTarget) {
 				case this._viewUI.box_player:
 					if (!this._unitInfo) this.getUnitArrData();
-					this._curType = WxSaoLeiHBRoomInfoPage.TYPE_PLAYER_INFO
+					this._curType = WxSaoLeiHBRoomInfoPage.TYPE_PLAYER_INFO;
+					this._viewUI.title_room.visible = this._curType == WxSaoLeiHBRoomInfoPage.TYPE_ROOM_INFO;
+					this._viewUI.title_player.visible = this._curType == WxSaoLeiHBRoomInfoPage.TYPE_PLAYER_INFO;
 					this._viewUI.list_player.dataSource = this._unitInfo;
 					this._viewUI.room_info.visible = false;
 					this._viewUI.player_info.visible = true;
@@ -99,6 +115,8 @@ module gamewxsaoleihb.page {
 			this._viewUI.player_info.visible = false;
 			this._viewUI.room_info.visible = true;
 			this._curType = WxSaoLeiHBRoomInfoPage.TYPE_ROOM_INFO;
+			this._viewUI.title_room.visible = this._curType == WxSaoLeiHBRoomInfoPage.TYPE_ROOM_INFO;
+			this._viewUI.title_player.visible = this._curType == WxSaoLeiHBRoomInfoPage.TYPE_PLAYER_INFO;
 			//房间名
 			this._wxSaoLeiMapInfo = this._game.sceneObjectMgr.mapInfo as WxSaoLeiHBMapInfo;
 			let mapLv = this._wxSaoLeiMapInfo.GetMapLevel();
