@@ -31,15 +31,17 @@ module gamewxsaoleihb.page {
 			if (this._wxSaoLeiStory) {
 				this._wxSaoLeiMgr = this._wxSaoLeiStory.wxSaoLeiHBMgr;
 			}
-			if (this._game.isFullScreen) {
-				let diff = 56
-				//有刘海
-				this._viewUI.box_up.height = 95 + diff;
-				this._viewUI.box_di.top = -1 + diff;
-			} else {
-				this._viewUI.box_up.height = 95;
-				this._viewUI.box_di.top = -1;
-			}
+			Laya.timer.frameOnce(1, this, () => {
+				if (this._game.isFullScreen) {
+					let diff = 56
+					//有刘海
+					this._viewUI.box_up.height = 95 + diff;
+					this._viewUI.box_di.top = -1 + diff;
+				} else {
+					this._viewUI.box_up.height = 95;
+					this._viewUI.box_di.top = -1;
+				}
+			})
 			if (this._viewUI) {
 				this._viewUI.box_main.scaleX = 1.77;
 				this._viewUI.box_main.scaleY = 1.77;
