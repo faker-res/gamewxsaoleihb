@@ -107,6 +107,18 @@ module gamewxsaoleihb.page {
             }
         }
 
+        //panel滑动
+        private panelSlide(): void {
+            let cur_value = this._viewUI.panel_hb.vScrollBar.value;
+            let maxValue = this._viewUI.panel_hb.vScrollBar.max;
+            if (cur_value < maxValue) {
+                Laya.Tween.clearAll(this._viewUI.panel_hb.vScrollBar);
+                Laya.Tween.to(this._viewUI.panel_hb.vScrollBar, { value: maxValue }, 200, null, new Handler(this, () => {
+                    this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
+                }));
+            }
+        }
+
         private panelChangeHandler(value: number) {
             let maxValue = this._viewUI.panel_hb.vScrollBar.max;
             if (value >= maxValue) {
@@ -161,7 +173,7 @@ module gamewxsaoleihb.page {
             this._viewUI.btn_hb_close.on(LEvent.CLICK, this, this.onBtnClickWithTween);
             this._viewUI.btn_hb_open.on(LEvent.CLICK, this, this.onBtnClickWithTween);
             this._viewUI.rain_open.on(LEvent.CLICK, this, this.onBtnClickWithTween);
-            this._viewUI.box_down.on(LEvent.CLICK, this, this.onBtnClickWithTween);
+            this._viewUI.btn_down.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 
             this._viewUI.btn_add.on(LEvent.CLICK, this, this.onBtnClick);
             this._viewUI.btn_di1.on(LEvent.CLICK, this, this.onBtnClick);
@@ -184,10 +196,6 @@ module gamewxsaoleihb.page {
         //弹出红包详情界面
         private openHBInfoPage(lq_datas: any): void {
             this._viewUI.box_hb_open.visible = false;
-            // if (!lq_datas || lq_datas.length <= 0 || !this._curHbData) {
-            //     this._game.showTips("该红包已过期");
-            //     return;
-            // }
             let pageHBJl = this._game.uiRoot.general.getPage(WxsaoleihbPageDef.PAGE_WXSLHB_JL);
             if (pageHBJl) {
                 //是红包记录界面发出的请求
@@ -319,7 +327,7 @@ module gamewxsaoleihb.page {
                 this._viewUI.panel_hb.bottom = this._viewUI.box_di1.bottom + this._viewUI.box_di1.height;
             }
             if (!this._drage) {
-                this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
+                this.panelSlide();
             }
         }
 
@@ -452,6 +460,8 @@ module gamewxsaoleihb.page {
                             this._game.playSound(Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.hongbao_tan);
                             this._game.network.call_wxsaoleihb_opt(this._curHbData.hb_id);
                             this._viewUI.box_hb_open.visible = false;
+                            //在弹出详情界面
+                            this._game.network.call_wxsaoleihb_get_lqjl(this._curHbData.hb_id);
                         }
                     } else {
                         //红包已领完
@@ -461,22 +471,26 @@ module gamewxsaoleihb.page {
                 case this._viewUI.rain_open:
                     //红包雨领取红包
                     this._game.network.call_wxsaoleihb_opt(-1);
-                    this._viewUI.box_hb_open.visible = false;
+                    // this._viewUI.box_hb_open.visible = false;
                     break
                 case this._viewUI.box_hb:
                     //红包雨领取红包
                     this._wxSaoLeiMgr.showHBRain(this._game.sync.serverTimeBys + 30, this._viewUI.box_hb_rain);
                     break
-                case this._viewUI.box_down:
+                case this._viewUI.btn_down:
                     //直达底部
                     if (this._isClickDrag) return;
                     this._isClickDrag = true;
                     let maxValue = this._viewUI.panel_hb.vScrollBar.max;
-                    Laya.Tween.to(this._viewUI.panel_hb.vScrollBar, { value: maxValue }, 700, null, new Handler(this, () => {
-                        this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
-                        this._drage = false;
-                        this._isClickDrag = false;
-                    }));
+                    let curValue = this._viewUI.panel_hb.vScrollBar.value;
+                    if (curValue < maxValue) {
+                        Laya.Tween.clearAll(this._viewUI.panel_hb.vScrollBar);
+                        Laya.Tween.to(this._viewUI.panel_hb.vScrollBar, { value: maxValue }, 700, null, new Handler(this, () => {
+                            this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
+                            this._drage = false;
+                            this._isClickDrag = false;
+                        }));
+                    }
                     break
             }
         }
@@ -497,7 +511,7 @@ module gamewxsaoleihb.page {
             //箭头标志
             let maxValue = this._viewUI.panel_hb.vScrollBar.max;
             let curValue = this._viewUI.panel_hb.vScrollBar.value;
-            if (curValue < maxValue - 250) {
+            if (curValue < maxValue - this._viewUI.panel_hb.height) {
                 this._viewUI.box_down.visible = true;
             } else {
                 this._viewUI.box_down.visible = false;
@@ -554,7 +568,7 @@ module gamewxsaoleihb.page {
                 }
             }
             if (!this._drage) {
-                this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
+                this.panelSlide();
             }
         }
 
@@ -573,14 +587,8 @@ module gamewxsaoleihb.page {
             //只有我领别人或者别人领我的红包,才需要加信息条
             if (isSelfHB || (lq_data && lq_data.uid == this._mainUid)) {
                 this.addHB(hb_info, isSelfHB, WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO, 0, lq_data);
-                if (lq_data && lq_data.uid == this._mainUid) {
-                    //开完隐藏
-                    this._viewUI.box_hb_open.visible = false;
-                    //在弹出详情界面
-                    this._game.network.call_wxsaoleihb_get_lqjl(lq_data.hb_id);
-                }
                 if (!this._drage) {
-                    this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
+                    this.panelSlide();
                 }
             }
         }
@@ -676,6 +684,9 @@ module gamewxsaoleihb.page {
                 }
             }
             this._hbUIY -= diffY;
+            if (!this._drage) {
+                this.panelSlide();
+            }
         }
 
         //更新红包
@@ -742,9 +753,7 @@ module gamewxsaoleihb.page {
         //------------------红包主界面操作end---------
         public close(): void {
             WebConfig.setMyOrientation(true);
-            Laya.timer.once(3000, this, () => {
-                Laya.stage.screenMode = Stage.SCREEN_HORIZONTAL;
-            })
+            Laya.stage.screenMode = Stage.SCREEN_HORIZONTAL;
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_INFO, this, this.updateHBdata);
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, this, this.openHBInfoPage);
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_LQ_MSG, this, this.updateLqMsg);

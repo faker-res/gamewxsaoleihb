@@ -27,17 +27,15 @@ module gamewxsaoleihb.page {
 				this._viewUI.box_main.scaleX = 1.77;
 				this._viewUI.box_main.scaleY = 1.77;
 			}
-			Laya.timer.frameOnce(1, this, () => {
-				if (this._game.isFullScreen) {
-					let diff = 56
-					//有刘海
-					this._viewUI.img_up.height = 97 + diff;
-					this._viewUI.box_di.top = -1 + diff;
-				} else {
-					this._viewUI.img_up.height = 97;
-					this._viewUI.box_di.top = -1;
-				}
-			})
+			if (this._game.isFullScreen) {
+				let diff = 56
+				//有刘海
+				this._viewUI.img_up.height = 97 + diff;
+				this._viewUI.box_di.top = -1 + diff;
+			} else {
+				this._viewUI.img_up.height = 97;
+				this._viewUI.box_di.top = -1;
+			}
 			this._viewUI.btn_back.on(LEvent.CLICK, this, this.close);
 			this._viewUI.list_ye.vScrollBarSkin = "";
 			this._viewUI.list_ye.scrollBar.elasticDistance = 100;

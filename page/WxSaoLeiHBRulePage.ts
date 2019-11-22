@@ -40,17 +40,15 @@ module gamewxsaoleihb.page {
 			this._viewUI.box_out.visible = this._curType == WxSaoLeiHBRulePage.OUTSIDE_RULE;
 			this._viewUI.box_inner.visible = this._curType == WxSaoLeiHBRulePage.INNER_RULE;
 			if (this._curType == WxSaoLeiHBRulePage.INNER_RULE) {
-				Laya.timer.frameOnce(1, this, () => {
-					if (this._game.isFullScreen) {
-						let diff = 56
-						//有刘海
-						this._viewUI.img_up.height = 100 + diff;
-						this._viewUI.panel_inner.top = 115 + diff;
-					} else {
-						this._viewUI.img_up.height = 100;
-						this._viewUI.panel_inner.top = 115;
-					}
-				})
+				if (this._game.isFullScreen) {
+					let diff = 56
+					//有刘海
+					this._viewUI.img_up.height = 100 + diff;
+					this._viewUI.panel_inner.top = 115 + diff;
+				} else {
+					this._viewUI.img_up.height = 100;
+					this._viewUI.panel_inner.top = 115;
+				}
 				this._defaultSoundPath = Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.btn;
 				if (this._viewUI) {
 					this._viewUI.box_main.scaleX = 1.77;

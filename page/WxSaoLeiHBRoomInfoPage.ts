@@ -27,21 +27,17 @@ module gamewxsaoleihb.page {
 			this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLei_GDUI');
 			this.addChild(this._viewUI);
 			//全面屏
-			Laya.timer.frameOnce(1, this, () => {
-				if (this._game.isFullScreen) {
-					let diff = 56
-					//有刘海
-					this._viewUI.img_up.height = 97 + diff;
-					this._viewUI.room_info.top = -1 + diff;
-					this._viewUI.player_info.top = -1 + diff;
-				} else {
-					this._viewUI.img_up.height = 97;
-					this._viewUI.room_info.top = -1;
-					this._viewUI.player_info.top = -1;
-				}
-			})
-
-
+			if (this._game.isFullScreen) {
+				let diff = 56
+				//有刘海
+				this._viewUI.img_up.height = 97 + diff;
+				this._viewUI.room_info.top = -1 + diff;
+				this._viewUI.player_info.top = -1 + diff;
+			} else {
+				this._viewUI.img_up.height = 97;
+				this._viewUI.room_info.top = -1;
+				this._viewUI.player_info.top = -1;
+			}
 			if (this._viewUI) {
 				this._viewUI.box_main.scaleX = 1.77;
 				this._viewUI.box_main.scaleY = 1.77;
