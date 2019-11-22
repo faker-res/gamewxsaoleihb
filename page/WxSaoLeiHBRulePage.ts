@@ -44,10 +44,10 @@ module gamewxsaoleihb.page {
 					if (this._game.isFullScreen) {
 						let diff = 56
 						//有刘海
-						this._viewUI.img_up.height = 115 + diff;
+						this._viewUI.img_up.height = 100 + diff;
 						this._viewUI.panel_inner.top = 115 + diff;
 					} else {
-						this._viewUI.img_up.height = 115;
+						this._viewUI.img_up.height = 100;
 						this._viewUI.panel_inner.top = 115;
 					}
 				})

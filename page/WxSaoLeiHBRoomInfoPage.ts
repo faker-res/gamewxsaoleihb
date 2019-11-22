@@ -31,11 +31,11 @@ module gamewxsaoleihb.page {
 				if (this._game.isFullScreen) {
 					let diff = 56
 					//有刘海
-					this._viewUI.img_up.height = 102 + diff;
+					this._viewUI.img_up.height = 97 + diff;
 					this._viewUI.room_info.top = -1 + diff;
 					this._viewUI.player_info.top = -1 + diff;
 				} else {
-					this._viewUI.img_up.height = 102;
+					this._viewUI.img_up.height = 97;
 					this._viewUI.room_info.top = -1;
 					this._viewUI.player_info.top = -1;
 				}
@@ -68,6 +68,8 @@ module gamewxsaoleihb.page {
 				this._viewUI.room_info.visible = true;
 				this._viewUI.player_info.visible = false;
 				this._curType = WxSaoLeiHBRoomInfoPage.TYPE_ROOM_INFO
+				this._viewUI.title_room.visible = this._curType == WxSaoLeiHBRoomInfoPage.TYPE_ROOM_INFO;
+				this._viewUI.title_player.visible = this._curType == WxSaoLeiHBRoomInfoPage.TYPE_PLAYER_INFO;
 			} else if (this._curType == WxSaoLeiHBRoomInfoPage.TYPE_ROOM_INFO) {
 				this.close();
 			}

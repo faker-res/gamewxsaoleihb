@@ -741,8 +741,10 @@ module gamewxsaoleihb.page {
         }
         //------------------红包主界面操作end---------
         public close(): void {
-            Laya.stage.screenMode = Stage.SCREEN_HORIZONTAL;
             WebConfig.setMyOrientation(true);
+            Laya.timer.once(3000, this, () => {
+                Laya.stage.screenMode = Stage.SCREEN_HORIZONTAL;
+            })
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_INFO, this, this.updateHBdata);
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, this, this.openHBInfoPage);
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_LQ_MSG, this, this.updateLqMsg);

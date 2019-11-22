@@ -15,7 +15,7 @@ module gamewxsaoleihb.page {
 		private _mainPlayer: PlayerData;
 		private _mapLv: number;
 		// private _zcInputMoney: MyTextInput;
-		// private _notStageClickUI: Laya.Node[]; //不响应舞台点击UI对象集合
+		private _notStageClickUI: Laya.Node[]; //不响应舞台点击UI对象集合
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);
 			this._isNeedBlack = true;
@@ -42,10 +42,10 @@ module gamewxsaoleihb.page {
 				if (this._game.isFullScreen) {
 					let diff = 56
 					//有刘海
-					this._viewUI.box_up.height = 119 + diff;
+					this._viewUI.box_up.height = 99 + diff;
 					this._viewUI.box_main.top = -1 + diff;
 				} else {
-					this._viewUI.box_up.height = 119;
+					this._viewUI.box_up.height = 99;
 					this._viewUI.box_main.top = -1;
 				}
 			})
@@ -75,6 +75,7 @@ module gamewxsaoleihb.page {
 			this._viewUI.hb_duoL_num1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			// this._zcInputMoney.on(LEvent.BLUR, this, this.updateTxtInput);
 			this._viewUI.txtInput.on(LEvent.BLUR, this, this.updateTxtInput);
+			this._viewUI.lb_ts.on(LEvent.CLICK, this, this.onPromptClick);
 			let story: WxSaoLeiHBStory = this._game.sceneObjectMgr.story;
 			this._wxSaoLeiMgr = story.wxSaoLeiHBMgr;
 			this._viewUI.tab_hb.selectedIndex = 0;
@@ -97,22 +98,38 @@ module gamewxsaoleihb.page {
 					this._money = hb_data.money;
 					// this._zcInputMoney.setText_0(this._money.toString());
 					this._viewUI.txtInput.text = this._money.toString();
+					this.checkTextInputUI()
 				}
 			}
-			// this._notStageClickUI = [this._zcInputMoney];
+			this._notStageClickUI = [this._viewUI.txtInput, this._viewUI.lb_ts];
 		}
 
-		// protected onMouseClick(e: LEvent) {
-		// 	for (let index = 0; index < this._notStageClickUI.length; index++) {
-		// 		let v = this._notStageClickUI[index];
-		// 		if (v.contains(e.target)) {
-		// 			return;
-		// 		}
-		// 	}
-		// 	if (this._viewUI == this._game.datingGame.jianPanMgr.pageUI) {
-		// 		this._game.datingGame.jianPanMgr.closeJianPan();
-		// 	}
-		// }
+		private onPromptClick(): void {
+			this._viewUI.lb_ts.visible = false;
+			this._viewUI.txtInput.focus = true;
+		}
+
+		protected onMouseClick(e: LEvent) {
+			for (let index = 0; index < this._notStageClickUI.length; index++) {
+				let v = this._notStageClickUI[index];
+				if (v.contains(e.target)) {
+					return;
+				}
+			}
+			this.checkTextInputUI();
+		}
+
+		private checkTextInputUI(): void {
+			if (this._viewUI) {
+				if (this._viewUI.txtInput.text == "") {
+					this._viewUI.lb_ts.visible = true;
+					this._viewUI.txtInput.visible = false;
+				} else {
+					this._viewUI.lb_ts.visible = false;
+					this._viewUI.txtInput.visible = true;
+				}
+			}
+		}
 
 		private updateTxtInput(textInput: Laya.TextInput): void {
 			if (!textInput) return;
@@ -122,6 +139,7 @@ module gamewxsaoleihb.page {
 			money = Math.min(this._moneyMax, money);
 			textInput.text = money.toString();
 			this._money = money;
+			this.checkTextInputUI();
 		}
 
 		protected onMouseSoudHandle(e: LEvent): any {
@@ -288,7 +306,7 @@ module gamewxsaoleihb.page {
 				type: this._type + 1,
 				baoNum: this._baoNum,
 				ld_str: leiDianStr,
-				money: this._money,
+				money: this._viewUI.txtInput.text,
 			}
 			localSetItem("hb_data" + this._mapLv, JSON.stringify(obj));
 		}

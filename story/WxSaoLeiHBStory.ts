@@ -34,8 +34,10 @@ module gamewxsaoleihb.story {
 			if (!info) return;
 			this.onMapInfoChange();
 			this._game.uiRoot.closeAll();
-			Laya.stage.screenMode = Stage.SCREEN_VERTICAL;
 			WebConfig.setMyOrientation(false);
+			Laya.timer.once(3000, this, () => {
+				Laya.stage.screenMode = Stage.SCREEN_VERTICAL;
+			})
 			this._game.uiRoot.HUD.open(WxsaoleihbPageDef.PAGE_WXSLHB_MAP);
 		}
 
