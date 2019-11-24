@@ -156,7 +156,7 @@ module gamewxsaoleihb.page {
 			let playerInfo = this._mainPlayer.playerInfo;
 			if (!playerInfo) return;
 			for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {
-				this._viewUI["btn_" + i].on(LEvent.CLICK, this, this.onLeiDianClick, [i]);
+				this._viewUI["btn_" + i].on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			}
 			let money: number = playerInfo.money;
 			this._viewUI.lb_ye.text = money.toFixed(2);
@@ -283,6 +283,36 @@ module gamewxsaoleihb.page {
 				case this._viewUI.btn_back:
 					this.close();
 					break
+				case this._viewUI.btn_0:
+					this.onLeiDianClick(0)
+					break
+				case this._viewUI.btn_1:
+					this.onLeiDianClick(1)
+					break
+				case this._viewUI.btn_2:
+					this.onLeiDianClick(2)
+					break
+				case this._viewUI.btn_3:
+					this.onLeiDianClick(3)
+					break
+				case this._viewUI.btn_4:
+					this.onLeiDianClick(4)
+					break
+				case this._viewUI.btn_5:
+					this.onLeiDianClick(5)
+					break
+				case this._viewUI.btn_6:
+					this.onLeiDianClick(6)
+					break
+				case this._viewUI.btn_7:
+					this.onLeiDianClick(7)
+					break
+				case this._viewUI.btn_8:
+					this.onLeiDianClick(8)
+					break
+				case this._viewUI.btn_9:
+					this.onLeiDianClick(9)
+					break
 				// case this._zcInputMoney:
 				// 	DatingGame.ins.jianPanMgr.openJianPan(target, this._viewUI);
 				// 	break;
@@ -372,7 +402,7 @@ module gamewxsaoleihb.page {
 			this.updateLocalData();
 			if (this._viewUI) {
 				for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {
-					this._viewUI["btn_" + i].off(LEvent.CLICK, this, this.onLeiDianClick, [i]);
+					this._viewUI["btn_" + i].off(LEvent.CLICK, this, this.onBtnClickWithTween, [i]);
 				}
 			}
 			super.close();

@@ -200,12 +200,8 @@ module gamewxsaoleihb.page {
 
             this.updateMainInfo();
             this._viewUI.btn_share.on(LEvent.CLICK, this, this.onBtnClickWithTween)
-            this._viewUI.btn_hbjl.on(LEvent.CLICK, this, this.onBtnClickWithTween)
             this._viewUI.btn_ye.on(LEvent.CLICK, this, this.onBtnClickWithTween)
-            this._viewUI.btn_fhb.on(LEvent.CLICK, this, this.onBtnClickWithTween)
-            this._viewUI.lb_yemx.on(LEvent.CLICK, this, this.onBtnClickWithTween)
             this._viewUI.lb_ok.on(LEvent.CLICK, this, this.onBtnClickWithTween)
-            this._viewUI.box_fhb.on(LEvent.CLICK, this, this.onBtnClickWithTween)
             this._viewUI.btn_back.on(LEvent.CLICK, this, this.onBtnClickWithTween)
             this._viewUI.btn_more.on(LEvent.CLICK, this, this.onBtnClickWithTween)
             // this._viewUI.box_hb.on(LEvent.CLICK, this, this.onBtnClickWithTween)
@@ -215,6 +211,10 @@ module gamewxsaoleihb.page {
             this._viewUI.rain_open.on(LEvent.CLICK, this, this.onBtnClickWithTween);
             this._viewUI.btn_down.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 
+            this._viewUI.btn_hbjl.on(LEvent.CLICK, this, this.onBtnClick)
+            this._viewUI.lb_yemx.on(LEvent.CLICK, this, this.onBtnClick)
+            this._viewUI.btn_fhb.on(LEvent.CLICK, this, this.onBtnClick)
+            this._viewUI.box_fhb.on(LEvent.CLICK, this, this.onBtnClick)
             this._viewUI.btn_add.on(LEvent.CLICK, this, this.onBtnClick);
             this._viewUI.btn_di1.on(LEvent.CLICK, this, this.onBtnClick);
             this._viewUI.btn_di2.on(LEvent.CLICK, this, this.onBtnClick);
@@ -321,6 +321,16 @@ module gamewxsaoleihb.page {
         private _isShowInfo = false;
         private onBtnClick(e: LEvent): void {
             switch (e.currentTarget) {
+                case this._viewUI.btn_hbjl:
+                    this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_JL);
+                    break
+                case this._viewUI.lb_yemx:
+                    this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_YEMX);
+                    break
+                case this._viewUI.btn_fhb:
+                case this._viewUI.box_fhb:
+                    this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_FAHB);
+                    break
                 case this._viewUI.btn_add:
                     this._isShowInfo = !this._isShowInfo;
                     this.updateDiBuUI();
@@ -408,22 +418,13 @@ module gamewxsaoleihb.page {
                     this._game.datingGame.shareContinueTime = Laya.timer.currTimer;
                     this._game.datingGame.wxShareQrcodeImg("", "", Web_operation_fields.WXSCENESESSION)
                     break
-                case this._viewUI.btn_hbjl:
-                    this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_JL);
-                    break
                 case this._viewUI.btn_ye:
                     this._viewUI.box_ye.visible = true;
-                    break
-                case this._viewUI.lb_yemx:
-                    this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_YEMX);
                     break
                 case this._viewUI.lb_ok:
                     this._viewUI.box_ye.visible = false;
                     break
-                case this._viewUI.btn_fhb:
-                case this._viewUI.box_fhb:
-                    this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_FAHB);
-                    break
+
                 case this._viewUI.btn_back:
                     this.backMap();
 
@@ -859,7 +860,7 @@ module gamewxsaoleihb.page {
                 let diffTime = this._game.sync.serverTimeBys - this._data.create_time;
                 let isLQFinsh = this._data.lq_num >= this._data.bao_num;
                 let isTimeOut = diffTime > WxSaoLeiHBMgr.HB_TIME;
-                this.img_di.alpha = 0.4;
+                this.img_di.alpha = 0.2;
                 if (this._data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
                     this.img_hb.skin = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_hb.png";
                 } else if (this._data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
@@ -964,7 +965,7 @@ module gamewxsaoleihb.page {
                 let diffTime = this._game.sync.serverTimeBys - this._data.create_time;
                 let isLQFinsh = this._data.lq_num >= this._data.bao_num;
                 let isTimeOut = diffTime > WxSaoLeiHBMgr.HB_TIME;
-                this.img_di.alpha = 0.4;
+                this.img_di.alpha = 0.2;
                 if (this._data.type == WxSaoLeiHBMgr.TYPE_DANLEI) {
                     this.img_hb.skin = Path_game_wxSaoLeiHB.ui_wxsaoleihb + "saolei/tu_hb.png";
                 } else if (this._data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {

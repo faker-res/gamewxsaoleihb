@@ -55,7 +55,7 @@ module gamewxsaoleihb.page {
 					this._viewUI.box_main.scaleY = 1.77;
 				}
 			}
-			this._viewUI.btn_back.on(LEvent.CLICK, this, this.onBtnClickWithTween);
+			this._viewUI.btn_back.on(LEvent.CLICK, this, this.close);
 			this._viewUI.btn_close.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.panel_inner.vScrollBarSkin = "";
 			this._viewUI.panel_inner.vScrollBar.autoHide = true;
@@ -77,9 +77,9 @@ module gamewxsaoleihb.page {
 			let mainPlayer = this._game.sceneObjectMgr.mainPlayer;
 			if (!mainPlayer) return;
 			switch (target) {
-				case this._viewUI.btn_back:
-					this.close();
-					break
+				// case this._viewUI.btn_back:
+				// 	this.close();
+				// 	break
 				case this._viewUI.btn_close:
 					this.close();
 					break
