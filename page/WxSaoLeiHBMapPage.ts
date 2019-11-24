@@ -648,7 +648,7 @@ module gamewxsaoleihb.page {
                 isAdd = true;
                 this._viewUI.box_hb_open.visible = false;
                 //在弹出详情界面
-                this._game.network.call_wxsaoleihb_get_lqjl(this._curHbData.hb_id);
+                this._game.network.call_wxsaoleihb_get_lqjl(hb_info.hb_id);
             } else if (lq_data.sp_money_num > 0) {
                 this.addHB(hb_info, false, WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO, WxSaoLeiHBMapPage.EXTRA_TYPE_SPECIAL_REWARD, lq_data);
                 isAdd = true;
