@@ -68,9 +68,9 @@ module gamewxsaoleihb.page {
 			this._viewUI.btn_random.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.btn_send.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.btn_back.on(LEvent.CLICK, this, this.onBtnClickWithTween);
-			this._viewUI.hb_danL_num1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
-			this._viewUI.hb_danL_num2.on(LEvent.CLICK, this, this.onBtnClickWithTween);
-			this._viewUI.hb_duoL_num1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
+			this._viewUI.btn_danL_num1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
+			this._viewUI.btn_danL_num2.on(LEvent.CLICK, this, this.onBtnClickWithTween);
+			this._viewUI.btn_duoL_num1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			// this._zcInputMoney.on(LEvent.BLUR, this, this.updateTxtInput);
 			this._viewUI.txtInput.on(LEvent.BLUR, this, this.updateTxtInput);
 			this._viewUI.lb_ts.on(LEvent.CLICK, this, this.onPromptClick);
@@ -268,15 +268,15 @@ module gamewxsaoleihb.page {
 					this._game.network.call_wxsaoleihb_sendhb(this._type + 1, this._baoNum, leiDianStr, this._money);
 					this.close();
 					break
-				case this._viewUI.hb_danL_num1:
+				case this._viewUI.btn_danL_num1:
 					this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[0];
 					this.updateBaoUI()
 					break
-				case this._viewUI.hb_danL_num2:
+				case this._viewUI.btn_danL_num2:
 					this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[1];
 					this.updateBaoUI()
 					break
-				case this._viewUI.hb_duoL_num1:
+				case this._viewUI.btn_duoL_num1:
 					this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[1];
 					this.updateBaoUI()
 					break
@@ -339,9 +339,9 @@ module gamewxsaoleihb.page {
 		private updateBaoUI(isChangeTab: boolean = false): void {
 			this._viewUI.box_danL.visible = false;
 			this._viewUI.box_duoL.visible = false;
-			this._viewUI.hb_danL_num1.selected = false;
-			this._viewUI.hb_danL_num2.selected = false;
-			this._viewUI.hb_duoL_num1.selected = false;
+			this._viewUI.btn_danL_num1.selected = false;
+			this._viewUI.btn_danL_num2.selected = false;
+			this._viewUI.btn_duoL_num1.selected = false;
 			//清空数据
 			this._leiDian = [];
 			for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {
@@ -351,15 +351,15 @@ module gamewxsaoleihb.page {
 				if (isChangeTab) this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[0];
 				this._viewUI.lb_hbDanl_num.text = this._baoNum + "包";
 				this._viewUI.box_danL.visible = true;
-				this._viewUI.hb_danL_num1.selected = this._baoNum == WxSaoLeiHBMgr.BAO_NUMS[0];
-				this._viewUI.hb_danL_num2.selected = this._baoNum == WxSaoLeiHBMgr.BAO_NUMS[1];
+				this._viewUI.btn_danL_num1.selected = this._baoNum == WxSaoLeiHBMgr.BAO_NUMS[0];
+				this._viewUI.btn_danL_num2.selected = this._baoNum == WxSaoLeiHBMgr.BAO_NUMS[1];
 				let bet = WxSaoLeiHBMgr.DANLEI_BET[WxSaoLeiHBMgr.BAO_NUMS.indexOf(this._baoNum)];
 				this._viewUI.lb_danL_info.text = StringU.substitute("赔率:{0}", bet);
 			} else if (this._type == WxSaoLeiHBMgr.TYPE_DUOLEI - 1) {
 				if (isChangeTab) this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[1];
 				this._viewUI.lb_hbDuol_num.text = this._baoNum + "包";
 				this._viewUI.box_duoL.visible = true;
-				this._viewUI.hb_duoL_num1.selected = true;
+				this._viewUI.btn_duoL_num1.selected = true;
 			}
 			this.updateLeiDianUI();
 		}

@@ -58,7 +58,7 @@ module gamewxsaoleihb.page {
 			this.initUI();
 		}
 
-		private btnClose(): void {
+		public btnClose(): void {
 			this._game.playSound(this._defaultSoundPath);
 			if (this._curType == WxSaoLeiHBRoomInfoPage.TYPE_PLAYER_INFO) {
 				this._viewUI.room_info.visible = true;

@@ -93,6 +93,46 @@ module gamewxsaoleihb.page {
             Laya.timer.frameOnce(1, this, () => {
                 this.checkHbRain();
             })
+            this._game.network.addHanlder(Protocols.SMSG_OPERATION_FAILED, this, this.onOptHandler);
+            this._game.sceneGame.sceneObjectMgr.on(SceneObjectMgr.EVENT_PLAYER_INFO_UPDATE, this, this.updateMainInfo);
+            this._game.datingGame.on(DatingGame.EVENT_APP_CLOSE_CALLBACK, this, this.appClose);
+        }
+
+        //侧滑关闭
+        private get PageAppCloseArr() {
+            return [
+                WxsaoleihbPageDef.PAGE_WXSLHB_JL,
+                WxsaoleihbPageDef.PAGE_WXSLHB_YEMX,
+                WxsaoleihbPageDef.PAGE_WXSLHB_FAHB,
+                WxsaoleihbPageDef.PAGE_WXSLHB_HB_INFO,
+                WxsaoleihbPageDef.PAGE_WXSLHB_RULE,
+                WxsaoleihbPageDef.PAGE_WXSLHB_HB_ROOM_INFO
+            ]
+        }
+        private appClose(): void {
+            if (this._viewUI.box_hb_open.visible) {
+                this._viewUI.box_hb_open.visible = false;
+            } else {
+                let isPageClose = false;
+                //当前有页面顶在上面就关掉那个页面，没有就退出场景
+                for (let i = 0; i < this.PageAppCloseArr.length; i++) {
+                    let pageId: string = this.PageAppCloseArr[i];
+                    let page = this._game.uiRoot.general.getPage(pageId);
+                    if (page) {
+                        isPageClose = true;
+                        if (page instanceof WxSaoLeiHBRoomInfoPage) {
+                            page.btnClose();
+                        } else {
+                            page.close();
+                        }
+                        break
+                    }
+                }
+                if (!isPageClose) {
+                    //退出场景
+                    this.backMap();
+                }
+            }
         }
 
         private checkHbRain() {
@@ -168,7 +208,7 @@ module gamewxsaoleihb.page {
             this._viewUI.box_fhb.on(LEvent.CLICK, this, this.onBtnClickWithTween)
             this._viewUI.btn_back.on(LEvent.CLICK, this, this.onBtnClickWithTween)
             this._viewUI.btn_more.on(LEvent.CLICK, this, this.onBtnClickWithTween)
-            this._viewUI.box_hb.on(LEvent.CLICK, this, this.onBtnClickWithTween)
+            // this._viewUI.box_hb.on(LEvent.CLICK, this, this.onBtnClickWithTween)
 
             this._viewUI.btn_hb_close.on(LEvent.CLICK, this, this.onBtnClickWithTween);
             this._viewUI.btn_hb_open.on(LEvent.CLICK, this, this.onBtnClickWithTween);
@@ -179,9 +219,6 @@ module gamewxsaoleihb.page {
             this._viewUI.btn_di1.on(LEvent.CLICK, this, this.onBtnClick);
             this._viewUI.btn_di2.on(LEvent.CLICK, this, this.onBtnClick);
             this._viewUI.finsh_check.on(LEvent.CLICK, this, this.onBtnClick);
-
-            this._game.network.addHanlder(Protocols.SMSG_OPERATION_FAILED, this, this.onOptHandler);
-            this._game.sceneGame.sceneObjectMgr.on(SceneObjectMgr.EVENT_PLAYER_INFO_UPDATE, this, this.updateMainInfo);
         }
 
         //重置UI状态
@@ -388,43 +425,8 @@ module gamewxsaoleihb.page {
                     this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_FAHB);
                     break
                 case this._viewUI.btn_back:
-                    //判断离开地图规则
-                    let is_get_can_leave = true;
-                    for (let i = 0; i < this._wxSaoLeiMgr.self_hb_lqjl.length; i++) {
-                        let cur_self_hb_lqjl = this._wxSaoLeiMgr.self_hb_lqjl[i];
-                        if (!cur_self_hb_lqjl) continue;
-                        let hb_id = cur_self_hb_lqjl.hb_id;
-                        let hb_data = this._wxSaoLeiMgr.findHBDataById(hb_id);
-                        if (hb_data.hb_state == WxSaoLeiHBMgr.HB_STATE_ING) {
-                            is_get_can_leave = false;
-                            break
-                        }
-                    }
-                    if (!is_get_can_leave) {
-                        this._game.showTips("您参与抢红包尚未结束，请稍后再试~");
-                        return;
-                    }
-                    let is_send_can_leave = true;
-                    for (let i = 0; i < this._wxSaoLeiMgr.selfHbData.length; i++) {
-                        let cur_hb_data = this._wxSaoLeiMgr.selfHbData[i];
-                        if (!cur_hb_data) continue;
-                        if (cur_hb_data.hb_state == WxSaoLeiHBMgr.HB_STATE_ING) {
-                            is_send_can_leave = false;
-                            break
-                        }
-                    }
-                    if (!is_send_can_leave) {
-                        this._game.showTips("您已发的红包尚未结束，请稍后再试~")
-                        return
-                    }
-                    //清除红包
-                    if (this._wxSaoLeiMgr.isHbRain)
-                        this._wxSaoLeiMgr.end();
-                    this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_FZTS, (page: WxSaoLeiHBFZTSPage) => {
-                        page.isInner = true;
-                    }, () => {
-                        this._game.sceneObjectMgr.leaveStory(true);
-                    })
+                    this.backMap();
+
                     break
                 case this._viewUI.btn_more:
                     //成员列表
@@ -471,7 +473,6 @@ module gamewxsaoleihb.page {
                 case this._viewUI.rain_open:
                     //红包雨领取红包
                     this._game.network.call_wxsaoleihb_opt(-1);
-                    // this._viewUI.box_hb_open.visible = false;
                     break
                 case this._viewUI.box_hb:
                     //红包雨领取红包
@@ -493,6 +494,46 @@ module gamewxsaoleihb.page {
                     }
                     break
             }
+        }
+
+        private backMap(): void {
+            //判断离开地图规则
+            let is_get_can_leave = true;
+            for (let i = 0; i < this._wxSaoLeiMgr.self_hb_lqjl.length; i++) {
+                let cur_self_hb_lqjl = this._wxSaoLeiMgr.self_hb_lqjl[i];
+                if (!cur_self_hb_lqjl) continue;
+                let hb_id = cur_self_hb_lqjl.hb_id;
+                let hb_data = this._wxSaoLeiMgr.findHBDataById(hb_id);
+                if (hb_data.hb_state == WxSaoLeiHBMgr.HB_STATE_ING) {
+                    is_get_can_leave = false;
+                    break
+                }
+            }
+            if (!is_get_can_leave) {
+                this._game.showTips("您参与抢红包尚未结束，请稍后再试~");
+                return;
+            }
+            let is_send_can_leave = true;
+            for (let i = 0; i < this._wxSaoLeiMgr.selfHbData.length; i++) {
+                let cur_hb_data = this._wxSaoLeiMgr.selfHbData[i];
+                if (!cur_hb_data) continue;
+                if (cur_hb_data.hb_state == WxSaoLeiHBMgr.HB_STATE_ING) {
+                    is_send_can_leave = false;
+                    break
+                }
+            }
+            if (!is_send_can_leave) {
+                this._game.showTips("您已发的红包尚未结束，请稍后再试~")
+                return
+            }
+            //清除红包
+            if (this._wxSaoLeiMgr.isHbRain)
+                this._wxSaoLeiMgr.end();
+            this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_FZTS, (page: WxSaoLeiHBFZTSPage) => {
+                page.isInner = true;
+            }, () => {
+                this._game.sceneObjectMgr.leaveStory(true);
+            })
         }
 
         private _curDiffTime: number;
@@ -520,7 +561,13 @@ module gamewxsaoleihb.page {
 
         //帧间隔心跳
         deltaUpdate() {
-
+            if (this._arrHB.length > 0) {
+                for (let i = 0; i < this._arrHB.length; i++) {
+                    let cur_hb_ui = this._arrHB[i];
+                    if (cur_hb_ui instanceof HBInfo) continue;
+                    cur_hb_ui.updateTime();
+                }
+            }
         }
 
         //------------------红包主界面操作start---------
@@ -752,6 +799,7 @@ module gamewxsaoleihb.page {
         }
         //------------------红包主界面操作end---------
         public close(): void {
+            this._game.datingGame.off(DatingGame.EVENT_APP_CLOSE_CALLBACK, this, this.appClose);
             WebConfig.setMyOrientation(true);
             Laya.stage.screenMode = Stage.SCREEN_HORIZONTAL;
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_INFO, this, this.updateHBdata);
@@ -761,12 +809,19 @@ module gamewxsaoleihb.page {
             this._game.network.removeHanlder(Protocols.SMSG_OPERATION_FAILED, this, this.onOptHandler);
             this._game.sceneGame.sceneObjectMgr.off(SceneObjectMgr.EVENT_PLAYER_INFO_UPDATE, this, this.updateMainInfo);
             if (this._viewUI) {
-                this._game.stopAllSound();
-                this._game.stopMusic();
+                if (this._viewUI) {
+                    if (this._viewUI.panel_hb) {
+                        this._viewUI.panel_hb.vScrollBar.changeHandler.recover();
+                        this._viewUI.panel_hb.vScrollBar.changeHandler = null;
+                    }
+                    this._game.stopAllSound();
+                    this._game.stopMusic();
+                }
+                super.close();
             }
-            super.close();
         }
     }
+
     class HBLeft extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_HB1UI {
         private _game: Game;
         private _data: any;
@@ -838,12 +893,9 @@ module gamewxsaoleihb.page {
             this.lb_money.text = this._data.money;
             //红包雷号
             this.lb_ld.text = this._data.ld_str;
-            //倒计时
-            Laya.timer.clearAll(this);
-            Laya.timer.loop(1000, this, this.updateTime);
         }
 
-        private updateTime(): void {
+        updateTime(): void {
             if (!this._data) return;
             let diffTime: number = this._game.sync.serverTimeBys - this._data.create_time;
             let countDown = Math.floor(WxSaoLeiHBMgr.HB_TIME - diffTime);
@@ -946,12 +998,9 @@ module gamewxsaoleihb.page {
             this.lb_money.text = this._data.money;
             //红包雷号
             this.lb_ld.text = this._data.ld_str;
-            //倒计时
-            Laya.timer.clearAll(this);
-            Laya.timer.loop(1000, this, this.updateTime);
         }
 
-        private updateTime(): void {
+        updateTime(): void {
             if (!this._data) return;
             let diffTime: number = this._game.sync.serverTimeBys - this._data.create_time;
             let countDown = Math.floor(WxSaoLeiHBMgr.HB_TIME - diffTime);
