@@ -349,9 +349,9 @@ module gamewxsaoleihb.page {
 			for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {
 				if (this._leiDian.indexOf(i) > -1) {
 					//有值
-					this._viewUI["btn_" + i].selected = true;
+					this._viewUI["btn_" + i].index = 1;
 				} else {
-					this._viewUI["btn_" + i].selected = false;
+					this._viewUI["btn_" + i].index = 0;
 				}
 			}
 			this._leiDian.sort((a: any, b: any) => {
@@ -369,9 +369,9 @@ module gamewxsaoleihb.page {
 		private updateBaoUI(isChangeTab: boolean = false): void {
 			this._viewUI.box_danL.visible = false;
 			this._viewUI.box_duoL.visible = false;
-			this._viewUI.btn_danL_num1.selected = false;
-			this._viewUI.btn_danL_num2.selected = false;
-			this._viewUI.btn_duoL_num1.selected = false;
+			this._viewUI.btn_danL_num1.index = 0;
+			this._viewUI.btn_danL_num2.index = 0;
+			this._viewUI.btn_duoL_num1.index = 0;
 			//清空数据
 			this._leiDian = [];
 			for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {
@@ -381,15 +381,15 @@ module gamewxsaoleihb.page {
 				if (isChangeTab) this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[0];
 				this._viewUI.lb_hbDanl_num.text = this._baoNum + "包";
 				this._viewUI.box_danL.visible = true;
-				this._viewUI.btn_danL_num1.selected = this._baoNum == WxSaoLeiHBMgr.BAO_NUMS[0];
-				this._viewUI.btn_danL_num2.selected = this._baoNum == WxSaoLeiHBMgr.BAO_NUMS[1];
+				this._viewUI.btn_danL_num1.index = this._baoNum == WxSaoLeiHBMgr.BAO_NUMS[0] ? 1 : 0;
+				this._viewUI.btn_danL_num2.index = this._baoNum == WxSaoLeiHBMgr.BAO_NUMS[1] ? 1 : 0;
 				let bet = WxSaoLeiHBMgr.DANLEI_BET[WxSaoLeiHBMgr.BAO_NUMS.indexOf(this._baoNum)];
 				this._viewUI.lb_danL_info.text = StringU.substitute("赔率:{0}", bet);
 			} else if (this._type == WxSaoLeiHBMgr.TYPE_DUOLEI - 1) {
 				if (isChangeTab) this._baoNum = WxSaoLeiHBMgr.BAO_NUMS[1];
 				this._viewUI.lb_hbDuol_num.text = this._baoNum + "包";
 				this._viewUI.box_duoL.visible = true;
-				this._viewUI.btn_duoL_num1.selected = true;
+				this._viewUI.btn_duoL_num1.index = 1;
 			}
 			this.updateLeiDianUI();
 		}

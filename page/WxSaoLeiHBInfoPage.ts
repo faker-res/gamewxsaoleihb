@@ -42,7 +42,7 @@ module gamewxsaoleihb.page {
 				this._viewUI.box_main.scaleY = 1.77;
 			}
 			if (this._game.isFullScreen) {
-				let diff = 56
+				let diff = 88
 				//有刘海
 				this._viewUI.box_main.top = -1 + diff;
 			} else {

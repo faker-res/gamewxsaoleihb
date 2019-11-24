@@ -173,6 +173,8 @@ module gamewxsaoleihb.page {
             switch (e.type) {
                 case LEvent.MOUSE_DOWN:
                     this._drage = true;
+                    //中途阻断缓动操作
+                    this._isClickDrag = false;
                     break
                 case LEvent.MOUSE_UP:
                     if (value >= maxValue) {
@@ -462,9 +464,6 @@ module gamewxsaoleihb.page {
                             //未操作过
                             this._game.playSound(Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.hongbao_tan);
                             this._game.network.call_wxsaoleihb_opt(this._curHbData.hb_id);
-                            this._viewUI.box_hb_open.visible = false;
-                            //在弹出详情界面
-                            this._game.network.call_wxsaoleihb_get_lqjl(this._curHbData.hb_id);
                         }
                     } else {
                         //红包已领完
@@ -544,8 +543,10 @@ module gamewxsaoleihb.page {
             //红包雨时间
             if (this._wxSaoLeiMapInfo && !this._wxSaoLeiMgr.isHbRain) {
                 let end_time = this._wxSaoLeiMapInfo.GetYuChaoLaiQiTime();
-                if (end_time) {
+                if (end_time && end_time > this._game.sync.serverTimeBys) {
                     this._viewUI.lb_hby_tim.text = Sync.getTimeShortStr3(end_time - this._game.sync.serverTimeBys);
+                } else {
+                    this._viewUI.lb_hby_tim.text = "00:00";
                 }
             } else {
                 this._viewUI.lb_hby_tim.text = "00:00";
@@ -633,11 +634,19 @@ module gamewxsaoleihb.page {
             //是否是自己的红包
             let isSelfHB = this._mainUid == hb_info.uid;
             //只有我领别人或者别人领我的红包,才需要加信息条
+            let isAdd = false;
             if (isSelfHB || (lq_data && lq_data.uid == this._mainUid)) {
                 this.addHB(hb_info, isSelfHB, WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO, 0, lq_data);
-                if (!this._drage) {
-                    this.panelSlide();
-                }
+                isAdd = true;
+                this._viewUI.box_hb_open.visible = false;
+                //在弹出详情界面
+                this._game.network.call_wxsaoleihb_get_lqjl(this._curHbData.hb_id);
+            } else if (lq_data.sp_money_num > 0) {
+                this.addHB(hb_info, false, WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO, WxSaoLeiHBMapPage.EXTRA_TYPE_SPECIAL_REWARD, lq_data);
+                isAdd = true;
+            }
+            if (!this._drage && isAdd) {
+                this.panelSlide();
             }
         }
 
@@ -646,6 +655,7 @@ module gamewxsaoleihb.page {
         private static readonly MAIN_HB_LQ_INFO: number = 2;   //红包信息
         public static readonly EXTRA_TYPE_FINSH: number = 1;    //红包已领完
         public static readonly EXTRA_TYPE_ZL_SETTLE: number = 2;    //预中雷信息结算
+        public static readonly EXTRA_TYPE_SPECIAL_REWARD: number = 3;    //特殊奖励
         private _hbUIY: number = 0;
         private _diffY: number = 0;
         addHB(hbData: any, isSelf: boolean = false, type: number, extraType: number = 0, lq_data: any = "") {
@@ -1044,12 +1054,12 @@ module gamewxsaoleihb.page {
             let infoText = "";//没有html假信息
             //赔付金额
             let mainUid = mainPlayer.GetUserId();
+            let color = "#3b72fe";  //玩家颜色色值
             if (this._extraType == 0) {
                 //不是额外信息
                 let pf_money: number = Number(this._lq_data.pf_money.toFixed(2));
                 let isSelf = this._lq_data.uid == mainUid;  //领取人是自己
                 let name = "";
-                let color = "#3b72fe";  //玩家颜色色值
                 let lq_money: string = this._lq_data.lq_money.toFixed(2); //领取的金钱
                 let zl_num = Number(lq_money.substr(-1, 1));;  //中雷号
                 let is_zl = pf_money > 0;      //是否中雷
@@ -1067,7 +1077,8 @@ module gamewxsaoleihb.page {
                             //冻结钱数
                             let obj = {
                                 hb_id: this._lq_data.hb_id,
-                                pf_money: pf_money
+                                pf_money: pf_money,
+                                sp_money_num: sp_money_num,
                             }
                             this._wxsaoleihbMgr.pf_data.push(obj)
                             info = StringU.substitute("您领取了{0}玩家的红包,获得{1}元,预中雷{2}冻结{3}元", HtmlFormat.addHtmlColor(name.toString(), color), HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED), zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
@@ -1078,11 +1089,7 @@ module gamewxsaoleihb.page {
                         info = StringU.substitute("您领取了{0}玩家的红包,获得{1}元", HtmlFormat.addHtmlColor(name.toString(), color), HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED));
                         infoText = StringU.substitute("您领取了{0}玩家的红包,获得{1}元", name.toString(), lq_money.toString());
                     }
-                    //特殊数值奖励
-                    if (sp_money_num > 0) {
-                        info += StringU.substitute(",获取奖励{0}元", HtmlFormat.addHtmlColor(sp_money_num.toString(), TeaStyle.COLOR_RED));
-                        infoText += StringU.substitute(",获取奖励{0}元", sp_money_num.toString());
-                    }
+
                     this._wxsaoleihbMgr.self_hb_lqjl.push(this._lq_data);
                 } else {
                     //自己的红包别人领了
@@ -1149,8 +1156,18 @@ module gamewxsaoleihb.page {
                                 info += StringU.substitute("免赔付,解除冻结{0}元", HtmlFormat.addHtmlColor(pfData.pf_money, TeaStyle.COLOR_RED));
                                 infoText += StringU.substitute("免赔付,解除冻结{0}元", pfData.pf_money);
                             }
+                            //特殊数值奖励
+                            if (pfData.sp_money_num > 0) {
+                                info += StringU.substitute(",获取奖励{0}元", HtmlFormat.addHtmlColor(pfData.sp_money_num.toString(), TeaStyle.COLOR_RED));
+                                infoText += StringU.substitute(",获取奖励{0}元", pfData.sp_money_num.toString());
+                            }
                         }
                         break
+                    case WxSaoLeiHBMapPage.EXTRA_TYPE_SPECIAL_REWARD:
+                        //红包已经领完了
+                        info = StringU.substitute("恭喜{0}玩家抢得{1}元，给予奖励{2}元", HtmlFormat.addHtmlColor(this._lq_data.name.toString(), color), HtmlFormat.addHtmlColor(this._lq_data.lq_money.toString(), TeaStyle.COLOR_RED), HtmlFormat.addHtmlColor(this._lq_data.sp_money_num.toString(), TeaStyle.COLOR_RED));
+                        infoText = StringU.substitute("恭喜{0}玩家抢得{1}元，给予奖励{2}元", this._lq_data.name.toString(), this._lq_data.lq_money.toString(), this._lq_data.sp_money_num.toString());
+                        break;
                 }
             }
             this.lb_info.text = infoText;
