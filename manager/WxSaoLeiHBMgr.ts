@@ -362,6 +362,15 @@ module gamewxsaoleihb.manager {
 			Laya.timer.clearAll(this);
 		}
 
+		//场次vip判断
+		MapJudgeIsFHOrLB(mapLv: number): boolean {
+			if (mapLv == Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_2 || mapLv == Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_3) {
+				return true
+			} else {
+				return false
+			}
+		}
+
 		//------------------------红包雨start---------------
 		public static CREATE_HB_RAIN_TIME: number = 1.5;
 		public static MAX_HB_NUM = 10;

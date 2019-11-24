@@ -20,6 +20,7 @@ module gamewxsaoleihb.page {
         private _mainUnit: Unit;
         private _mainUid: string;
         private _isClickDrag: boolean = false;
+        private _mapLv: number;
         constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
             super(v, onOpenFunc, onCloseFunc);
             this._isNeedDuang = false;
@@ -86,8 +87,8 @@ module gamewxsaoleihb.page {
             });
             this._viewUI.mouseThrough = true;
             //初始房间名字
-            let mapLv = this._wxSaoLeiMapInfo.GetMapLevel();
-            let index = WxSaoLeiHBMgr.ALL_GAME_ROOM_CONFIG_ID.indexOf(mapLv);
+            this._mapLv = this._wxSaoLeiMapInfo.GetMapLevel();
+            let index = WxSaoLeiHBMgr.ALL_GAME_ROOM_CONFIG_ID.indexOf(this._mapLv);
             if (index < 0) index = 0;
             this._viewUI.lb_map_name.text = WxSaoLeiHBMgr.GMAE_ROOME_NAME[index];
             Laya.timer.frameOnce(1, this, () => {
@@ -462,6 +463,13 @@ module gamewxsaoleihb.page {
                             this.initHBGetUI(WxSaoLeiHBMapPage.TYPE_NO_OPT_HB, this._curHbData);
                         } else {
                             //未操作过
+                            //判断是否老板富豪场v1
+                            if (this._wxSaoLeiMgr.MapJudgeIsFHOrLB(this._mapLv)) {
+                                if (this._mainPlayer.playerInfo.vip_level < 1) {
+                                    this._game.showTips("该场次需要VIP1的玩家方可操作哦!")
+                                    return;
+                                }
+                            }
                             this._game.playSound(Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.hongbao_tan);
                             this._game.network.call_wxsaoleihb_opt(this._curHbData.hb_id);
                         }

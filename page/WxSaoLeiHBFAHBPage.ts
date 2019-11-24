@@ -237,6 +237,12 @@ module gamewxsaoleihb.page {
 					this.updateLeiDianUI();
 					break
 				case this._viewUI.btn_send:
+					if (this._wxSaoLeiMgr.MapJudgeIsFHOrLB(this._mapLv)) {
+						if (this._mainPlayer.playerInfo.vip_level < 1) {
+							this._game.showTips("该场次需要VIP1的玩家方可操作哦!")
+							return;
+						}
+					}
 					//发红包
 					if (this._type != 0 && !this._type) {
 						this._game.showTips("请选择红包类型哦~");
