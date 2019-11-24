@@ -646,9 +646,12 @@ module gamewxsaoleihb.page {
             if (isSelfHB || (lq_data && lq_data.uid == this._mainUid)) {
                 this.addHB(hb_info, isSelfHB, WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO, 0, lq_data);
                 isAdd = true;
-                this._viewUI.box_hb_open.visible = false;
-                //在弹出详情界面
-                this._game.network.call_wxsaoleihb_get_lqjl(hb_info.hb_id);
+                if (lq_data && lq_data.uid == this._mainUid) {
+                    //自己在弹出来
+                    this._viewUI.box_hb_open.visible = false;
+                    //在弹出详情界面
+                    this._game.network.call_wxsaoleihb_get_lqjl(hb_info.hb_id);
+                }
             } else if (lq_data.sp_money_num > 0) {
                 this.addHB(hb_info, false, WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO, WxSaoLeiHBMapPage.EXTRA_TYPE_SPECIAL_REWARD, lq_data);
                 isAdd = true;
