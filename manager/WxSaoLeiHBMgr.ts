@@ -31,6 +31,8 @@ module gamewxsaoleihb.manager {
 			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FHB, "发红包",
 			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_GHB_SETTLE, "抢红包结算",
 			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FHB_SETTLE, "发红包结算",
+			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_SPECIAL_REWARD, "特殊数值奖励",
+			Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_BOM_NUM_REWARD, "雷数奖励",
 		]
 
 		private _hb_data: Array<any> = [];	//红包总数据

@@ -97,6 +97,8 @@ module gamewxsaoleihb.page {
             this._game.network.addHanlder(Protocols.SMSG_OPERATION_FAILED, this, this.onOptHandler);
             this._game.sceneGame.sceneObjectMgr.on(SceneObjectMgr.EVENT_PLAYER_INFO_UPDATE, this, this.updateMainInfo);
             this._game.datingGame.on(DatingGame.EVENT_APP_CLOSE_CALLBACK, this, this.appClose);
+            //没有背景音乐
+            this._game.stopMusic();
         }
 
         //侧滑关闭
@@ -330,6 +332,7 @@ module gamewxsaoleihb.page {
                     break
                 case this._viewUI.lb_yemx:
                     this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_YEMX);
+                    this._viewUI.box_ye.visible = false;
                     break
                 case this._viewUI.btn_fhb:
                 case this._viewUI.box_fhb:
