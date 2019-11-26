@@ -488,7 +488,15 @@ module gamewxsaoleihb.page {
                     break
                 case this._viewUI.box_hb:
                     //红包雨领取红包
-                    this._wxSaoLeiMgr.showHBRain(this._game.sync.serverTimeBys + 30, this._viewUI.box_hb_rain);
+                    // let _notices = ["天啊，玩家[p]眷念[/p]在[m]honghei[/m]一把赢得[n]1146.00[/n]，真是太厉害了！"];
+                    // if (this._game.uiRoot.top.isOpened(DatingPageDef.PAGE_GONGGAO)) {
+                    //     this.event(NoticesMgr.EVENT_CHANGE);
+                    // } else {
+                    //     this._game.uiRoot.top.open(DatingPageDef.PAGE_GONGGAO, (page: gamedating.page.GongGaoPage) => {
+                    //         page.setSpeed(_notices.length);
+                    //     })
+                    // }
+                    // this._wxSaoLeiMgr.showHBRain(this._game.sync.serverTimeBys + 30, this._viewUI.box_hb_rain);
                     break
                 case this._viewUI.btn_down:
                     //直达底部
@@ -757,6 +765,8 @@ module gamewxsaoleihb.page {
                 }
             }
             this._hbUIY -= diffY;
+            let cur_value = this._viewUI.panel_hb.vScrollBar.value;
+            this._viewUI.panel_hb.vScrollBar.value = cur_value - diffY;
             if (!this.drage) {
                 this.panelSlide();
             }
