@@ -323,6 +323,7 @@ module gamewxsaoleihb.page {
         //===========红包领取end==========
         private _isShowInfo = false;
         private onBtnClick(e: LEvent): void {
+            this._game.playSound(this._defaultSoundPath);
             switch (e.currentTarget) {
                 case this._viewUI.btn_hbjl:
                     this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_JL);
@@ -1083,6 +1084,11 @@ module gamewxsaoleihb.page {
                             this._game.playSound(Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.zhonglei);
                             info = StringU.substitute("您领取了{0}玩家的红包,获得{1}元,中雷{2}赔付{3}元", HtmlFormat.addHtmlColor(name.toString(), color), HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED), zl_num, HtmlFormat.addHtmlColor(pf_money.toString(), TeaStyle.COLOR_RED));
                             infoText = StringU.substitute("您领取了{0}玩家的红包,获得{1}元,中雷{2}赔付{3}元", name.toString(), lq_money.toString(), zl_num, pf_money.toString());
+                            //特殊数值奖励
+                            if (sp_money_num > 0) {
+                                info += StringU.substitute(",获取奖励{0}元", HtmlFormat.addHtmlColor(sp_money_num.toString(), TeaStyle.COLOR_RED));
+                                infoText += StringU.substitute(",获取奖励{0}元", sp_money_num.toString());
+                            }
                         } else if (this._data.type == WxSaoLeiHBMgr.TYPE_DUOLEI) {
                             this._game.playSound(Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.no_zhonglei);
                             //冻结钱数
@@ -1099,8 +1105,12 @@ module gamewxsaoleihb.page {
                         this._game.playSound(Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.no_zhonglei);
                         info = StringU.substitute("您领取了{0}玩家的红包,获得{1}元", HtmlFormat.addHtmlColor(name.toString(), color), HtmlFormat.addHtmlColor(lq_money.toString(), TeaStyle.COLOR_RED));
                         infoText = StringU.substitute("您领取了{0}玩家的红包,获得{1}元", name.toString(), lq_money.toString());
+                        //特殊数值奖励
+                        if (sp_money_num > 0) {
+                            info += StringU.substitute(",获取奖励{0}元", HtmlFormat.addHtmlColor(sp_money_num.toString(), TeaStyle.COLOR_RED));
+                            infoText += StringU.substitute(",获取奖励{0}元", sp_money_num.toString());
+                        }
                     }
-
                     this._wxsaoleihbMgr.self_hb_lqjl.push(this._lq_data);
                 } else {
                     //自己的红包别人领了
@@ -1195,7 +1205,7 @@ module gamewxsaoleihb.page {
             if (this.lb_info.wordWrap) {
                 height += 30;
             } else {
-                height += 25;
+                height += 20;
             }
             this.box_main.size(width, height);
             this.img_di.size(width, height);

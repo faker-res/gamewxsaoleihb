@@ -55,7 +55,7 @@ module gamewxsaoleihb.page {
 					this._viewUI.box_main.scaleY = 1.77;
 				}
 			}
-			this._viewUI.btn_back.on(LEvent.CLICK, this, this.close);
+			this._viewUI.btn_back.on(LEvent.CLICK, this, this.onBackClose);
 			this._viewUI.btn_close.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.panel_inner.vScrollBarSkin = "";
 			this._viewUI.panel_inner.vScrollBar.autoHide = true;
@@ -70,6 +70,11 @@ module gamewxsaoleihb.page {
 		private selectHandler(index: number): void {
 			this._viewUI.img_pf.visible = this._viewUI.tab_Type.selectedIndex == WxSaoLeiHBRulePage.TYPE_WANFA_JIESHAO;
 			this._viewUI.panel_out.visible = this._viewUI.tab_Type.selectedIndex == WxSaoLeiHBRulePage.TYPE_CARD_PEIFU;
+		}
+
+		private onBackClose(): void {
+			this._game.playSound(this._defaultSoundPath);
+			this.close();
 		}
 
 		/**按钮点击事件缓动完 回调 该做啥就做啥 */

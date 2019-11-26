@@ -64,7 +64,9 @@ module gamewxsaoleihb.page {
 			// this._zcInputMoney.settext(this._game, "#7b7b7b", "发包金额", TeaStyle.COLOR_BLACK, 28, 3, [MyTextInput.TYPE_INPUT_NUMBER]);
 			// this._zcInputMoney.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 
-			this._viewUI.tab_hb.selectHandler = Handler.create(this, this.selectHandler, null, false);
+			// this._viewUI.tab_hb.selectHandler = Handler.create(this, this.selectHandler, null, false);
+			this._viewUI.box_tab_1.on(LEvent.CLICK, this, this.selectHandler, [0]);
+			this._viewUI.box_tab_2.on(LEvent.CLICK, this, this.selectHandler, [1]);
 			this._viewUI.btn_random.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.btn_send.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.btn_back.on(LEvent.CLICK, this, this.onBtnClickWithTween);
@@ -76,14 +78,16 @@ module gamewxsaoleihb.page {
 			this._viewUI.lb_ts.on(LEvent.CLICK, this, this.onPromptClick);
 			let story: WxSaoLeiHBStory = this._game.sceneObjectMgr.story;
 			this._wxSaoLeiMgr = story.wxSaoLeiHBMgr;
-			this._viewUI.tab_hb.selectedIndex = 0;
+			this.selectHandler(0);
+			// this._viewUI.tab_hb.selectedIndex = 0;
 			this.updateViewUI();
 			let hb_data_str = localGetItem("hb_data" + this._mapLv);
 			if (hb_data_str) {
 				let hb_data = JSON.parse(hb_data_str);
 				if (hb_data) {
 					this._type = hb_data.type - 1;
-					this._viewUI.tab_hb.selectedIndex = this._type;
+					this.selectHandler(this._type);
+					// this._viewUI.tab_hb.selectedIndex = ;
 					this._baoNum = hb_data.baoNum;
 					this.updateBaoUI();
 					this._leiDian = hb_data.ld_str.split(",");
@@ -172,7 +176,6 @@ module gamewxsaoleihb.page {
 
 		private onLeiDianClick(index: number): void {
 			//点击音效
-			this._game.playSound(this._defaultSoundPath);
 			let have_index = this._leiDian.indexOf(index)
 			if (have_index > -1) {
 				//有的要去除掉
@@ -346,7 +349,10 @@ module gamewxsaoleihb.page {
 		}
 
 		private selectHandler(index: number): void {
+			this._game.playSound(this._defaultSoundPath);
 			this._type = index;
+			this._viewUI.btn_tab_1.selected = (this._type + 1) == WxSaoLeiHBMgr.TYPE_DANLEI;
+			this._viewUI.btn_tab_2.selected = (this._type + 1) == WxSaoLeiHBMgr.TYPE_DUOLEI;
 			this.updateBaoUI(true);
 		}
 

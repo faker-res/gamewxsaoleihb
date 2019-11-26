@@ -58,8 +58,11 @@ module gamewxsaoleihb.page {
 			this._viewUI.list_info.scrollBar.elasticDistance = 100;
 			this._viewUI.list_info.itemRender = this.createChildren("game_ui.wxsaoleihb.component.WXSaoLei_LB1UI", HBInfoMX);
 			this._viewUI.list_info.renderHandler = new Handler(this, this.renderHandler);
-			this._viewUI.tab.selectHandler = Handler.create(this, this.selectHandler, null, false);
-			this._viewUI.tab.selectedIndex = 0;
+			// this._viewUI.tab.selectHandler = Handler.create(this, this.selectHandler, null, false);
+			// this._viewUI.tab.selectedIndex = 0;
+			this._viewUI.box_tab_1.on(LEvent.CLICK, this, this.selectHandler, [0]);
+			this._viewUI.box_tab_2.on(LEvent.CLICK, this, this.selectHandler, [1]);
+			this.selectHandler(0);
 			this._baoBiaoMgr = this._game.datingGame.baobiaoMgr;
 			this._baoBiaoMgr.on(BaoBiaoMgr.EVENT_CHANGE, this, this.onUpdateDataInfo);
 			this._viewUI.btn_back.on(LEvent.CLICK, this, this.close);
@@ -165,7 +168,7 @@ module gamewxsaoleihb.page {
 				let cur_get_hb_data;
 				if (cur_get_data && cur_get_data.params) {
 					let params = JSON.parse(cur_get_data.params);
-					cur_get_hb_data = params.hb_data;
+					cur_get_hb_data = params;
 				}
 				let obj_new = {
 					get_data: cur_get_data,
@@ -174,26 +177,24 @@ module gamewxsaoleihb.page {
 					pf_money: 0,	//赔付的数据
 				}
 				if (cur_get_data.type == MONEY_TYPE) {
-					obj_new.get_money = obj_new.get_data.shouzhi;
+					obj_new.get_money = cur_get_data.shouzhi;
 					//领发红包
 					let index = this.getInfoIndex(dataInfoTotal, cur_get_hb_data);
 					if (index > -1) {
 						let obj_old = dataInfoTotal[index];
-						obj_old.get_money += obj_new.get_data.shouzhi;
+						obj_old.get_money += obj_new.get_money;
 						dataInfoTotal[index] = obj_old;
 					} else {
 						dataInfoTotal.push(obj_new);
 					}
 				} else if (cur_get_data.type == SETTLE_TYPE) {
-					obj_new.pf_money = obj_new.get_data.shouzhi;
+					obj_new.pf_money =cur_get_data.shouzhi;
 					//领发红包结算
 					let index = this.getInfoIndex(dataInfoTotal, cur_get_hb_data);
 					if (index > -1) {
-						//数据跟时间以结算的为准
+						//数据跟时间以第一条得结算的为准
 						let obj_old_settle = dataInfoTotal[index];
-						obj_old_settle.pf_money += obj_new.get_data.shouzhi;
-						obj_old_settle.hb_data = obj_new.hb_data;
-						obj_old_settle.get_data = obj_new.get_data;
+						obj_old_settle.pf_money += obj_new.pf_money;
 						dataInfoTotal[index] = obj_old_settle;
 					} else {
 						dataInfoTotal.push(obj_new);
@@ -227,7 +228,10 @@ module gamewxsaoleihb.page {
 		}
 
 		private selectHandler(index: number): void {
+			this._game.playSound(this._defaultSoundPath);
 			this._curType = index;
+			this._viewUI.btn_tab_1.selected = this._curType == WxSaoLeiHBJLPage.TYPE_GET_HB;
+			this._viewUI.btn_tab_2.selected = this._curType == WxSaoLeiHBJLPage.TYPE_SEND_HB;
 			this.updateUI(index);
 		}
 
@@ -277,20 +281,19 @@ module gamewxsaoleihb.page {
 			this.lb_time.text = Sync.getTimeShortStr(this._data.get_data.time * 1000);
 			this.lb_money.text = Math.abs(this._data.get_money).toFixed(2);
 			this.lb_diff.text = this._data.pf_money.toFixed(2);
-			// this.lb_diff.color = this._data.shouzhi > 0 ? TeaStyle.COLOR_GREEN : TeaStyle.COLOR_RED;
 			this.btn_jh.visible = curType == WxSaoLeiHBJLPage.TYPE_SEND_HB;
 			if (curType == WxSaoLeiHBJLPage.TYPE_SEND_HB) {
 				//发出的红包
 				if (this._data.hb_data) {
-					this.lb_type.text = this._data.hb_data.name;
+					this.lb_type.text = this._data.hb_data.hb_name;
 				}
 				this.on(LEvent.CLICK, this, this.onBtnClick);
 			} else {
-				if (this._data.type == Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FLHB) {
+				if (this._data.get_data.type == Web_operation_fields.USE_MONEY_LOG_TYPE_WXSLHB_FLHB) {
 					this.lb_type.text = "红包雨";
 				} else {
 					if (this._data.hb_data) {
-						this.lb_type.text = this._data.hb_data.name;
+						this.lb_type.text = this._data.hb_data.hb_name;
 					}
 				}
 				this.off(LEvent.CLICK, this, this.onBtnClick);
