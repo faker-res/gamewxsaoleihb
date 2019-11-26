@@ -20,6 +20,7 @@ module gamewxsaoleihb.page {
         private _mainUnit: Unit;
         private _mainUid: string;
         private _isClickDrag: boolean = false;
+        private _isPanleSlide: boolean = false;
         private _mapLv: number;
         constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
             super(v, onOpenFunc, onCloseFunc);
@@ -156,7 +157,9 @@ module gamewxsaoleihb.page {
             let maxValue = this._viewUI.panel_hb.vScrollBar.max;
             if (cur_value < maxValue) {
                 Laya.Tween.clearAll(this._viewUI.panel_hb.vScrollBar);
+                this._isPanleSlide = true;
                 Laya.Tween.to(this._viewUI.panel_hb.vScrollBar, { value: maxValue }, 200, null, new Handler(this, () => {
+                    this._isPanleSlide = false;
                     this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
                 }));
             }
@@ -173,6 +176,7 @@ module gamewxsaoleihb.page {
         private panelMouseHandle(e: LEvent): void {
             let maxValue = this._viewUI.panel_hb.vScrollBar.max;
             let value = this._viewUI.panel_hb.vScrollBar.value;
+            logd("===============", maxValue, value);
             switch (e.type) {
                 case LEvent.MOUSE_DOWN:
                     this._drage = true;
@@ -184,6 +188,7 @@ module gamewxsaoleihb.page {
                         this._drage = false;
                     } else {
                         this._drage = true;
+                        logd("this._drage ", this._isPanleSlide, this._isClickDrag, maxValue, value);
                     }
                     break
             }
@@ -496,10 +501,12 @@ module gamewxsaoleihb.page {
                     this._isClickDrag = true;
                     let maxValue = this._viewUI.panel_hb.vScrollBar.max;
                     let curValue = this._viewUI.panel_hb.vScrollBar.value;
+                    this._isPanleSlide = true;
                     if (curValue < maxValue) {
                         Laya.Tween.clearAll(this._viewUI.panel_hb.vScrollBar);
                         Laya.Tween.to(this._viewUI.panel_hb.vScrollBar, { value: maxValue }, 700, null, new Handler(this, () => {
                             this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
+                            this._isPanleSlide = false;
                             this._drage = false;
                             this._isClickDrag = false;
                         }));
@@ -933,9 +940,10 @@ module gamewxsaoleihb.page {
         }
 
         //领取红包
-        private onBtnLQ(): void {
+        private onBtnLQ(e: LEvent): void {
             if (!this._data) return;
             let is_opt = this._wxsaoleihbMgr.isOptHBById(this._data.hb_id);
+            logd("-------------------------")
             if (this._data.hb_state == WxSaoLeiHBMgr.HB_STATE_END) {
                 //红包已领完
                 if (is_opt) {
