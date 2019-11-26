@@ -14,6 +14,7 @@ module gamewxsaoleihb.page {
 		private _wxSaoLeiMgr: WxSaoLeiHBMgr;
 		private _mainPlayer: PlayerData;
 		private _mapLv: number;
+		private _mainUnit: Unit;
 		// private _zcInputMoney: MyTextInput;
 		private _notStageClickUI: Laya.Node[]; //不响应舞台点击UI对象集合
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
@@ -78,6 +79,7 @@ module gamewxsaoleihb.page {
 			this._viewUI.lb_ts.on(LEvent.CLICK, this, this.onPromptClick);
 			let story: WxSaoLeiHBStory = this._game.sceneObjectMgr.story;
 			this._wxSaoLeiMgr = story.wxSaoLeiHBMgr;
+			this._mainUnit = this._game.sceneObjectMgr.mainUnit;
 			this.selectHandler(0);
 			// this._viewUI.tab_hb.selectedIndex = 0;
 			this.updateViewUI();
@@ -162,7 +164,7 @@ module gamewxsaoleihb.page {
 			for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {
 				this._viewUI["btn_" + i].on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			}
-			let money: number = playerInfo.money;
+			let money: number = this._mainUnit.GetMoney();
 			this._viewUI.lb_ye.text = money.toFixed(2);
 			//红包发放范围
 			this._mapinfo = this._game.sceneObjectMgr.mapInfo as WxSaoLeiHBMapInfo;
@@ -266,8 +268,8 @@ module gamewxsaoleihb.page {
 					}
 					//造假数据
 					let leiDianStr = this.changeLeiDianToStr();
-					if (!this._mainPlayer) return;
-					if (this._mainPlayer.playerInfo.money < this._money) {
+					if (!this._mainUnit) return;
+					if (this._mainUnit.GetMoney() < this._money) {
 						this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_YEBZ);
 						this.close();
 						return

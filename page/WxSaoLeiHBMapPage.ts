@@ -20,7 +20,6 @@ module gamewxsaoleihb.page {
         private _mainUnit: Unit;
         private _mainUid: string;
         private _isClickDrag: boolean = false;
-        private _isPanleSlide: boolean = false;
         private _mapLv: number;
         constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
             super(v, onOpenFunc, onCloseFunc);
@@ -157,9 +156,7 @@ module gamewxsaoleihb.page {
             let maxValue = this._viewUI.panel_hb.vScrollBar.max;
             if (cur_value < maxValue) {
                 Laya.Tween.clearAll(this._viewUI.panel_hb.vScrollBar);
-                this._isPanleSlide = true;
                 Laya.Tween.to(this._viewUI.panel_hb.vScrollBar, { value: maxValue }, 200, null, new Handler(this, () => {
-                    this._isPanleSlide = false;
                     this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
                 }));
             }
@@ -168,27 +165,25 @@ module gamewxsaoleihb.page {
         private panelChangeHandler(value: number) {
             let maxValue = this._viewUI.panel_hb.vScrollBar.max;
             if (value >= maxValue) {
-                this._drage = false;
+                this.drage = false;
             }
         }
 
-        private _drage: boolean = false;
+        public drage: boolean = false;
         private panelMouseHandle(e: LEvent): void {
             let maxValue = this._viewUI.panel_hb.vScrollBar.max;
             let value = this._viewUI.panel_hb.vScrollBar.value;
-            logd("===============", maxValue, value);
             switch (e.type) {
                 case LEvent.MOUSE_DOWN:
-                    this._drage = true;
+                    this.drage = true;
                     //中途阻断缓动操作
                     this._isClickDrag = false;
                     break
                 case LEvent.MOUSE_UP:
                     if (value >= maxValue) {
-                        this._drage = false;
+                        this.drage = false;
                     } else {
-                        this._drage = true;
-                        logd("this._drage ", this._isPanleSlide, this._isClickDrag, maxValue, value);
+                        this.drage = true;
                     }
                     break
             }
@@ -385,14 +380,14 @@ module gamewxsaoleihb.page {
                 this._viewUI.box_down.bottom = 87;
                 this._viewUI.panel_hb.bottom = this._viewUI.box_di1.bottom + this._viewUI.box_di1.height;
             }
-            if (!this._drage) {
+            if (!this.drage) {
                 this.panelSlide();
             }
         }
 
         //更新玩家数据
         updateMainInfo(): void {
-            if (!this._mainPlayer) return;
+            if (!this._mainUnit) return;
             //冻结
             let dj_money = 0;
             let pfData
@@ -405,9 +400,9 @@ module gamewxsaoleihb.page {
                 let cur_hb_data: any = this._wxSaoLeiMgr.hbData[index];
                 if (!cur_hb_data || cur_hb_data.hb_state == WxSaoLeiHBMgr.HB_STATE_END) continue;
                 dj_money += pf_money;
-            }
-            let mainPlayerInfo = this._mainPlayer.playerInfo;
-            this._viewUI.lb_ye.text = StringU.substitute("余额：{0}", (mainPlayerInfo.money - dj_money).toFixed(2));
+            };
+            let money = this._mainUnit.GetMoney()
+            this._viewUI.lb_ye.text = StringU.substitute("余额：{0}", (money - dj_money).toFixed(2));
             this._viewUI.lb_dj.text = StringU.substitute("冻结：{0}", (dj_money).toFixed(2));
         }
 
@@ -458,8 +453,8 @@ module gamewxsaoleihb.page {
                     }
                     //判断赔付钱数是否足够
                     let pf_money = this._wxSaoLeiMgr.GetPFMoneyByData(this._curHbData);
-                    if (!this._mainPlayer) return;
-                    if (this._mainPlayer.playerInfo.money < pf_money) {
+                    if (!this._mainUnit) return;
+                    if (this._mainUnit.GetMoney() < pf_money) {
                         this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_YEBZ);
                         this._viewUI.box_hb_open.visible = false;
                         return
@@ -501,13 +496,11 @@ module gamewxsaoleihb.page {
                     this._isClickDrag = true;
                     let maxValue = this._viewUI.panel_hb.vScrollBar.max;
                     let curValue = this._viewUI.panel_hb.vScrollBar.value;
-                    this._isPanleSlide = true;
                     if (curValue < maxValue) {
                         Laya.Tween.clearAll(this._viewUI.panel_hb.vScrollBar);
                         Laya.Tween.to(this._viewUI.panel_hb.vScrollBar, { value: maxValue }, 700, null, new Handler(this, () => {
                             this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
-                            this._isPanleSlide = false;
-                            this._drage = false;
+                            this.drage = false;
                             this._isClickDrag = false;
                         }));
                     }
@@ -635,7 +628,7 @@ module gamewxsaoleihb.page {
                     }
                 }
             }
-            if (!this._drage) {
+            if (!this.drage) {
                 this.panelSlide();
             }
         }
@@ -667,7 +660,7 @@ module gamewxsaoleihb.page {
                 this.addHB(hb_info, false, WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO, WxSaoLeiHBMapPage.EXTRA_TYPE_SPECIAL_REWARD, lq_data);
                 isAdd = true;
             }
-            if (!this._drage && isAdd) {
+            if (!this.drage && isAdd) {
                 this.panelSlide();
             }
         }
@@ -764,7 +757,7 @@ module gamewxsaoleihb.page {
                 }
             }
             this._hbUIY -= diffY;
-            if (!this._drage) {
+            if (!this.drage) {
                 this.panelSlide();
             }
         }
@@ -942,8 +935,8 @@ module gamewxsaoleihb.page {
         //领取红包
         private onBtnLQ(e: LEvent): void {
             if (!this._data) return;
+            this._page.drage = false;
             let is_opt = this._wxsaoleihbMgr.isOptHBById(this._data.hb_id);
-            logd("-------------------------")
             if (this._data.hb_state == WxSaoLeiHBMgr.HB_STATE_END) {
                 //红包已领完
                 if (is_opt) {
@@ -1048,6 +1041,7 @@ module gamewxsaoleihb.page {
         //领取红包
         private onBtnLQ(): void {
             if (!this._data) return;
+            this._page.drage = false;
             this._page.initHBGetUI(WxSaoLeiHBMapPage.TYPE_NO_OPT_HB, this._data);
         }
     }
