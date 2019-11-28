@@ -158,7 +158,7 @@ module gamewxsaoleihb.page {
             if (cur_value < maxValue) {
                 Laya.Tween.clearAll(this._viewUI.panel_hb.vScrollBar);
                 Laya.Tween.to(this._viewUI.panel_hb.vScrollBar, { value: maxValue }, 200, null, new Handler(this, () => {
-                    this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
+                    // this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
                 }));
             }
         }
@@ -712,7 +712,7 @@ module gamewxsaoleihb.page {
 
         //找出最远一位自己没有操作过的红包数据，清除掉
         checkHbArrUI(): void {
-            if (this._arrHB && this._arrHB.length > 50) {
+            if (this._arrHB && this.getCountHbNum() > 50) {
                 for (let i = 0; i < this._arrHB.length; i++) {
                     let cur_hb_ui = this._arrHB[i];
                     //经过筛选,干掉一个就行
@@ -747,6 +747,20 @@ module gamewxsaoleihb.page {
             }
         }
 
+        //计算当前红包存在数量
+        getCountHbNum(): number {
+            let count = 0;
+            for (let i = 0; i < this._arrHB.length; i++) {
+                let cur_hb_ui = this._arrHB[i];
+                if (cur_hb_ui instanceof HBInfo) {
+                    continue;
+                } else {
+                    count++;
+                }
+            }
+            return count;
+        }
+
         //移除红包
         removeHB(index: any) {
             let removeUiHB = this._arrHB[index];
@@ -765,9 +779,9 @@ module gamewxsaoleihb.page {
                     curUiHB.y = curUiHB.y - diffY;
                 }
             }
-            this._hbUIY -= diffY;
             let cur_value = this._viewUI.panel_hb.vScrollBar.value;
             this._viewUI.panel_hb.vScrollBar.value = cur_value - diffY;
+            this._hbUIY -= diffY;
             if (!this.drage) {
                 this.panelSlide();
             }
