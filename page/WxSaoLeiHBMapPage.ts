@@ -166,25 +166,26 @@ module gamewxsaoleihb.page {
         private panelChangeHandler(value: number) {
             let maxValue = this._viewUI.panel_hb.vScrollBar.max;
             if (value >= maxValue) {
-                this.drage = false;
+                this.isDrage = false;
             }
         }
 
-        public drage: boolean = false;
+        //是否处于拖动中
+        public isDrage: boolean = false;
         private panelMouseHandle(e: LEvent): void {
             let maxValue = this._viewUI.panel_hb.vScrollBar.max;
             let value = this._viewUI.panel_hb.vScrollBar.value;
             switch (e.type) {
                 case LEvent.MOUSE_DOWN:
-                    this.drage = true;
+                    this.isDrage = true;
                     //中途阻断缓动操作
                     this._isClickDrag = false;
                     break
                 case LEvent.MOUSE_UP:
                     if (value >= maxValue) {
-                        this.drage = false;
+                        this.isDrage = false;
                     } else {
-                        this.drage = true;
+                        this.isDrage = true;
                     }
                     break
             }
@@ -381,7 +382,7 @@ module gamewxsaoleihb.page {
                 this._viewUI.box_down.bottom = 87;
                 this._viewUI.panel_hb.bottom = this._viewUI.box_di1.bottom + this._viewUI.box_di1.height;
             }
-            if (!this.drage) {
+            if (!this.isDrage) {
                 this.panelSlide();
             }
         }
@@ -509,7 +510,7 @@ module gamewxsaoleihb.page {
                         Laya.Tween.clearAll(this._viewUI.panel_hb.vScrollBar);
                         Laya.Tween.to(this._viewUI.panel_hb.vScrollBar, { value: maxValue }, 700, null, new Handler(this, () => {
                             this._viewUI.panel_hb.vScrollBar.value = this._viewUI.panel_hb.vScrollBar.max;
-                            this.drage = false;
+                            this.isDrage = false;
                             this._isClickDrag = false;
                         }));
                     }
@@ -637,7 +638,7 @@ module gamewxsaoleihb.page {
                     }
                 }
             }
-            if (!this.drage) {
+            if (!this.isDrage) {
                 this.panelSlide();
             }
         }
@@ -669,7 +670,7 @@ module gamewxsaoleihb.page {
                 this.addHB(hb_info, false, WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO, WxSaoLeiHBMapPage.EXTRA_TYPE_SPECIAL_REWARD, lq_data);
                 isAdd = true;
             }
-            if (!this.drage && isAdd) {
+            if (!this.isDrage && isAdd) {
                 this.panelSlide();
             }
         }
@@ -779,10 +780,10 @@ module gamewxsaoleihb.page {
                     curUiHB.y = curUiHB.y - diffY;
                 }
             }
+            this._hbUIY -= diffY;
             let cur_value = this._viewUI.panel_hb.vScrollBar.value;
             this._viewUI.panel_hb.vScrollBar.value = cur_value - diffY;
-            this._hbUIY -= diffY;
-            if (!this.drage) {
+            if (!this.isDrage) {
                 this.panelSlide();
             }
         }
@@ -960,7 +961,7 @@ module gamewxsaoleihb.page {
         //领取红包
         private onBtnLQ(e: LEvent): void {
             if (!this._data) return;
-            this._page.drage = false;
+            this._page.isDrage = false;
             let is_opt = this._wxsaoleihbMgr.isOptHBById(this._data.hb_id);
             if (this._data.hb_state == WxSaoLeiHBMgr.HB_STATE_END) {
                 //红包已领完
@@ -1066,7 +1067,7 @@ module gamewxsaoleihb.page {
         //领取红包
         private onBtnLQ(): void {
             if (!this._data) return;
-            this._page.drage = false;
+            this._page.isDrage = false;
             this._page.initHBGetUI(WxSaoLeiHBMapPage.TYPE_NO_OPT_HB, this._data);
         }
     }
