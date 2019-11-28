@@ -20,7 +20,6 @@ module gamewxsaoleihb.manager {
 		public static readonly MAP_HB_LQ_MSG = "WxSaoLeiHBMgr.MAP_HB_LQ_MSG";//红包领取数据消息
 		public static readonly PF_INFO_UPDATE = "WxSaoLeiHBMgr.PF_INFO_UPDATE";	//赔付数据修改
 		public static readonly HB_TIME: number = 90;	//红包持续时间
-		public static readonly HB_RAIN_TIME: number = 30;	//红包雨持续时间
 
 		public static readonly HB_STATE_ING: number = 1;
 		public static readonly HB_STATE_END: number = 2;
@@ -355,6 +354,22 @@ module gamewxsaoleihb.manager {
 				leiDianNum = 1;
 			}
 			return leiDianNum
+		}
+
+		//获取冻结的金钱
+		getDJMoney(): number {
+			let dj_money = 0;
+			for (let i = 0; i < this.pf_data.length; i++) {
+				let pfData = this.pf_data[i];
+				if (!pfData) continue;
+				let hb_id = pfData.hb_id;
+				let pf_money = pfData.pf_money;
+				let index = this.findHBDataIndexById(hb_id);
+				let cur_hb_data: any = this.hbData[index];
+				if (!cur_hb_data || cur_hb_data.hb_state == WxSaoLeiHBMgr.HB_STATE_END) continue;
+				dj_money += pf_money;
+			};
+			return dj_money;
 		}
 
 		clear(fource?: boolean) {

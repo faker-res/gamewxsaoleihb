@@ -11,6 +11,7 @@ module gamewxsaoleihb.page {
         zhonglei: "zhonglei.mp3",   //中雷音效
     }
     export class WxSaoLeiHBMapPage extends game.gui.base.Page {
+        private static HB_MAX_NUM: number = 50;          //现存最大红包数
         private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLeiUI;
         private _arrHB: Array<any> = [];    //红包UI
         private _wxSaoLeiMgr: WxSaoLeiHBMgr;
@@ -391,18 +392,7 @@ module gamewxsaoleihb.page {
         updateMainInfo(): void {
             if (!this._mainUnit) return;
             //冻结
-            let dj_money = 0;
-            let pfData
-            for (let i = 0; i < this._wxSaoLeiMgr.pf_data.length; i++) {
-                let pfData = this._wxSaoLeiMgr.pf_data[i];
-                if (!pfData) continue;
-                let hb_id = pfData.hb_id;
-                let pf_money = pfData.pf_money;
-                let index = this._wxSaoLeiMgr.findHBDataIndexById(hb_id);
-                let cur_hb_data: any = this._wxSaoLeiMgr.hbData[index];
-                if (!cur_hb_data || cur_hb_data.hb_state == WxSaoLeiHBMgr.HB_STATE_END) continue;
-                dj_money += pf_money;
-            };
+            let dj_money = this._wxSaoLeiMgr.getDJMoney();
             let money = this._mainUnit.GetMoney()
             this._viewUI.lb_ye.text = StringU.substitute("余额：{0}", (money - dj_money).toFixed(2));
             this._viewUI.lb_dj.text = StringU.substitute("冻结：{0}", (dj_money).toFixed(2));
@@ -622,12 +612,12 @@ module gamewxsaoleihb.page {
                     }
                 } else if (type == GlobalDef.WXSAOLEI_HB_REMOVE) {
                     //移除
-                    for (let key in hb_info) {
-                        if (hb_info.hasOwnProperty(key)) {
-                            let cur_hb_data = hb_info[key];
-                            this.removeHB(hb_info);
-                        }
-                    }
+                    // for (let key in hb_info) {
+                    //     if (hb_info.hasOwnProperty(key)) {
+                    //         let cur_hb_data = hb_info[key];
+                    //         this.removeHB(hb_info);
+                    //     }
+                    // }
                 } else if (type == GlobalDef.WXSAOLEI_HB_UPDATE) {
                     //红包更新
                     for (let key in hb_info) {
@@ -641,6 +631,8 @@ module gamewxsaoleihb.page {
             if (!this.isDrage) {
                 this.panelSlide();
             }
+            //检测红包 显示最多不能超过10个
+            this.checkHbArrUI();
         }
 
         //领取信息
@@ -707,13 +699,11 @@ module gamewxsaoleihb.page {
             this._viewUI.panel_hb.addChild(uiHb);
             this._hbUIY += uiHb.height + this._diffY;
             this._arrHB.push(uiHb);
-            //检测红包 显示最多不能超过10个
-            this.checkHbArrUI();
         }
 
         //找出最远一位自己没有操作过的红包数据，清除掉
         checkHbArrUI(): void {
-            if (this._arrHB && this.getCountHbNum() > 50) {
+            if (this._arrHB && this.getCountHbNum() > WxSaoLeiHBMapPage.HB_MAX_NUM) {
                 for (let i = 0; i < this._arrHB.length; i++) {
                     let cur_hb_ui = this._arrHB[i];
                     //经过筛选,干掉一个就行
@@ -764,10 +754,12 @@ module gamewxsaoleihb.page {
 
         //移除红包
         removeHB(index: any) {
-            let removeUiHB = this._arrHB[index];
+            let removeUiHB: any = this._arrHB[index];
             let startRemoveY: number = removeUiHB.y;
             let height: number = removeUiHB.height;
             removeUiHB.removeSelf();
+            removeUiHB.destroy();
+            removeUiHB = null;
             this._arrHB.splice(index, 1);
             //在调整在它之后的所有的位置
             let diffY: number = 0;
@@ -980,6 +972,11 @@ module gamewxsaoleihb.page {
                 }
             }
         }
+
+        destroy() {
+            this.box_main.off(LEvent.CLICK, this, this.onBtnLQ);
+            super.destroy();
+        }
     }
     class HBRight extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_HB2UI {
         private _game: Game;
@@ -1069,6 +1066,11 @@ module gamewxsaoleihb.page {
             if (!this._data) return;
             this._page.isDrage = false;
             this._page.initHBGetUI(WxSaoLeiHBMapPage.TYPE_NO_OPT_HB, this._data);
+        }
+
+        destroy() {
+            this.box_main.off(LEvent.CLICK, this, this.onBtnLQ);
+            super.destroy();
         }
     }
     class HBInfo extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_getUI {
@@ -1242,6 +1244,11 @@ module gamewxsaoleihb.page {
             this.img_di.size(width, height);
             // this.lb_info.size(this.lb_info.width, this.lb_info.height);
             TextFieldU.setHtmlText(this.lb_info, info, false);//支持HTML
+        }
+
+        destroy() {
+            TextFieldU.setHtmlText(this.lb_info, "", false);
+            super.destroy();
         }
     }
 }

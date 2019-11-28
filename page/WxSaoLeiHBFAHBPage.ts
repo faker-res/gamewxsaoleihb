@@ -111,7 +111,6 @@ module gamewxsaoleihb.page {
 		}
 
 		private onFoucs(): void {
-			logd("==========");
 			this.changeText();
 			if (this._viewUI.txtInput.text == "发包金额")
 				this._viewUI.txtInput.text = "";
@@ -148,7 +147,9 @@ module gamewxsaoleihb.page {
 			for (let i = 0; i < WxSaoLeiHBMgr.LEI_MAX_NUM; i++) {
 				this._viewUI["btn_" + i].on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			}
-			let money: number = this._mainUnit.GetMoney();
+			//主玩家身上的钱，在加上冻结的钱
+			let dj_money = this._wxSaoLeiMgr.getDJMoney();
+			let money: number = this._mainUnit.GetMoney() - dj_money;
 			this._viewUI.lb_ye.text = money.toFixed(2);
 			//红包发放范围
 			this._mapinfo = this._game.sceneObjectMgr.mapInfo as WxSaoLeiHBMapInfo;
