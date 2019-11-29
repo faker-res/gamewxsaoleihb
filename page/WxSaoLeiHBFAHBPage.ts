@@ -254,7 +254,8 @@ module gamewxsaoleihb.page {
 					//造假数据
 					let leiDianStr = this.changeLeiDianToStr();
 					if (!this._mainUnit) return;
-					if (this._mainUnit.GetMoney() < this._money) {
+					let dj_money = this._wxSaoLeiMgr.getDJMoney();
+					if (this._mainUnit.GetMoney() - dj_money < this._money) {
 						this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_YEBZ);
 						this.close();
 						return

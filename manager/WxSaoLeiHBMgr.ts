@@ -453,6 +453,11 @@ module gamewxsaoleihb.manager {
 					index--;
 				}
 			}
+			//红包雨时间结束,如果此时开启红包雨界面还存在的话,就关掉它
+			let page: gamewxsaoleihb.page.WxSaoLeiHBMapPage = this._game.uiRoot.HUD.getPage(WxsaoleihbPageDef.PAGE_WXSLHB_MAP) as gamewxsaoleihb.page.WxSaoLeiHBMapPage;
+			if (page) {
+				page.rainPageOnClose();
+			}
 		}
 
 		//点击领取福利红包

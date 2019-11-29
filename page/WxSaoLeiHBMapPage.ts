@@ -11,7 +11,7 @@ module gamewxsaoleihb.page {
         zhonglei: "zhonglei.mp3",   //中雷音效
     }
     export class WxSaoLeiHBMapPage extends game.gui.base.Page {
-        private static HB_MAX_NUM: number = 50;          //现存最大红包数
+        private static HB_MAX_NUM: number = 40;          //现存最大红包数
         private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLeiUI;
         private _arrHB: Array<any> = [];    //红包UI
         private _wxSaoLeiMgr: WxSaoLeiHBMgr;
@@ -227,6 +227,15 @@ module gamewxsaoleihb.page {
             this._viewUI.btn_di1.on(LEvent.CLICK, this, this.onBtnClick);
             this._viewUI.btn_di2.on(LEvent.CLICK, this, this.onBtnClick);
             this._viewUI.finsh_check.on(LEvent.CLICK, this, this.onBtnClick);
+        }
+
+        //红包雨关闭
+        public rainPageOnClose(): void {
+            if (this._viewUI.box_hb_open.visible) {
+                if (this._viewUI.hb_rain.visible) {
+                    this._viewUI.box_hb_open.visible = false;
+                }
+            }
         }
 
         //重置UI状态
@@ -631,8 +640,7 @@ module gamewxsaoleihb.page {
             if (!this.isDrage) {
                 this.panelSlide();
             }
-            //检测红包 显示最多不能超过10个
-            this.checkHbArrUI();
+
         }
 
         //领取信息
@@ -699,6 +707,8 @@ module gamewxsaoleihb.page {
             this._viewUI.panel_hb.addChild(uiHb);
             this._hbUIY += uiHb.height + this._diffY;
             this._arrHB.push(uiHb);
+            //检测红包 显示最多不能超过指定数量
+            this.checkHbArrUI();
         }
 
         //找出最远一位自己没有操作过的红包数据，清除掉
