@@ -302,7 +302,7 @@ module gamewxsaoleihb.page {
 
 		private onBtnClick(): void {
 			//点击查看红包详情,这里走后台
-			this._page.getDataInfo(this._data.hb_data.hb_id.toString(), WxsaoleihbPageDef.GAME_NAME, this._data.hb_data.create_time);
+			this._page.getDataInfo(this._data.hb_data.hb_id_str.toString(), WxsaoleihbPageDef.GAME_NAME, this._data.hb_data.create_time);
 		}
 	}
 }

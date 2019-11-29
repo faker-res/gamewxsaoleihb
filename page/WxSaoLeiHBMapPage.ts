@@ -37,6 +37,7 @@ module gamewxsaoleihb.page {
                 Path_game_wxSaoLeiHB.atlas_game_ui + "guize.atlas",
                 Path_game_wxSaoLeiHB.atlas_game_ui + "hud.atlas",
                 Path_game_wxSaoLeiHB.atlas_game_ui + "saolei.atlas",
+                Path_game_wxSaoLeiHB.atlas_game_ui + "xz.atlas",
             ];
         }
 
@@ -81,20 +82,7 @@ module gamewxsaoleihb.page {
             this._wxSaoLeiMgr.on(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, this, this.openHBInfoPage);  //红包领取数据详情
             this._wxSaoLeiMgr.on(WxSaoLeiHBMgr.MAP_HB_LQ_MSG, this, this.updateLqMsg);  //红包领取消息
             this._wxSaoLeiMgr.on(WxSaoLeiHBMgr.PF_INFO_UPDATE, this, this.updateMainInfo);
-            this._viewUI.box_hb_rain.visible = false;
-            //初始化所有的红包
-            Laya.timer.frameOnce(1, this, () => {
-                this.updateHBdata(GlobalDef.WXSAOLEI_HB_TOTAL, null);
-            });
-            this._viewUI.mouseThrough = true;
-            //初始房间名字
-            this._mapLv = this._wxSaoLeiMapInfo.GetMapLevel();
-            let index = WxSaoLeiHBMgr.ALL_GAME_ROOM_CONFIG_ID.indexOf(this._mapLv);
-            if (index < 0) index = 0;
-            this._viewUI.lb_map_name.text = WxSaoLeiHBMgr.GMAE_ROOME_NAME[index];
-            Laya.timer.frameOnce(1, this, () => {
-                this.checkHbRain();
-            })
+
             this._game.network.addHanlder(Protocols.SMSG_OPERATION_FAILED, this, this.onOptHandler);
             this._game.sceneGame.sceneObjectMgr.on(SceneObjectMgr.EVENT_PLAYER_INFO_UPDATE, this, this.updateMainInfo);
             this._game.datingGame.on(DatingGame.EVENT_APP_CLOSE_CALLBACK, this, this.appClose);
@@ -141,6 +129,7 @@ module gamewxsaoleihb.page {
 
         private checkHbRain() {
             //进来的时候 是否处于红包雨时间
+            if (!this._wxSaoLeiMapInfo || !this._mainUnit) return;
             let rain_time = this._wxSaoLeiMapInfo.GetYuChaoLaiQiTime()
             let rain_end_time = this._wxSaoLeiMapInfo.GetTouPiaoTime()
             let rain_lq_time = this._mainUnit.GetCurChip();
@@ -204,6 +193,20 @@ module gamewxsaoleihb.page {
         // 页面打开时执行函数
         protected onOpen(): void {
             super.onOpen();
+            this._viewUI.box_hb_rain.visible = false;
+            //初始化所有的红包
+            Laya.timer.frameOnce(1, this, () => {
+                this.updateHBdata(GlobalDef.WXSAOLEI_HB_TOTAL, null);
+            });
+            this._viewUI.mouseThrough = true;
+            //初始房间名字
+            this._mapLv = this._wxSaoLeiMapInfo.GetMapLevel();
+            let index = WxSaoLeiHBMgr.ALL_GAME_ROOM_CONFIG_ID.indexOf(this._mapLv);
+            if (index < 0) index = 0;
+            this._viewUI.lb_map_name.text = WxSaoLeiHBMgr.GMAE_ROOME_NAME[index];
+            Laya.timer.frameOnce(1, this, () => {
+                this.checkHbRain();
+            })
             this.updateViewUI();
 
             this.updateMainInfo();

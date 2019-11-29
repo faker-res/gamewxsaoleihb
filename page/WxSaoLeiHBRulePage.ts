@@ -44,10 +44,10 @@ module gamewxsaoleihb.page {
 					let diff = 56
 					//有刘海
 					this._viewUI.img_up.height = 100 + diff;
-					this._viewUI.panel_inner.top = 115 + diff;
+					this._viewUI.panel_inner.top = 95 + diff;
 				} else {
 					this._viewUI.img_up.height = 100;
-					this._viewUI.panel_inner.top = 115;
+					this._viewUI.panel_inner.top = 95;
 				}
 				this._defaultSoundPath = Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.btn;
 				if (this._viewUI) {
