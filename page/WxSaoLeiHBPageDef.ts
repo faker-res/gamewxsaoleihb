@@ -57,6 +57,7 @@ module gamewxsaoleihb.page {
 				Path_game_wxSaoLeiHB.atlas_game_ui + "guize.atlas",
 				Path_game_wxSaoLeiHB.atlas_game_ui + "hud.atlas",
 				Path_game_wxSaoLeiHB.atlas_game_ui + "saolei.atlas",
+				Path_game_wxSaoLeiHB.atlas_game_ui + "xz.atlas",
 			]
 
 			if (WebConfig.needMusicPreload) {

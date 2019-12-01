@@ -76,6 +76,7 @@ module gamewxsaoleihb.page {
 		//打开红包记录界面
 		private openHbJL(): void {
 			this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_JL);
+			this.close();
 		}
 
 		private _hbData: any
