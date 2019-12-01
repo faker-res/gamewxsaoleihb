@@ -138,9 +138,10 @@ module gamewxsaoleihb.page {
 
         private checkHbRain() {
             //进来的时候 是否处于红包雨时间
+            let continue_start_time = this._wxSaoLeiMapInfo.GetYuChaoLaiQiTime()
             let continue_end_time = this._wxSaoLeiMapInfo.GetTouPiaoTime()
             let rain_lq_time = this._mainUnit.GetCurChip();
-            if (continue_end_time > this._game.sync.serverTimeBys && !this._wxSaoLeiMgr.isHbRain) {
+            if (this._game.sync.serverTimeBys >= continue_start_time && this._game.sync.serverTimeBys < continue_end_time && !this._wxSaoLeiMgr.isHbRain) {
                 //红包雨中途进入，处于红包雨时间，并且还未领取过的,领取的时间大于红包雨持续结束时间
                 if (!rain_lq_time || rain_lq_time <= 0 || continue_end_time - rain_lq_time > WxSaoLeiHBMgr.HB_RAIN_TIME) {
                     this._wxSaoLeiMgr.showHBRain(continue_end_time, this._viewUI.box_hb_rain);
