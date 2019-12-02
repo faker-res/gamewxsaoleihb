@@ -691,16 +691,16 @@ module gamewxsaoleihb.page {
             switch (type) {
                 case WxSaoLeiHBMapPage.MAIN_HB:
                     if (!isSelf) {
-                        uiHb = new HBLeft();
+                        uiHb = ObjectPools.malloc(HBLeft) as HBLeft;
                         uiHb.left = 40;
                     } else {
-                        uiHb = new HBRight();
+                        uiHb = ObjectPools.malloc(HBRight) as HBRight;
                         uiHb.right = 40;
                     }
                     break
                 case WxSaoLeiHBMapPage.MAIN_HB_LQ_INFO:
                     if (extraType == 0 && !lq_data) return;
-                    uiHb = new HBInfo(extraType, lq_data);
+                    uiHb = new HBInfo(extraType, lq_data) //ObjectPools.malloc(HBInfo, [extraType, lq_data]) as HBInfo;
                     uiHb.left = 100;
                     uiHb.right = 100;
                     break
@@ -718,35 +718,28 @@ module gamewxsaoleihb.page {
         checkHbArrUI(): void {
             if (this._arrHB && this.getCountHbNum() > WxSaoLeiHBMapPage.HB_MAX_NUM) {
                 for (let i = 0; i < this._arrHB.length; i++) {
-                    let cur_hb_ui = this._arrHB[i];
-                    //经过筛选,干掉一个就行
-                    //自己的信息不能干掉
-                    let hb_data = cur_hb_ui._data;
                     let removeUiHB = this._arrHB[i];
+                    let hb_data = removeUiHB._data;
+                    //找出最新的红包数据
+                    let new_hb_data = this._wxSaoLeiMgr.findHBDataById(hb_data.hb_id);
                     if (removeUiHB instanceof HBInfo) {
                         //信息要拿到最新的红包数据
-                        let new_hb_data = this._wxSaoLeiMgr.findHBDataById(hb_data.hb_id);
-                        if (new_hb_data && new_hb_data.hb_state == WxSaoLeiHBMgr.HB_STATE_ING) {
+                        if ((new_hb_data && new_hb_data.hb_state == WxSaoLeiHBMgr.HB_STATE_ING) || i != 0) {
+                            //中间的信息条不能删，因为会出现空
                             continue;
                         }
                     } else {
                         //状态未结束的也不能删
-                        if (hb_data.hb_state == WxSaoLeiHBMgr.HB_STATE_ING) continue;
+                        if (new_hb_data.hb_state == WxSaoLeiHBMgr.HB_STATE_ING) {
+                            continue;
+                        }
                     }
-                    //首先是不是自己的红包
-                    // if (hb_data && hb_data.uid == this._mainUid) continue;
-                    // //其次是不是领取过的红包
-                    // let is_opt = false;
-                    // for (let k = 0; k < this._wxSaoLeiMgr.self_hb_lqjl.length; k++) {
-                    //     let cur_lq_data = this._wxSaoLeiMgr.self_hb_lqjl[k];
-                    //     if (cur_lq_data.hb_id == hb_data.hb_id) {
-                    //         is_opt = true;
-                    //         break
-                    //     }
-                    // }
-                    // if (is_opt) continue;
                     this.removeHB(i);
-                    break
+                    if (this.getCountHbNum() <= WxSaoLeiHBMapPage.HB_MAX_NUM - 5) {
+                        //如果删除数量差值大于就不删了
+                        break
+                    }
+                    i--
                 }
             }
         }
@@ -770,9 +763,13 @@ module gamewxsaoleihb.page {
             let removeUiHB: any = this._arrHB[index];
             let startRemoveY: number = removeUiHB.y;
             let height: number = removeUiHB.height;
-            removeUiHB.removeSelf();
-            removeUiHB.destroy();
-            removeUiHB = null;
+            //进池
+            if (removeUiHB instanceof HBInfo) {
+                removeUiHB.removeSelf();
+                removeUiHB.destroy()
+            } else {
+                ObjectPools.free(removeUiHB);
+            }
             this._arrHB.splice(index, 1);
             //在调整在它之后的所有的位置
             let diffY: number = 0;
@@ -879,7 +876,7 @@ module gamewxsaoleihb.page {
         }
     }
 
-    class HBLeft extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_HB1UI {
+    class HBLeft extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_HB1UI implements IPoolsObject {
         private _game: Game;
         private _data: any;
         private _player: PlayerData;
@@ -889,6 +886,21 @@ module gamewxsaoleihb.page {
         constructor() {
             super();
         }
+
+        poolName: string = "HBLeft";
+		/**
+		 * 进池 （相当于对象dispose函数）
+		 */
+        intoPool(...arg: any[]): void {
+            this.dispose();
+        }
+		/**
+		 * 出池 （相当于对象初始化函数）
+		 */
+        outPool(...arg: any[]): void {
+
+        }
+
         setData(page: WxSaoLeiHBMapPage, game: Game, data: any) {
             this._data = data;
             if (!data) return;
@@ -986,12 +998,16 @@ module gamewxsaoleihb.page {
             }
         }
 
+        private dispose() {
+            this.destroy();
+        }
+
         destroy() {
             this.box_main.off(LEvent.CLICK, this, this.onBtnLQ);
-            super.destroy();
+            this.removeSelf();
         }
     }
-    class HBRight extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_HB2UI {
+    class HBRight extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_HB2UI implements IPoolsObject {
         private _game: Game;
         private _data: any;
         private _player: PlayerData;
@@ -999,6 +1015,19 @@ module gamewxsaoleihb.page {
         private _page: WxSaoLeiHBMapPage;
         constructor() {
             super();
+        }
+        poolName: string = "HBRight";
+		/**
+		 * 进池 （相当于对象dispose函数）
+		 */
+        intoPool(...arg: any[]): void {
+            this.dispose();
+        }
+		/**
+		 * 出池 （相当于对象初始化函数）
+		 */
+        outPool(...arg: any[]): void {
+
         }
         setData(page: WxSaoLeiHBMapPage, game: Game, data: any) {
             this._data = data;
@@ -1081,9 +1110,13 @@ module gamewxsaoleihb.page {
             this._page.initHBGetUI(WxSaoLeiHBMapPage.TYPE_NO_OPT_HB, this._data);
         }
 
+        private dispose() {
+            this.destroy();
+        }
+
         destroy() {
             this.box_main.off(LEvent.CLICK, this, this.onBtnLQ);
-            super.destroy();
+            this.removeSelf();
         }
     }
     class HBInfo extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_getUI {
@@ -1097,6 +1130,19 @@ module gamewxsaoleihb.page {
             this._extraType = extraType;
             this._lq_data = lq_data;
         }
+        // poolName: string = "HBInfo";
+        // /**
+        //  * 进池 （相当于对象dispose函数）
+        //  */
+        // intoPool(...arg: any[]): void {
+        //     this.dispose();
+        // }
+        // /**
+        //  * 出池 （相当于对象初始化函数）
+        //  */
+        // outPool(...arg: any[]): void {
+
+        // }
         setData(page: WxSaoLeiHBMapPage, game: Game, data: any) {
             if (!data) return;
             this._data = data;
@@ -1259,9 +1305,15 @@ module gamewxsaoleihb.page {
             TextFieldU.setHtmlText(this.lb_info, info, false);//支持HTML
         }
 
+        private dispose() {
+            this.destroy();
+        }
+
         destroy() {
-            TextFieldU.setHtmlText(this.lb_info, "", false);
-            super.destroy();
+            this._data = null
+            this._lq_data = null
+            this._extraType = -1
+            this.removeSelf();
         }
     }
 }
