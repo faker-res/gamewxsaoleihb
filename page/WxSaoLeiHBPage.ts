@@ -92,15 +92,15 @@ module gamewxsaoleihb.page {
 				case this._viewUI.img_room2://0.1元场
 					this.checkMoneyToStory(Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_3);
 					break;
-				case this._viewUI.btn_join:
-					let maplv = TongyongUtil.getJoinMapLv(WxsaoleihbPageDef.GAME_NAME, mainPlayer.playerInfo.money);
-					if (!maplv) return;
-					this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_FZTS, (page: WxSaoLeiHBFZTSPage) => {
-						page.isInner = false;
-					}, () => {
-						this._game.sceneObjectMgr.intoStory(WxsaoleihbPageDef.GAME_NAME, maplv.toString(), true);
-					})
-					break;
+				// case this._viewUI.btn_join:
+				// 	let maplv = TongyongUtil.getJoinMapLv(WxsaoleihbPageDef.GAME_NAME, mainPlayer.playerInfo.money);
+				// 	if (!maplv) return;
+				// 	this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_FZTS, (page: WxSaoLeiHBFZTSPage) => {
+				// 		page.isInner = false;
+				// 	}, () => {
+				// 		this._game.sceneObjectMgr.intoStory(WxsaoleihbPageDef.GAME_NAME, maplv.toString(), true);
+				// 	})
+				// 	break;
 			}
 		}
 
