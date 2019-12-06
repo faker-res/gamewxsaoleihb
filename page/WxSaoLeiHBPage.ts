@@ -54,7 +54,7 @@ module gamewxsaoleihb.page {
 		protected onOpen(): void {
 			super.onOpen();
 			this._game.playMusic(Path_game_wxSaoLeiHB.music_wxsaoleihb + "back.mp3");
-			(this._viewUI.view_hud as TongyongHudNqpPage).onOpen(this._game, WxsaoleihbPageDef.GAME_NAME);
+			(this._viewUI.view_hud as TongyongHudPage).onOpen(this._game, WxsaoleihbPageDef.GAME_NAME);
 			//按钮监听
 			this._viewUI.img_room0.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.img_room1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
