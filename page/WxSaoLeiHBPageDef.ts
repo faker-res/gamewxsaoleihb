@@ -52,7 +52,6 @@ module gamewxsaoleihb.page {
 				PathGameTongyong.atlas_game_ui_tongyong + "logo.atlas",
 				PathGameTongyong.atlas_game_ui_tongyong + "general.atlas",
 				PathGameTongyong.atlas_game_ui_tongyong + "touxiang.atlas",
-				PathGameTongyong.atlas_game_ui_tongyong + "tuichu.atlas",
 				DatingPath.atlas_dating_ui + "qifu.atlas",
 				Path_game_wxSaoLeiHB.atlas_game_ui + "guize.atlas",
 				Path_game_wxSaoLeiHB.atlas_game_ui + "hud.atlas",
