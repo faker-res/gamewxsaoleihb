@@ -28,11 +28,12 @@ module gamewxsaoleihb.page {
             this._delta = 1000;
             this._defaultSoundPath = Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.btn;
             this._asset = [
+                DatingPath.atlas_dating_ui + "qifu.atlas",
                 PathGameTongyong.atlas_game_ui_tongyong + "hud.atlas",
                 PathGameTongyong.atlas_game_ui_tongyong + "pai.atlas",
                 PathGameTongyong.atlas_game_ui_tongyong + "general.atlas",
                 PathGameTongyong.atlas_game_ui_tongyong + "touxiang.atlas",
-                DatingPath.atlas_dating_ui + "qifu.atlas",
+                PathGameTongyong.atlas_game_ui_tongyong + "qifu.atlas",
                 Path_game_wxSaoLeiHB.atlas_game_ui + "guize.atlas",
                 Path_game_wxSaoLeiHB.atlas_game_ui + "hud.atlas",
                 Path_game_wxSaoLeiHB.atlas_game_ui + "saolei.atlas",
