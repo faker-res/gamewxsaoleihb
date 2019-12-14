@@ -5,7 +5,7 @@ module gamewxsaoleihb.page {
 	export class WxSaoLeiHBRoomInfoPage extends game.gui.base.Page {
 		private static TYPE_ROOM_INFO: number = 1;
 		private static TYPE_PLAYER_INFO: number = 2;
-		private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLei_GDUI;
+		private _viewUI: ui.ajqp.game_ui.wxsaoleihb.WXSaoLei_GDUI;
 		private _wxSaoLeiMapInfo: WxSaoLeiHBMapInfo;
 		private _curType: number;
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
@@ -135,7 +135,7 @@ module gamewxsaoleihb.page {
 		}
 	}
 
-	class WXSaoLeiTX extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_TXUI {
+	class WXSaoLeiTX extends ui.ajqp.game_ui.wxsaoleihb.component.WXSaoLei_TXUI {
 		constructor() {
 			super();
 		}

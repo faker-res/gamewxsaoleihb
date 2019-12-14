@@ -5,7 +5,7 @@ module gamewxsaoleihb.page {
 	export class WxSaoLeiHBInfoPage extends game.gui.base.Page {
 		public static readonly TYPE_HB_RAIN: number = 1	//红包雨
 		public static readonly TYPE_HB_INFO: number = 2	//红包详情界面
-		private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLeiHB_InfoUI;
+		private _viewUI: ui.ajqp.game_ui.wxsaoleihb.WXSaoLeiHB_InfoUI;
 		private _mianSiJinPaiData: any;
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);
@@ -169,7 +169,7 @@ module gamewxsaoleihb.page {
 			super.close();
 		}
 	}
-	class HBLingQuMX extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_LBUI {
+	class HBLingQuMX extends ui.ajqp.game_ui.wxsaoleihb.component.WXSaoLei_LBUI {
 		private _game: Game;
 		private _data: any;
 		private _mainPlayer: PlayerData;

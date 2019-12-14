@@ -47,6 +47,10 @@ module gamewxsaoleihb.page {
 
 			this["__needLoadAsset"] = [
 				DatingPath.atlas_dating_ui + "qifu.atlas",
+				Path_game_wxSaoLeiHB.atlas_game_ui + "guize.atlas",
+				Path_game_wxSaoLeiHB.atlas_game_ui + "hud.atlas",
+				Path_game_wxSaoLeiHB.atlas_game_ui + "saolei.atlas",
+				Path_game_wxSaoLeiHB.atlas_game_ui + "xz.atlas",
 				PathGameTongyong.atlas_game_ui_tongyong + "hud.atlas",
 				PathGameTongyong.atlas_game_ui_tongyong + "pai.atlas",
 				PathGameTongyong.atlas_game_ui_tongyong + "dating.atlas",
@@ -54,10 +58,12 @@ module gamewxsaoleihb.page {
 				PathGameTongyong.atlas_game_ui_tongyong + "general.atlas",
 				PathGameTongyong.atlas_game_ui_tongyong + "touxiang.atlas",
 				PathGameTongyong.atlas_game_ui_tongyong + "qifu.atlas",
-				Path_game_wxSaoLeiHB.atlas_game_ui + "guize.atlas",
-				Path_game_wxSaoLeiHB.atlas_game_ui + "hud.atlas",
-				Path_game_wxSaoLeiHB.atlas_game_ui + "saolei.atlas",
-				Path_game_wxSaoLeiHB.atlas_game_ui + "xz.atlas",
+				PathGameTongyong.atlas_game_ui_tongyong_general + "anniu.atlas",
+				PathGameTongyong.atlas_game_ui_tongyong_general_effect + "anniug.atlas",
+
+				Path.map + 'pz_wxsaoleihb.png',
+				Path.map_far + 'bg_wxsaoleihb.jpg',
+
 			]
 
 			if (WebConfig.needMusicPreload) {

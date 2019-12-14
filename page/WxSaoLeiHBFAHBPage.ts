@@ -3,7 +3,7 @@
 */
 module gamewxsaoleihb.page {
 	export class WxSaoLeiHBFAHBPage extends game.gui.base.Page {
-		private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLei_HBUI;
+		private _viewUI: ui.ajqp.game_ui.wxsaoleihb.WXSaoLei_HBUI;
 		private _type: number;	//红包类型
 		private _baoNum: number;//红包数
 		private _leiDian: Array<number> = [];//雷点数

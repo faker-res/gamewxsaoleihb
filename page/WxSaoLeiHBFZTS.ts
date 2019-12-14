@@ -3,7 +3,7 @@
 */
 module gamewxsaoleihb.page {
 	export class WxSaoLeiHBFZTSPage extends game.gui.base.Page {
-		private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLei_FZUI;
+		private _viewUI: ui.ajqp.game_ui.wxsaoleihb.WXSaoLei_FZUI;
 		public isInner: boolean = false;
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);

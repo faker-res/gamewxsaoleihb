@@ -12,7 +12,7 @@ module gamewxsaoleihb.page {
     }
     export class WxSaoLeiHBMapPage extends game.gui.base.Page {
         private static HB_MAX_NUM: number = 40;          //现存最大红包数
-        private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLeiUI;
+        private _viewUI: ui.ajqp.game_ui.wxsaoleihb.WXSaoLeiUI;
         private _arrHB: Array<any> = [];    //红包UI
         private _wxSaoLeiMgr: WxSaoLeiHBMgr;
         private _wxSaoLeiStory: WxSaoLeiHBStory;
@@ -876,7 +876,7 @@ module gamewxsaoleihb.page {
         }
     }
 
-    class HBLeft extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_HB1UI implements IPoolsObject {
+    class HBLeft extends ui.ajqp.game_ui.wxsaoleihb.component.WXSaoLei_HB1UI implements IPoolsObject {
         private _game: Game;
         private _data: any;
         private _player: PlayerData;
@@ -1007,7 +1007,7 @@ module gamewxsaoleihb.page {
             this.removeSelf();
         }
     }
-    class HBRight extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_HB2UI implements IPoolsObject {
+    class HBRight extends ui.ajqp.game_ui.wxsaoleihb.component.WXSaoLei_HB2UI implements IPoolsObject {
         private _game: Game;
         private _data: any;
         private _player: PlayerData;
@@ -1119,7 +1119,7 @@ module gamewxsaoleihb.page {
             this.removeSelf();
         }
     }
-    class HBInfo extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_getUI {
+    class HBInfo extends ui.ajqp.game_ui.wxsaoleihb.component.WXSaoLei_getUI {
         private _game: Game;
         private _data: any;  //红包数据
         private _lq_data: any;      //领取数据

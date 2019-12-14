@@ -5,7 +5,7 @@ module gamewxsaoleihb.page {
 	export class WxSaoLeiHBJLPage extends game.gui.base.Page {
 		static readonly TYPE_GET_HB = 0;//收到红包
 		static readonly TYPE_SEND_HB = 1;//发出红包
-		private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLei_JLUI;
+		private _viewUI: ui.ajqp.game_ui.wxsaoleihb.WXSaoLei_JLUI;
 		private _curType: number;
 		private _wxSaoLeiMgr: WxSaoLeiHBMgr;
 		private _wxSaoLeiStory: WxSaoLeiHBStory;
@@ -263,7 +263,7 @@ module gamewxsaoleihb.page {
 		}
 	}
 
-	class HBInfoMX extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_LB1UI {
+	class HBInfoMX extends ui.ajqp.game_ui.wxsaoleihb.component.WXSaoLei_LB1UI {
 		private _game: Game;
 		private _data: any;
 		private _page: WxSaoLeiHBJLPage

@@ -8,7 +8,7 @@ module gamewxsaoleihb.page {
 
 		private static TYPE_WANFA_JIESHAO: number = 0;
 		private static TYPE_CARD_PEIFU: number = 1;
-		private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLei_GuiZeUI;
+		private _viewUI: ui.ajqp.game_ui.wxsaoleihb.WXSaoLei_GuiZeUI;
 		private _curType: number = 1;
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);
@@ -21,6 +21,7 @@ module gamewxsaoleihb.page {
 				PathGameTongyong.atlas_game_ui_tongyong + "hud.atlas",
 				Path_game_wxSaoLeiHB.atlas_game_ui + "saolei.atlas",
 				Path_game_wxSaoLeiHB.atlas_game_ui + "guize.atlas",
+				PathGameTongyong.atlas_game_ui_tongyong_general + "anniu.atlas",
 			];
 		}
 

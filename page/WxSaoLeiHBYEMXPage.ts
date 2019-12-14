@@ -3,7 +3,7 @@
 */
 module gamewxsaoleihb.page {
 	export class WxSaoLeiHBYEMXPage extends game.gui.base.Page {
-		private _viewUI: ui.nqp.game_ui.wxsaoleihb.WXSaoLei_MXUI;
+		private _viewUI: ui.ajqp.game_ui.wxsaoleihb.WXSaoLei_MXUI;
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);
 			this._isNeedBlack = true;
@@ -87,7 +87,7 @@ module gamewxsaoleihb.page {
 			super.close();
 		}
 	}
-	class YEMX extends ui.nqp.game_ui.wxsaoleihb.component.WXSaoLei_LB2UI {
+	class YEMX extends ui.ajqp.game_ui.wxsaoleihb.component.WXSaoLei_LB2UI {
 		private _game: Game;
 		private _data: any;
 		constructor() {
