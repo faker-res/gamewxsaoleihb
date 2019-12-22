@@ -6,6 +6,7 @@ module gamewxsaoleihb.page {
 		private _viewUI: ui.ajqp.game_ui.wxsaoleihb.WXSaoLei_HUDUI;
 		private _player: any;
 		private _playerInfo: any;
+		private _limitClipList: ClipUtil[] = [];
 
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);
@@ -29,6 +30,17 @@ module gamewxsaoleihb.page {
 			for (let index = 0; index < this._viewUI.box_right.numChildren; index++) {
 				this._viewUI.box_right._childs[index].visible = false;
 			}
+			for (let index = 0; index < 3; index++) {
+				if (!this._limitClipList[index]) {
+					this._limitClipList[index] = new ClipUtil(WxSaoLeiHBClip.WHITE_FONT);
+					this._limitClipList[index].centerX = this._viewUI["txt_limit" + index].centerX;
+					this._limitClipList[index].centerY = this._viewUI["txt_limit" + index].centerY;
+					this._viewUI["txt_limit" + index].parent && this._viewUI["txt_limit" + index].parent.addChild(this._limitClipList[index]);
+					this._viewUI["txt_limit" + index].removeSelf();
+					let str = WxSaoLeiHBMgr.MIN_TEMP[index] + "-" + WxSaoLeiHBMgr.MAX_TEMP[index];
+					this._limitClipList[index] && this._limitClipList[index].setText(str, true, false, PathGameTongyong.ui_tongyong_hud + "tu_xe.png");
+				}
+			}
 		}
 
 		// 页面打开时执行函数
@@ -44,12 +56,8 @@ module gamewxsaoleihb.page {
 			for (let index = 0; index < this._viewUI.box_right.numChildren; index++) {
 				this._viewUI.box_right._childs[index].visible = true;
 				Laya.Tween.from(this._viewUI.box_right._childs[index], {
-					right: -300
+					x: 1280
 				}, 200 + index * 100, Laya.Ease.linearNone);
-			}
-			for (let index = 0; index < WxSaoLeiHBMgr.MIN_TEMP.length; index++) {
-				this._viewUI["txt_num" + index].text = "7/9包"
-				this._viewUI["txt_limit" + index].text = "限额:" + WxSaoLeiHBMgr.MIN_TEMP[index] + "-" + WxSaoLeiHBMgr.MAX_TEMP[index];
 			}
 		}
 
@@ -121,6 +129,15 @@ module gamewxsaoleihb.page {
 				this._viewUI.img_room0.off(LEvent.CLICK, this, this.onBtnClickWithTween);
 				this._viewUI.img_room1.off(LEvent.CLICK, this, this.onBtnClickWithTween);
 				this._viewUI.img_room2.off(LEvent.CLICK, this, this.onBtnClickWithTween);
+				if (this._limitClipList && this._limitClipList.length) {
+					for (let index = 0; index < this._limitClipList.length; index++) {
+						if (this._limitClipList[index]) {
+							this._limitClipList[index].removeSelf();
+							this._limitClipList[index] = null;
+						}
+					}
+					this._limitClipList = [];
+				}
 			}
 			super.close();
 		}

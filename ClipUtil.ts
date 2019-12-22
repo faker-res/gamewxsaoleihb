@@ -11,6 +11,8 @@ module gamewxsaoleihb {
         public static HUD_FONT2: any;
         //HUD数字3
         public static HUD_FONT3: any;
+        //底分准入通用白字
+        public static WHITE_FONT: any;
 
         static init(): void {
             this.MONEY_FONT = {
@@ -49,6 +51,16 @@ module gamewxsaoleihb {
                 clipHeight: 24,
                 clipX: 11,
                 space: -5
+            };
+            
+            //底分准入通用白字
+            this.WHITE_FONT = {
+                source: PathGameTongyong.atlas_game_ui_tongyong + "hud.atlas",
+                url: PathGameTongyong.ui_tongyong_hud + 'clip_sz1.png',
+                clipWidth: 17,
+                clipHeight: 23,
+                clipX: 11,
+                space: -4
             };
         }
         private _clip: ClipCell;
@@ -227,7 +239,7 @@ module gamewxsaoleihb {
                 for (let i = 0; i < len; i++) {
                     let clip = this._clipArray[i];
                     let indexStr: string = this._txtStr.charAt(i).toString();
-                    let index = (indexStr == ".") ? 10 : parseInt(indexStr);
+                    let index = (indexStr == "-" || indexStr == ".") ? 10 : parseInt(indexStr);
                     if (!clip) {
                         clip = this.createClip(index);
                         this._container.addChild(clip);

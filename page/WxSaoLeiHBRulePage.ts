@@ -58,18 +58,25 @@ module gamewxsaoleihb.page {
 			}
 			this._viewUI.btn_back.on(LEvent.CLICK, this, this.onBackClose);
 			this._viewUI.btn_close.on(LEvent.CLICK, this, this.onBtnClickWithTween);
+			
+			this._viewUI.panel_pf.vScrollBarSkin = "";
+			this._viewUI.panel_pf.vScrollBar.autoHide = true;
+			this._viewUI.panel_pf.vScrollBar.elasticDistance = 100;
+
 			this._viewUI.panel_inner.vScrollBarSkin = "";
 			this._viewUI.panel_inner.vScrollBar.autoHide = true;
 			this._viewUI.panel_inner.vScrollBar.elasticDistance = 100;
+
 			this._viewUI.panel_out.vScrollBarSkin = "";
 			this._viewUI.panel_out.vScrollBar.autoHide = true;
 			this._viewUI.panel_out.vScrollBar.elasticDistance = 100;
+
 			this._viewUI.tab_Type.selectHandler = Handler.create(this, this.selectHandler, null, false);
 			this._viewUI.tab_Type.selectedIndex = 0;
 		}
 
 		private selectHandler(index: number): void {
-			this._viewUI.img_pf.visible = this._viewUI.tab_Type.selectedIndex == WxSaoLeiHBRulePage.TYPE_WANFA_JIESHAO;
+			this._viewUI.panel_pf.visible = this._viewUI.tab_Type.selectedIndex == WxSaoLeiHBRulePage.TYPE_WANFA_JIESHAO;
 			this._viewUI.panel_out.visible = this._viewUI.tab_Type.selectedIndex == WxSaoLeiHBRulePage.TYPE_CARD_PEIFU;
 		}
 
