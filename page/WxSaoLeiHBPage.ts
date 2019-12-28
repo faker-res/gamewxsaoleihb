@@ -6,7 +6,7 @@ module gamewxsaoleihb.page {
 		private _viewUI: ui.ajqp.game_ui.wxsaoleihb.WXSaoLei_HUDUI;
 		private _player: any;
 		private _playerInfo: any;
-		private _limitClipList: ClipUtil[] = [];
+		private _limitClipList: WxSaoLeiHBClip[] = [];
 
 		constructor(v: Game, onOpenFunc?: Function, onCloseFunc?: Function) {
 			super(v, onOpenFunc, onCloseFunc);
@@ -30,15 +30,15 @@ module gamewxsaoleihb.page {
 			for (let index = 0; index < this._viewUI.box_right.numChildren; index++) {
 				this._viewUI.box_right._childs[index].visible = false;
 			}
-			for (let index = 0; index < 3; index++) {
-				if (!this._limitClipList[index]) {
-					this._limitClipList[index] = new ClipUtil(WxSaoLeiHBClip.WHITE_FONT);
-					this._limitClipList[index].centerX = this._viewUI["txt_limit" + index].centerX;
-					this._limitClipList[index].centerY = this._viewUI["txt_limit" + index].centerY;
-					this._viewUI["txt_limit" + index].parent && this._viewUI["txt_limit" + index].parent.addChild(this._limitClipList[index]);
-					this._viewUI["txt_limit" + index].removeSelf();
-					let str = WxSaoLeiHBMgr.MIN_TEMP[index] + "-" + WxSaoLeiHBMgr.MAX_TEMP[index];
-					this._limitClipList[index] && this._limitClipList[index].setText(str, true, false, PathGameTongyong.ui_tongyong_hud + "tu_xe.png");
+			for (let i = 0; i < 3; i++) {
+				if (!this._limitClipList[i]) {
+					this._limitClipList[i] = new WxSaoLeiHBClip(WxSaoLeiHBClip.WHITE_FONT);
+					this._limitClipList[i].centerX = this._viewUI["txt_limit" + i].centerX;
+					this._limitClipList[i].centerY = this._viewUI["txt_limit" + i].centerY;
+					this._viewUI["txt_limit" + i].parent.addChild(this._limitClipList[i]);
+					this._viewUI["txt_limit" + i].removeSelf();
+					let str = WxSaoLeiHBMgr.MIN_TEMP[i] + "-" + WxSaoLeiHBMgr.MAX_TEMP[i];
+					this._limitClipList[i].setText(str, true, false, PathGameTongyong.ui_tongyong_hud + "tu_xe.png");
 				}
 			}
 		}

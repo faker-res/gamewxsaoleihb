@@ -62,10 +62,10 @@ module gamewxsaoleihb.page {
 			this._viewUI.lb_hbjl.on(LEvent.CLICK, this, this.openHbJL);
 		}
 
-		private _moneyNum: ClipUtil;
+		private _moneyNum: WxSaoLeiHBClip;
 		private initClip(): void {
 			if (!this._moneyNum) {
-				this._moneyNum = new ClipUtil(WxSaoLeiHBClip.MONEY_FONT);
+				this._moneyNum = new WxSaoLeiHBClip(WxSaoLeiHBClip.MONEY_FONT);
 				this._moneyNum.centerX = this._viewUI.clip_hb_num.centerX;
 				this._moneyNum.top = this._viewUI.clip_hb_num.top;
 				this._viewUI.clip_hb_num.parent.addChild(this._moneyNum);

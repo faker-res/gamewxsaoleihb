@@ -52,14 +52,14 @@ module gamewxsaoleihb {
                 clipX: 11,
                 space: -5
             };
-            
+
             //底分准入通用白字
             this.WHITE_FONT = {
                 source: PathGameTongyong.atlas_game_ui_tongyong + "hud.atlas",
                 url: PathGameTongyong.ui_tongyong_hud + 'clip_sz1.png',
-                clipWidth: 17,
-                clipHeight: 23,
-                clipX: 11,
+                clipWidth: 19,
+                clipHeight: 16,
+                clipX: 12,
                 space: -4
             };
         }
@@ -239,7 +239,7 @@ module gamewxsaoleihb {
                 for (let i = 0; i < len; i++) {
                     let clip = this._clipArray[i];
                     let indexStr: string = this._txtStr.charAt(i).toString();
-                    let index = (indexStr == "-" || indexStr == ".") ? 10 : parseInt(indexStr);
+                    let index = (indexStr == "-") ? 11 : (indexStr == ".") ? 10 : parseInt(indexStr);
                     if (!clip) {
                         clip = this.createClip(index);
                         this._container.addChild(clip);
