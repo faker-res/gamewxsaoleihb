@@ -28,12 +28,12 @@ module gamewxsaoleihb.page {
             this._delta = 1000;
             this._defaultSoundPath = Path_game_wxSaoLeiHB.music_wxsaoleihb + MUSIC_PATH.btn;
             this._asset = [
-                DatingPath.atlas_dating_ui + "qifu.atlas",
                 PathGameTongyong.atlas_game_ui_tongyong + "hud.atlas",
                 PathGameTongyong.atlas_game_ui_tongyong + "pai.atlas",
                 PathGameTongyong.atlas_game_ui_tongyong + "general.atlas",
                 PathGameTongyong.atlas_game_ui_tongyong + "touxiang.atlas",
-                PathGameTongyong.atlas_game_ui_tongyong + "qifu.atlas",
+                PathGameTongyong.atlas_game_ui_tongyong + "tuichu.atlas",
+                DatingPath.atlas_dating_ui + "qifu.atlas",
                 Path_game_wxSaoLeiHB.atlas_game_ui + "guize.atlas",
                 Path_game_wxSaoLeiHB.atlas_game_ui + "hud.atlas",
                 Path_game_wxSaoLeiHB.atlas_game_ui + "saolei.atlas",
@@ -268,7 +268,7 @@ module gamewxsaoleihb.page {
             if (msg.type == Operation_Fields.OPRATE_GAME) {
                 switch (msg.reason) {
                     case Operation_Fields.OPRATE_GAME_WXSAOLEIHB_GET_RAIN_MONEY:
-                        let money = Number(msg.data);
+                        let money = TongyongUtil.getMoneyChange(Number(msg.data));
                         this._viewUI.box_hb_open.visible = false;
                         this._wxSaoLeiMgr.isHbRain = false;
                         this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_INFO, (page: WxSaoLeiHBInfoPage) => {
@@ -405,7 +405,7 @@ module gamewxsaoleihb.page {
             if (!this._mainUnit) return;
             //冻结
             let dj_money = this._wxSaoLeiMgr.getDJMoney();
-            let money = this._mainUnit.GetMoney()
+            let money = TongyongUtil.getMoneyChange(this._mainUnit.GetMoney())
             this._viewUI.lb_ye.text = StringU.substitute("余额：{0}", (money - dj_money).toFixed(2));
             this._viewUI.lb_dj.text = StringU.substitute("冻结：{0}", (dj_money).toFixed(2));
         }
@@ -430,6 +430,7 @@ module gamewxsaoleihb.page {
                     this._game.datingGame.wxShareQrcodeImg("", "", Web_operation_fields.WXSCENESESSION)
                     break
                 case this._viewUI.btn_ye:
+                    this.updateMainInfo();
                     this._viewUI.box_ye.visible = true;
                     break
                 case this._viewUI.lb_ok:
@@ -458,7 +459,7 @@ module gamewxsaoleihb.page {
                     //判断赔付钱数是否足够
                     let pf_money = this._wxSaoLeiMgr.GetPFMoneyByData(this._curHbData);
                     if (!this._mainUnit) return;
-                    if (this._mainUnit.GetMoney() < pf_money) {
+                    if (TongyongUtil.getMoneyChange(this._mainUnit.GetMoney()) < pf_money) {
                         this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_YEBZ);
                         this._viewUI.box_hb_open.visible = false;
                         return
@@ -959,7 +960,7 @@ module gamewxsaoleihb.page {
             //红包剩余
             this.lb_sy.text = StringU.substitute("剩余:{0}/{1}", this._data.bao_num - this._data.lq_num, this._data.bao_num);
             //红包金额
-            this.lb_money.text = this._data.money;
+            this.lb_money.text = this._data.money.toString();
             //红包雷号
             this.lb_ld.text = this._data.ld_str;
         }
@@ -1087,7 +1088,7 @@ module gamewxsaoleihb.page {
             //红包剩余
             this.lb_sy.text = StringU.substitute("剩余:{0}/{1}", this._data.bao_num - this._data.lq_num, this._data.bao_num);
             //红包金额
-            this.lb_money.text = this._data.money;
+            this.lb_money.text = this._data.money.toString();
             //红包雷号
             this.lb_ld.text = this._data.ld_str;
         }

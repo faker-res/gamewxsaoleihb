@@ -78,6 +78,8 @@ module gamewxsaoleihb.manager {
 						for (var key in hb_data) {
 							if (hb_data.hasOwnProperty(key)) {
 								let cur_hb_data = hb_data[key];
+								cur_hb_data.money = TongyongUtil.getMoneyChange(cur_hb_data.money)
+								cur_hb_data.sb_num = TongyongUtil.getMoneyChange(cur_hb_data.sb_num)
 								this.updateTotalHBData(cur_hb_data);
 								this.updateSelfHbData(cur_hb_data);
 							}
@@ -87,6 +89,8 @@ module gamewxsaoleihb.manager {
 						for (var key in hb_data) {
 							if (hb_data.hasOwnProperty(key)) {
 								let cur_hb_data = hb_data[key];
+								cur_hb_data.money = TongyongUtil.getMoneyChange(cur_hb_data.money)
+								cur_hb_data.sb_num = TongyongUtil.getMoneyChange(cur_hb_data.sb_num)
 								let index = this.findHBDataIndexById(cur_hb_data.hb_id);
 								this._hb_data.splice(index, 1);
 							}
@@ -97,6 +101,8 @@ module gamewxsaoleihb.manager {
 							if (hb_data.hasOwnProperty(key)) {
 								let cur_hb_data = hb_data[key];
 								if (!cur_hb_data) continue;
+								cur_hb_data.money = TongyongUtil.getMoneyChange(cur_hb_data.money)
+								cur_hb_data.sb_num = TongyongUtil.getMoneyChange(cur_hb_data.sb_num)
 								this.updateTotalHBData(cur_hb_data);
 								this.updateSelfHbData(cur_hb_data);
 							}
@@ -107,6 +113,8 @@ module gamewxsaoleihb.manager {
 							if (hb_data.hasOwnProperty(key)) {
 								let element = hb_data[key];
 								if (!element) continue;
+								element.money = TongyongUtil.getMoneyChange(element.money)
+								element.sb_num = TongyongUtil.getMoneyChange(element.sb_num)
 								this.updateTotalHBData(element);
 								this.updateSelfHbData(element);
 							}
@@ -126,12 +134,28 @@ module gamewxsaoleihb.manager {
 					} else {
 						lq_datas = JSON.parse(msg.lq_datas);
 					}
+					//金额转换
+					if (lq_datas.length > 0) {
+						for (let key in lq_datas) {
+							if (lq_datas.hasOwnProperty(key)) {
+								let element = lq_datas[key];
+								element.lq_money = TongyongUtil.getMoneyChange(element.lq_money);
+								element.pf_money = TongyongUtil.getMoneyChange(element.pf_money);
+								element.sp_money_num = TongyongUtil.getMoneyChange(element.sp_money_num);
+								lq_datas[key] = element
+							}
+						}
+					}
 					this.event(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, [lq_datas]);
 					break
 				case Protocols.SMSG_WXSAOLEIHB_LQ_INFO:
 					//领取信息
 					let lq_data = msg.lq_data != "" ? JSON.parse(msg.lq_data) : "";
 					if (!lq_data) return;
+					//金额转换
+					lq_data.lq_money = TongyongUtil.getMoneyChange(lq_data.lq_money);
+					lq_data.pf_money = TongyongUtil.getMoneyChange(lq_data.pf_money);
+					lq_data.sp_money_num = TongyongUtil.getMoneyChange(lq_data.sp_money_num);
 					this.event(WxSaoLeiHBMgr.MAP_HB_LQ_MSG, [lq_data]);
 					break
 			}

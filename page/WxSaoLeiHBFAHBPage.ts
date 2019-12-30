@@ -149,7 +149,7 @@ module gamewxsaoleihb.page {
 			}
 			//主玩家身上的钱，在加上冻结的钱
 			let dj_money = this._wxSaoLeiMgr.getDJMoney();
-			let money: number = this._mainUnit.GetMoney() - dj_money;
+			let money: number = TongyongUtil.getMoneyChange(this._mainUnit.GetMoney()) - dj_money;
 			this._viewUI.lb_ye.text = money.toFixed(2);
 			//红包发放范围
 			this._mapinfo = this._game.sceneObjectMgr.mapInfo as WxSaoLeiHBMapInfo;
@@ -255,7 +255,7 @@ module gamewxsaoleihb.page {
 					let leiDianStr = this.changeLeiDianToStr();
 					if (!this._mainUnit) return;
 					let dj_money = this._wxSaoLeiMgr.getDJMoney();
-					if (this._mainUnit.GetMoney() - dj_money < this._money) {
+					if (TongyongUtil.getMoneyChange(this._mainUnit.GetMoney()) - dj_money < this._money) {
 						this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_YEBZ);
 						this.close();
 						return
