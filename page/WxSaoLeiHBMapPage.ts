@@ -194,6 +194,10 @@ module gamewxsaoleihb.page {
         // 页面打开时执行函数
         protected onOpen(): void {
             super.onOpen();
+            //api充值不显示
+            this._viewUI.box_hb.visible = !WebConfig.enterGameLocked;
+            this._viewUI.box_share.visible = !WebConfig.enterGameLocked;
+
             this._viewUI.box_hb_rain.visible = false;
             //初始化所有的红包
             Laya.timer.frameOnce(1, this, () => {
