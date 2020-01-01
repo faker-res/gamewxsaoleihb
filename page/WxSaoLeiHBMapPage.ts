@@ -558,7 +558,7 @@ module gamewxsaoleihb.page {
             //清除红包
             if (this._wxSaoLeiMgr.isHbRain)
                 this._wxSaoLeiMgr.end();
-            if (!Browser.onPC) {
+            if (!Browser.onPC || !WebConfig.enterGameLocked) {
                 this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_FZTS, (page: WxSaoLeiHBFZTSPage) => {
                     page.isInner = true;
                 }, () => {
@@ -863,10 +863,8 @@ module gamewxsaoleihb.page {
         //------------------红包主界面操作end---------
         public close(): void {
             this._game.datingGame.off(DatingGame.EVENT_APP_CLOSE_CALLBACK, this, this.appClose);
-            if (!WebConfig.enterGameLocked) {
-                WebConfig.setMyOrientation(true);
-                Laya.stage.screenMode = Stage.SCREEN_HORIZONTAL;
-            }
+            WebConfig.setMyOrientation(true);
+            Laya.stage.screenMode = Stage.SCREEN_HORIZONTAL;
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_INFO, this, this.updateHBdata);
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, this, this.openHBInfoPage);
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_LQ_MSG, this, this.updateLqMsg);
