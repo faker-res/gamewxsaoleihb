@@ -63,12 +63,22 @@ module gamewxsaoleihb.page {
 			this._viewUI.img_room1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.img_room2.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 
+			this._viewUI.box_rl0.on(LEvent.CLICK, this, this.onBtnClickRule);
+			this._viewUI.box_rl1.on(LEvent.CLICK, this, this.onBtnClickRule);
+			this._viewUI.box_rl2.on(LEvent.CLICK, this, this.onBtnClickRule);
+
 			for (let index = 0; index < this._viewUI.box_right.numChildren; index++) {
 				this._viewUI.box_right._childs[index].visible = true;
 				Laya.Tween.from(this._viewUI.box_right._childs[index], {
 					x: 1280
 				}, 200 + index * 100, Laya.Ease.linearNone);
 			}
+		}
+
+		private onBtnClickRule(): void {
+			this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_RULE, (page: WxSaoLeiHBRulePage) => {
+				page.setData();
+			});
 		}
 
 		// 重新布局
