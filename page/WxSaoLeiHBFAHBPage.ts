@@ -228,7 +228,7 @@ module gamewxsaoleihb.page {
 					break
 				case this._viewUI.btn_send:
 					if (this._wxSaoLeiMgr.MapJudgeIsFHOrLB(this._mapLv)) {
-						if (this._mainPlayer.playerInfo.vip_level < 1) {
+						if (this._mainPlayer.playerInfo.vip_level < 1 && !WebConfig.enterGameLocked) {
 							this._game.showTips("该场次需要VIP1的玩家方可操作哦!")
 							return;
 						}

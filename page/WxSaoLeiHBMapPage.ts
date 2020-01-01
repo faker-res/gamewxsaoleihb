@@ -45,6 +45,7 @@ module gamewxsaoleihb.page {
         protected init(): void {
             this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLeiUI');
             this.addChild(this._viewUI);
+            this._viewUI.box_hb.visible = this._viewUI.box_share.visible = !WebConfig.enterGameLocked;
             //全面屏
             Laya.timer.frameOnce(1, this, () => {
                 if (this._game.isFullScreen) {
@@ -129,7 +130,7 @@ module gamewxsaoleihb.page {
 
         private checkHbRain() {
             //进来的时候 是否处于红包雨时间
-            if (!this._wxSaoLeiMapInfo || !this._mainUnit) return;
+            if (!this._wxSaoLeiMapInfo || !this._mainUnit || WebConfig.enterGameLocked) return;
             let rain_time = this._wxSaoLeiMapInfo.GetYuChaoLaiQiTime()
             let rain_end_time = this._wxSaoLeiMapInfo.GetTouPiaoTime()
             let rain_lq_time = this._mainUnit.GetCurChip();
@@ -265,7 +266,7 @@ module gamewxsaoleihb.page {
 
         //金币雨领取
         private onOptHandler(optcode: number, msg: any) {
-            if (msg.type == Operation_Fields.OPRATE_GAME) {
+            if (msg.type == Operation_Fields.OPRATE_GAME && !WebConfig.enterGameLocked) {
                 switch (msg.reason) {
                     case Operation_Fields.OPRATE_GAME_WXSAOLEIHB_GET_RAIN_MONEY:
                         let money = TongyongUtil.getMoneyChange(Number(msg.data));
@@ -474,7 +475,7 @@ module gamewxsaoleihb.page {
                             //未操作过
                             //判断是否老板富豪场v1
                             if (this._wxSaoLeiMgr.MapJudgeIsFHOrLB(this._mapLv)) {
-                                if (this._mainPlayer.playerInfo.vip_level < 1) {
+                                if (this._mainPlayer.playerInfo.vip_level < 1 && !WebConfig.enterGameLocked) {
                                     this._game.showTips("该场次需要VIP1的玩家方可操作哦!")
                                     return;
                                 }
@@ -554,11 +555,15 @@ module gamewxsaoleihb.page {
             //清除红包
             if (this._wxSaoLeiMgr.isHbRain)
                 this._wxSaoLeiMgr.end();
-            this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_FZTS, (page: WxSaoLeiHBFZTSPage) => {
-                page.isInner = true;
-            }, () => {
+            if (!Browser.onPC) {
+                this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_FZTS, (page: WxSaoLeiHBFZTSPage) => {
+                    page.isInner = true;
+                }, () => {
+                    this._game.sceneObjectMgr.leaveStory(true);
+                })
+            } else {
                 this._game.sceneObjectMgr.leaveStory(true);
-            })
+            }
         }
 
         private _curDiffTime: number;
@@ -855,8 +860,10 @@ module gamewxsaoleihb.page {
         //------------------红包主界面操作end---------
         public close(): void {
             this._game.datingGame.off(DatingGame.EVENT_APP_CLOSE_CALLBACK, this, this.appClose);
-            WebConfig.setMyOrientation(true);
-            Laya.stage.screenMode = Stage.SCREEN_HORIZONTAL;
+            if (!WebConfig.enterGameLocked) {
+                WebConfig.setMyOrientation(true);
+                Laya.stage.screenMode = Stage.SCREEN_HORIZONTAL;
+            }
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_INFO, this, this.updateHBdata);
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_LQ_INFO, this, this.openHBInfoPage);
             this._wxSaoLeiMgr.off(WxSaoLeiHBMgr.MAP_HB_LQ_MSG, this, this.updateLqMsg);

@@ -25,8 +25,18 @@ module gamewxsaoleihb.page {
 
 		// 页面初始化函数
 		protected init(): void {
+			WebConfig.setMyOrientation(false);
+			if (Browser.onPC) {
+				Laya.stage.screenMode = Stage.SCREEN_NONE;
+			} else {
+				Laya.stage.screenMode = Stage.SCREEN_VERTICAL;
+			}
 			this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLei_SPHUDUI', ["game_ui.wxsaoleihb.WXSaoLei_SPHUDUI"]);
 			this.addChild(this._viewUI);
+			if (this._viewUI) {
+				this._viewUI.box_main.scaleX = 1.5;
+				this._viewUI.box_main.scaleY = 1.5;
+			}
 			for (let index = 0; index < this._viewUI.box_right.numChildren; index++) {
 				this._viewUI.box_right._childs[index].visible = false;
 			}
@@ -47,7 +57,7 @@ module gamewxsaoleihb.page {
 		protected onOpen(): void {
 			super.onOpen();
 			this._game.playMusic(Path_game_wxSaoLeiHB.music_wxsaoleihb + "back.mp3");
-			(this._viewUI.view_hud as TongyongHudPage).onOpen(this._game, WxsaoleihbPageDef.GAME_NAME);
+			(this._viewUI.view_hud as TongyongSPHudPage).onOpen(this._game, WxsaoleihbPageDef.GAME_NAME);
 			//按钮监听
 			this._viewUI.img_room0.on(LEvent.CLICK, this, this.onBtnClickWithTween);
 			this._viewUI.img_room1.on(LEvent.CLICK, this, this.onBtnClickWithTween);
@@ -88,21 +98,7 @@ module gamewxsaoleihb.page {
          * @param mode 
          */
 		public checkMoneyToStory(mode: number): void {
-			// let mainPlayer = this._game.sceneObjectMgr.mainPlayer;
-			// if (!mainPlayer) return;
-			// let haveMoney = mainPlayer.playerInfo.money;
-			// let roomInfo = WxsaoleihbPageDef.getRoomInfoByMode(mode);
-			// if (haveMoney < roomInfo.minGold) {
-			// 	let str = StringU.substitute("老板，您的金币少于{0}哦~\n补充点金币去大杀四方吧~", roomInfo.minGold);
-			// 	this.gotoRecharge(str);
-			// } else {
-			//进入
-			this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_FZTS, (page: WxSaoLeiHBFZTSPage) => {
-				page.isInner = false;
-			}, () => {
-				this._game.sceneObjectMgr.intoStory(WxsaoleihbPageDef.GAME_NAME, mode.toString(), true);
-			})
-			// }
+			this._game.sceneObjectMgr.intoStory(WxsaoleihbPageDef.GAME_NAME, mode.toString(), true);
 		}
 
         /**
@@ -126,6 +122,8 @@ module gamewxsaoleihb.page {
 
 		public close(): void {
 			if (this._viewUI) {
+				WebConfig.setMyOrientation(true);
+				Laya.stage.screenMode = Stage.SCREEN_HORIZONTAL;
 				this._viewUI.img_room0.off(LEvent.CLICK, this, this.onBtnClickWithTween);
 				this._viewUI.img_room1.off(LEvent.CLICK, this, this.onBtnClickWithTween);
 				this._viewUI.img_room2.off(LEvent.CLICK, this, this.onBtnClickWithTween);
