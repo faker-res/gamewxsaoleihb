@@ -30,7 +30,11 @@ module gamewxsaoleihb.page {
 		static myinit(str: string) {
 			super.myinit(str);
 			WxSaoLeiHBClip.init()
-			PageDef._pageClassMap[WxsaoleihbPageDef.PAGE_WXSLHB_HUD] = WxSaoLeiHBPage;
+			if (WebConfig.enterGameLocked) {
+				PageDef._pageClassMap[WxsaoleihbPageDef.PAGE_WXSLHB_HUD] = WxSaoLeiSPHBPage;
+			} else {
+				PageDef._pageClassMap[WxsaoleihbPageDef.PAGE_WXSLHB_HUD] = WxSaoLeiHBPage;
+			}
 			PageDef._pageClassMap[WxsaoleihbPageDef.PAGE_WXSLHB_MAP] = WxSaoLeiHBMapPage;
 			PageDef._pageClassMap[WxsaoleihbPageDef.PAGE_WXSLHB_JL] = WxSaoLeiHBJLPage;
 			PageDef._pageClassMap[WxsaoleihbPageDef.PAGE_WXSLHB_YEMX] = WxSaoLeiHBYEMXPage;

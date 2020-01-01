@@ -447,6 +447,28 @@ module ui.ajqp.game_ui.wxsaoleihb {
 }
 
 module ui.ajqp.game_ui.wxsaoleihb {
+    export class WXSaoLei_SPHUDUI extends View {
+		public view_hud:ui.ajqp.game_ui.tongyong.HudSpUI;
+		public box_right:Laya.Box;
+		public img_room0:Laya.Box;
+		public txt_limit0:Laya.Clip;
+		public img_room1:Laya.Box;
+		public txt_limit1:Laya.Clip;
+		public img_room2:Laya.Box;
+		public txt_limit2:Laya.Clip;
+
+        public static  uiView:any ={"type":"View","props":{"width":720,"height":1280},"child":[{"type":"Image","props":{"top":-1,"skin":"wxsaoleihb_ui/game_ui/wxsaoleihb/hud/tu_di.png","right":-1,"left":-1,"bottom":-1}},{"type":"HudSp","props":{"var":"view_hud","runtime":"ui.ajqp.game_ui.tongyong.HudSpUI"}},{"type":"Box","props":{"y":174,"width":1280,"var":"box_right","height":330,"centerX":331},"child":[{"type":"Box","props":{"y":35,"x":1,"width":607,"var":"img_room0","height":242},"child":[{"type":"Button","props":{"stateNum":1,"skin":"wxsaoleihb_ui/game_ui/wxsaoleihb/hud/btn_spxzc.png"}},{"type":"Box","props":{"y":145,"x":329,"width":226,"height":23},"child":[{"type":"Image","props":{"skin":"wxsaoleihb_ui/game_ui/wxsaoleihb/hud/tu_bao.png","centerY":0,"centerX":0}}]},{"type":"Box","props":{"y":194,"x":425,"width":200,"anchorY":0.5,"anchorX":0.5},"child":[{"type":"Clip","props":{"var":"txt_limit0","skin":"tongyong_ui/game_ui/tongyong/hud/clip_sz1.png","clipX":11,"centerY":0,"centerX":0}}]}]},{"type":"Box","props":{"y":313,"x":1,"width":607,"var":"img_room1","height":242},"child":[{"type":"Button","props":{"stateNum":1,"skin":"wxsaoleihb_ui/game_ui/wxsaoleihb/hud/btn_splbc.png"}},{"type":"Box","props":{"y":159,"x":295,"width":226,"height":23},"child":[{"type":"Image","props":{"y":1,"x":-308,"skin":"wxsaoleihb_ui/game_ui/wxsaoleihb/hud/tu_bao.png","centerY":0,"centerX":0}}]},{"type":"Box","props":{"y":199,"x":407,"width":200,"anchorY":0.5,"anchorX":0.5},"child":[{"type":"Clip","props":{"var":"txt_limit1","skin":"tongyong_ui/game_ui/tongyong/hud/clip_sz1.png","clipX":11,"centerY":0,"centerX":0}}]}]},{"type":"Box","props":{"y":597,"x":1,"width":607,"var":"img_room2","height":242},"child":[{"type":"Button","props":{"stateNum":1,"skin":"wxsaoleihb_ui/game_ui/wxsaoleihb/hud/btn_spfhc.png"}},{"type":"Box","props":{"y":148,"x":350,"width":226,"height":23},"child":[{"type":"Image","props":{"y":1,"x":-698,"skin":"wxsaoleihb_ui/game_ui/wxsaoleihb/hud/tu_bao.png","centerY":0,"centerX":0}}]},{"type":"Box","props":{"y":188,"x":462,"width":200,"anchorY":0.5,"anchorX":0.5},"child":[{"type":"Clip","props":{"var":"txt_limit2","skin":"tongyong_ui/game_ui/tongyong/hud/clip_sz1.png","clipX":11,"centerY":0,"centerX":0}}]}]}]},{"type":"Image","props":{"width":163,"skin":"wxsaoleihb_ui/game_ui/wxsaoleihb/hud/sl_title.png","left":4,"height":29,"bottom":40,"anchorY":0.5,"anchorX":0.5}},{"type":"Image","props":{"width":159,"skin":"tongyong_ui/game_ui/tongyong/hud/tu_wrzx.png","right":7,"height":31,"bottom":41}}]};
+        constructor(){ super()}
+        createChildren():void {
+        			View.regComponent("ui.ajqp.game_ui.tongyong.HudSpUI",ui.ajqp.game_ui.tongyong.HudSpUI);
+
+            super.createChildren();
+            this.createView(ui.ajqp.game_ui.wxsaoleihb.WXSaoLei_SPHUDUI.uiView);
+        }
+    }
+}
+
+module ui.ajqp.game_ui.wxsaoleihb {
     export class WXSaoLei_YuEUI extends View {
 		public box_main:Laya.Box;
 		public lb_info:Laya.Label;
