@@ -50,7 +50,6 @@ module gamewxsaoleihb.page {
 			this.ROOM_INFO[Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_3] = { mode: Web_operation_fields.GAME_ROOM_CONFIG_WXSAOLEIHB_3, name: "富豪场", minGold: 40 };
 
 			this["__needLoadAsset"] = [
-				DatingPath.atlas_dating_ui + "qifu.atlas",
 				Path_game_wxSaoLeiHB.atlas_game_ui + "guize.atlas",
 				Path_game_wxSaoLeiHB.atlas_game_ui + "hud.atlas",
 				Path_game_wxSaoLeiHB.atlas_game_ui + "saolei.atlas",
