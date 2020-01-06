@@ -558,7 +558,7 @@ module gamewxsaoleihb.page {
             //清除红包
             if (this._wxSaoLeiMgr.isHbRain)
                 this._wxSaoLeiMgr.end();
-            if (!Browser.onPC || !WebConfig.enterGameLocked) {
+            if (!Browser.onPC && !WebConfig.enterGameLocked) {
                 this._game.uiRoot.general.open(WxsaoleihbPageDef.PAGE_WXSLHB_HB_FZTS, (page: WxSaoLeiHBFZTSPage) => {
                     page.isInner = true;
                 }, () => {
