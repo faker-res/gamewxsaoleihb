@@ -34,8 +34,8 @@ module gamewxsaoleihb.page {
 			this._viewUI = this.createView('game_ui.wxsaoleihb.WXSaoLei_SPHUDUI', ["game_ui.wxsaoleihb.WXSaoLei_SPHUDUI"]);
 			this.addChild(this._viewUI);
 			if (this._viewUI) {
-				this._viewUI.box_main.scaleX = 1.5;
-				this._viewUI.box_main.scaleY = 1.5;
+				this._viewUI.box_main.scaleX = 1.77;
+				this._viewUI.box_main.scaleY = 1.77;
 			}
 			for (let index = 0; index < this._viewUI.box_right.numChildren; index++) {
 				this._viewUI.box_right._childs[index].visible = false;
@@ -50,6 +50,13 @@ module gamewxsaoleihb.page {
 					let str = WxSaoLeiHBMgr.MIN_TEMP[i] + "-" + WxSaoLeiHBMgr.MAX_TEMP[i];
 					this._limitClipList[i].setText(str, true, false, PathGameTongyong.ui_tongyong_hud + "tu_xe.png");
 				}
+			}
+			if (this._game.isFullScreen) {
+				let diff = 56
+				//有刘海
+				this._viewUI.view_hud.box_top.top = -1 + diff;
+			} else {
+				this._viewUI.view_hud.box_top.top = -1;
 			}
 		}
 
