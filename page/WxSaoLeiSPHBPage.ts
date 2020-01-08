@@ -51,13 +51,6 @@ module gamewxsaoleihb.page {
 					this._limitClipList[i].setText(str, true, false, PathGameTongyong.ui_tongyong_hud + "tu_xe.png");
 				}
 			}
-			if (this._game.isFullScreen) {
-				let diff = 56
-				//有刘海
-				this._viewUI.view_hud.box_top.top = -1 + diff;
-			} else {
-				this._viewUI.view_hud.box_top.top = -1;
-			}
 		}
 
 		// 页面打开时执行函数
@@ -75,9 +68,10 @@ module gamewxsaoleihb.page {
 			this._viewUI.box_rl2.on(LEvent.CLICK, this, this.onBtnClickRule);
 
 			for (let index = 0; index < this._viewUI.box_right.numChildren; index++) {
+				let cur_view:Box = this._viewUI.box_right._childs[index]
 				this._viewUI.box_right._childs[index].visible = true;
 				Laya.Tween.from(this._viewUI.box_right._childs[index], {
-					x: 1280
+					centerX: -720
 				}, 200 + index * 100, Laya.Ease.linearNone);
 			}
 		}
