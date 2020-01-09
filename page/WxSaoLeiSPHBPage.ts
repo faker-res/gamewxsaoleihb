@@ -68,7 +68,7 @@ module gamewxsaoleihb.page {
 			this._viewUI.box_rl2.on(LEvent.CLICK, this, this.onBtnClickRule);
 
 			for (let index = 0; index < this._viewUI.box_right.numChildren; index++) {
-				let cur_view:Box = this._viewUI.box_right._childs[index]
+				let cur_view: Box = this._viewUI.box_right._childs[index]
 				this._viewUI.box_right._childs[index].visible = true;
 				Laya.Tween.from(this._viewUI.box_right._childs[index], {
 					centerX: -720
@@ -82,9 +82,24 @@ module gamewxsaoleihb.page {
 			});
 		}
 
+
+		private _curHeight: number;
+		updateRoomPos(): void {
+			this._viewUI.box_right.top = this._viewUI.view_hud.box_top.height + this._viewUI.view_hud.box_top.top;
+			this._viewUI.box_right.bottom = this._viewUI.view_hud.box_bottom.height + this._viewUI.view_hud.box_bottom.bottom;
+			let cur_scale = 1
+			if (this._viewUI.box_right.height < 1150) {
+				cur_scale = this._viewUI.box_right.height / (1200 + 200);
+			}
+			this._viewUI.box_room0.scale(cur_scale, cur_scale)
+			this._viewUI.box_room1.scale(cur_scale, cur_scale)
+			this._viewUI.box_room2.scale(cur_scale, cur_scale)
+		}
+
 		// 重新布局
 		protected layout(): void {
 			super.layout();
+			Laya.timer.frameOnce(1, this, this.updateRoomPos);
 		}
 
 		/**按钮点击事件缓动完 回调 该做啥就做啥 */
